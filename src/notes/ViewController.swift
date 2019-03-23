@@ -24,7 +24,7 @@ class ViewController: UIViewController {
         
         taps = 0
     }
-    
+
     @IBAction func onTap(_ sender: UIButton) {
         taps += 1
     }

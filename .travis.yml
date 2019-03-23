@@ -1,1 +1,4 @@
+# https://dev.to/geojow/deploying-an-ios-app-with-travisci--testflight-1naa
+
 language: objective-c
+xcode_project: src/notes.xcodeproj

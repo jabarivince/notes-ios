@@ -1,4 +1,4 @@
 # Notes iOS
-A basic notes app for iOS
+A basic notes app for iOS.
 
 -Swift

@@ -3,4 +3,4 @@
 language: objective-c
 xcode_project: notes.xcodeproj
 xcode_scheme: notesTests
-xcode_destination: platform=iOS Simulator,OS=10.1,name=iPad Pro (9.7-inch)
+xcode_destination: platform=iOS Simulator,OS=12.1,name=iPhone X

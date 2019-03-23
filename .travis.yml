@@ -2,3 +2,4 @@
 
 language: objective-c
 xcode_project: src/notes.xcodeproj
+xcode_scheme: src/notesTests

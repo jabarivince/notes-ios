@@ -1,5 +1,6 @@
 # https://dev.to/geojow/deploying-an-ios-app-with-travisci--testflight-1naa
 
 language: objective-c
-xcode_project: notes/notes.xcodeproj
-xcode_scheme: notes/notesTests
+xcode_project: notes.xcodeproj
+xcode_scheme: notesTests
+xcode_destination: platform=iOS Simulator,OS=10.1,name=iPad Pro (9.7-inch)

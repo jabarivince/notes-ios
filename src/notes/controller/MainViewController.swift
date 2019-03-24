@@ -12,6 +12,8 @@ class MainViewController: UITableViewController {
     let refresh = UIRefreshControl()
     let table = UITableView()
     
+    let noteService = NoteService.noteService
+    
     lazy var notes: [Note] = []
     
     override func viewDidLoad() {
@@ -69,33 +71,61 @@ extension MainViewController {
         
         return cell
     }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == UITableViewCell.EditingStyle.delete {
+            let note = notes.remove(at: indexPath.row)
+            noteService.deleteNote(note: note)
+            tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.automatic)
+        }
+    }
 }
 
 extension MainViewController {
     @objc func refresh(sender: AnyObject) {
-        getNotes { [weak self] in
-            self?.refreshControl?.endRefreshing()
-        }
+        refreshControl?.endRefreshing()
     }
     
     @objc private func openNewNote(_ sender: UIBarButtonItem) {
-        openNote(nil)
+        let alert = UIAlertController(title: nil, message: "Give your note a name", preferredStyle: .alert)
+        
+        alert.addTextField { (textField) in
+            textField.placeholder = "Untitled"
+        }
+        
+        let ok = UIAlertAction(title: "Ok", style: .default) { [weak self, weak alert] _ in
+            var title = alert?.textFields?[0].text ?? ""
+            
+            if title == "" {
+                title = "Untitled"
+            }
+            
+            if let note = self?.noteService.newNote(title: title) {
+               self?.openNote(note)
+            }
+        }
+        
+        let cancel = UIAlertAction(title: "cancel", style: .default) { [weak alert] _ in
+            alert?.dismiss(animated: true, completion: nil)
+        }
+        
+        cancel.setValue(UIColor.red, forKey: "titleTextColor")
+        
+        alert.addAction(ok)
+        alert.addAction(cancel)
+        
+        self.present(alert, animated: true, completion: nil)
     }
     
-    private func openNote(_ note: Note?) {
+    private func openNote(_ note: Note) {
         let noteController = NoteController(note: note)
         
         self.navigationController?.pushViewController(noteController, animated: true)
     }
     
     private func getNotes(completion: (() -> Void)? = nil) {
-        notes = NoteService.notes
-        
-        // TODO - Figure out how to update the table view
-        // so that the table shoes the updated list of notes
-        
-        print("FETCHING NOTES")
-        
+        notes = noteService.notes
+
         tableView.reloadData()
         
         if let completion = completion {

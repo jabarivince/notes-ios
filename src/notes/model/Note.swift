@@ -6,16 +6,6 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-import Foundation
+import CoreData
 
-struct Note: Equatable {
-    var title: String?
-    var body: String?
-    var uuid: UUID
-    
-    init(title: String?, body: String?) {
-        self.title = title
-        self.body = body
-        self.uuid = UUID()
-    }
-}
+class Note: NSManagedObject {}

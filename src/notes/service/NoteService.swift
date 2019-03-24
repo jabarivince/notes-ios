@@ -6,52 +6,47 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
+import CoreData
 import UIKit
 
 class NoteService {
-    private static var noteService: NoteService? = nil
+    private var container = AppDelegate.persistentContainer
+    private var context = AppDelegate.viewContext
+    static var noteService = NoteService()
     
-    static private var initialNotes: [Note] = [
-        Note(title: "First note", body: "The body"),
-        Note(title: "Second note", body: "The second body"),
-        Note(title: "Third note", body: "The third body"),
-        Note(title: "Fourth note", body: "The fourth body"),
-        Note(title: "Fifth note", body: "The dark meat body"),
-        Note(title: "Sixth note", body: "The sixth body"),
-        Note(title: nil, body: "The seventh note")
-    ]
-    
-    static private var notesById: [UUID: Note] = {
-        var map: [UUID: Note] = [: ]
-        
-        for note in initialNotes {
-            map[note.uuid] = note
-        }
-        
-        return map
-    }()
-    
-    static var notes: [Note] {
+    var notes: [Note] {
         var array: [Note] = []
         
-        for (_, val) in notesById {
-            array.append(val)
-        }
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Note")
+        
+        try? array = context.fetch(fetchRequest) as! [Note]
         
         return array
     }
     
-    static func saveNote(note: Note, completion: (() -> Void)? = nil) {
+    func newNote(title: String) -> Note {
+        let note = Note(context: context)
         
-        // TODO - Figure out how to save?
-        notesById[note.uuid] = note
-                
+        note.title = title
+        note.body = nil
+        
+        return note
+    }
+    
+    func deleteNote(note: Note) {
+        context.delete(note)
+        try? context.save()
+    }
+    
+    func saveNote(note : Note, completion: (() -> Void)? = nil) {
+        try? note.managedObjectContext?.save()
+        
         if let completion = completion {
             completion()
         }
     }
     
-    static func emailNote(note: Note, viewController: UIViewController) {
+    func emailNote(note: Note, viewController: UIViewController) {
         // TODO - Figure out how to send the note as an email
         // where the title is the subject and the note body is
         // the email body
@@ -61,4 +56,6 @@ class NoteService {
         alert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
         viewController.present(alert, animated: true)
     }
+    
+    private init() {}
 }

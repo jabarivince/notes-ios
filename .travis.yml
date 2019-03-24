@@ -1,4 +1,4 @@
-anguage: objective-c
+language: objective-c
 osx_image: xcode10.1
 xcode_project: src/notes.xcodeproj
 xcode_scheme: notesTests

@@ -13,7 +13,21 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    
+    // Convenience variable for unwrapping
+    // and type-casting persistent container
+    static var persistentContainer: NSPersistentContainer {
+        return (UIApplication.shared.delegate as! AppDelegate).persistentContainer
+    }
+    
+    /// Convenience variable for getting the
+    /// viewContext for the persistent container
+    static var viewContext: NSManagedObjectContext {
+        return persistentContainer.viewContext
+    }
 
+    /// The database for notes and other
+    /// associated entities
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "NotesDataModel")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
@@ -24,6 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return container
     }()
 
+    /// Manually sets the default view controller
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         let viewController = MainViewController()
         

@@ -6,16 +6,12 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-import Foundation
+import CoreData
 
-struct Note: Equatable {
-    var title: String?
-    var body: String?
-    var uuid: UUID
-    
-    init(title: String?, body: String?) {
-        self.title = title
-        self.body = body
-        self.uuid = UUID()
-    }
-}
+/// Class that is connected to the Note entity
+/// in Core Data database. The fields are generated
+/// automatically and available at runtime. No fields
+/// or functions are required. However, additional
+/// convenience functions can be writting here.
+class Note: NSManagedObject {}
+

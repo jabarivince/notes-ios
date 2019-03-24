@@ -10,5 +10,5 @@
 language: objective-c
 osx_image: xcode10.1
 xcode_project: src/notes.xcodeproj
-xcode_scheme: src/notesTests
+xcode_scheme: notesTests
 xcode_destination: platform=iOS Simulator,OS=12.1,name=iPhone X

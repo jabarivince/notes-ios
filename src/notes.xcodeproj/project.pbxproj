@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0CC2415522476FC000D681D4 /* NoteFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC2415422476FC000D681D4 /* NoteFactory.swift */; };
+		0CC241572247746800D681D4 /* NoteSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC241562247746800D681D4 /* NoteSender.swift */; };
 		0CE0BDA32246E4B6001C6401 /* NoteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDA22246E4B6001C6401 /* NoteService.swift */; };
 		0CE0BDA92246F71B001C6401 /* NoteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDA82246F71B001C6401 /* NoteController.swift */; };
 		0CE0BDAE22472C02001C6401 /* NotesDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDAC22472C02001C6401 /* NotesDataModel.xcdatamodeld */; };
@@ -29,6 +31,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0CC2415422476FC000D681D4 /* NoteFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteFactory.swift; sourceTree = "<group>"; };
+		0CC241562247746800D681D4 /* NoteSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSender.swift; sourceTree = "<group>"; };
 		0CE0BDA22246E4B6001C6401 /* NoteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteService.swift; sourceTree = "<group>"; };
 		0CE0BDA82246F71B001C6401 /* NoteController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteController.swift; sourceTree = "<group>"; };
 		0CE0BDAD22472C02001C6401 /* NotesDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = NotesDataModel.xcdatamodel; sourceTree = "<group>"; };
@@ -74,6 +78,8 @@
 			isa = PBXGroup;
 			children = (
 				0CE0BDA22246E4B6001C6401 /* NoteService.swift */,
+				0CC2415422476FC000D681D4 /* NoteFactory.swift */,
+				0CC241562247746800D681D4 /* NoteSender.swift */,
 			);
 			path = service;
 			sourceTree = "<group>";
@@ -231,6 +237,8 @@
 			files = (
 				0CFAB6DD2246CC75004AA4C7 /* MainViewController.swift in Sources */,
 				0CE0BDAE22472C02001C6401 /* NotesDataModel.xcdatamodeld in Sources */,
+				0CC241572247746800D681D4 /* NoteSender.swift in Sources */,
+				0CC2415522476FC000D681D4 /* NoteFactory.swift in Sources */,
 				0CFAB6DB2246CC75004AA4C7 /* AppDelegate.swift in Sources */,
 				0CE0BDA32246E4B6001C6401 /* NoteService.swift in Sources */,
 				0CE0BDA92246F71B001C6401 /* NoteController.swift in Sources */,

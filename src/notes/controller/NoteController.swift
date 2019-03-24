@@ -13,7 +13,8 @@ import UIKit
 class NoteController: UIViewController {
     let noteFactory = NoteService.noteFactory
     let noteSender = NoteService.noteSender
-    let textView = UITextView()
+    
+    private let textView = UITextView()
     private let note: Note
     
     init(note: Note) {
@@ -21,7 +22,7 @@ class NoteController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    /// Boilertplate. NEVER call this
+    /// Boilerplate. NEVER call this
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -38,7 +39,7 @@ class NoteController: UIViewController {
     
     /// One time function call to setup
     /// initial state of view
-    override func viewDidLoad() {        
+    override func viewDidLoad() { 
         title = note.title
         
         // Navigation buttons for back and send
@@ -62,11 +63,11 @@ class NoteController: UIViewController {
 /// the note in an email, text, saving it, or closing
 /// the currently opened note
 extension NoteController {
-    @objc func send() {
+    @objc private func send() {
         noteSender.sendNote(note: note, viewController: self)
     }
     
-    @objc func close() {
+    @objc private func close() {
         save()
         
         // This is what closes the current view and returns
@@ -74,7 +75,7 @@ extension NoteController {
         navigationController?.popViewController(animated: true)
     }
     
-    func save(completion: (() -> Void)? = nil) {
+    private func save(completion: (() -> Void)? = nil) {
         note.body = textView.text
         
         noteFactory.saveNote(note: note, completion: completion)

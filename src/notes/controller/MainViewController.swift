@@ -12,11 +12,10 @@ import UIKit
 /// (table view) of cells thar correspond
 /// to the notes that are on the device.
 class MainViewController: UITableViewController {
-    let refresh = UIRefreshControl()
-    let table = UITableView()
-    
-    let noteFactory = NoteService.noteFactory
-    var notes: [Note] = []
+    private let refresh = UIRefreshControl()
+    private let table = UITableView()
+    private var notes = [Note]()
+    private let noteFactory = NoteService.noteFactory
     
     /// Initialize the view for the first time.
     /// This only gets called once.
@@ -27,22 +26,13 @@ class MainViewController: UITableViewController {
         
         // Initialize the main table view
         table.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
-        table.register(UITableViewCell.self, forCellReuseIdentifier: "cellIdentifier")
+        table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         table.dataSource = self
-        view.addSubview(table)
-        
-        // Table view should occupy full screen
-        // TODO: Figure ou unsatisiable constraints error on startup
-        NSLayoutConstraint.activate([
-            table.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            table.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            table.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-            table.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-        ])
+        view.addAndPinSubview(table)
         
         // Set callbacks for button taps
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(openNewNote))
-        refresh.addTarget(self, action: #selector(refresh(sender:)), for: UIControl.Event.valueChanged)
+        refresh.addTarget(self, action: #selector(refreshNoteList), for: UIControl.Event.valueChanged)
     }
     
     /// Updates the view. This gets called every time
@@ -73,10 +63,7 @@ extension MainViewController {
     /// Function that gets call on each cell that
     /// actually  initializes thew view of each cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell =
-            tableView.dequeueReusableCell(withIdentifier: "cellIdentifier") ??
-                UITableViewCell(style: .subtitle, reuseIdentifier: "cellIdentifier")
-        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         let note = notes[indexPath.row]
         
         guard let textLabel = cell.textLabel else { return cell }
@@ -91,11 +78,12 @@ extension MainViewController {
     
     /// Enables the deletion function for each cell.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == UITableViewCell.EditingStyle.delete {
-            let note = notes.remove(at: indexPath.row)
-            noteFactory.deleteNote(note: note)
-            tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.automatic)
-        }
+        guard editingStyle == UITableViewCell.EditingStyle.delete else { return }
+        
+        let note = notes.remove(at: indexPath.row)
+        
+        noteFactory.deleteNote(note: note)
+        tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.automatic)
     }
 }
 
@@ -137,21 +125,22 @@ extension MainViewController {
         
         alert.addAction(ok)
         alert.addAction(cancel)
-        
-        // Show alert
+
         self.present(alert, animated: true, completion: nil)
     }
 }
 
 /// Callbacks associated with button taps and gestures.
 extension MainViewController {
-    @objc func refresh(sender: AnyObject) {
+    @objc func refreshNoteList() {
         
         // Get the notes, then after one
         // second hide the loading spinner.
         // The delay fixes jittery synchronization issues
         getNotes { [weak self] in
             if self?.tableView.refreshControl?.isRefreshing == true {
+                
+                // Async defered call on main thread with a 1 second delay
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                     self?.refreshControl?.endRefreshing()
                 }

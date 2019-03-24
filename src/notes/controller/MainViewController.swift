@@ -40,13 +40,15 @@ class MainViewController: UITableViewController {
         
         getNotes()
     }
-    
+}
+
+extension MainViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath){
         let note = notes[indexPath.row]
         
         openNote(note)
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notes.count
     }
@@ -54,7 +56,7 @@ class MainViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell =
             tableView.dequeueReusableCell(withIdentifier: "cellIdentifier") ??
-            UITableViewCell(style: .subtitle, reuseIdentifier: "cellIdentifier")
+                UITableViewCell(style: .subtitle, reuseIdentifier: "cellIdentifier")
         
         let note = notes[indexPath.row]
         
@@ -64,7 +66,6 @@ class MainViewController: UITableViewController {
         
         textLabel.font = UIFont.boldSystemFont(ofSize: fontSize)
         textLabel.text = note.title ?? "Untitled note*"
-        
         cell.detailTextLabel?.text = note.body
         
         return cell
@@ -85,6 +86,7 @@ extension MainViewController {
     private func getNotes() {
         notes = NoteService.notes
         
-        print(notes)
+        // TODO - Figure out how to update the table view
+        // so that the table shoes the updated list of notes
     }
 }

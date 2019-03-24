@@ -6,6 +6,8 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
+import UIKit
+
 class NoteService {
     private static var noteService: NoteService? = nil
     
@@ -40,10 +42,24 @@ class NoteService {
     }
     
     static func saveNote(note: Note, completion: (() -> Void)? = nil) {
+        
+        // TODO - Figure out how to save?
+        
         notesById[note.uuid] = note
         
         if let completion = completion {
             completion()
         }
+    }
+    
+    static func emailNote(note: Note, viewController: UIViewController) {
+        // TODO - Figure out how to send the note as an email
+        // where the title is the subject and the note body is
+        // the email body
+        
+        let alert = UIAlertController(title: "Coming soon", message: "Feature not yet implemented.", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
+        viewController.present(alert, animated: true)
     }
 }

@@ -38,16 +38,17 @@ class NoteController: UIViewController {
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.text = note.body
         
+        if let existingFont = textView.font?.fontName {
+            textView.font = UIFont(name: existingFont, size: 16)
+        }
+        
         view.addSubview(textView)
     }
 }
 
 extension NoteController {
     @objc func send() {
-        let alert = UIAlertController(title: "Coming soon", message: "Feature not yet implemented.", preferredStyle: .alert)
-        
-        alert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
-        self.present(alert, animated: true)
+        NoteService.emailNote(note: note, viewController: self)
     }
     
     @objc func close() {

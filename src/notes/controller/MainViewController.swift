@@ -9,29 +9,30 @@
 import UIKit
 
 class MainViewController: UITableViewController {
+    let refresh = UIRefreshControl()
     let table = UITableView()
+    
     lazy var notes: [Note] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        getNotes()
-        
+        tableView.refreshControl = refresh
         title = "Notes"
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(openNewNote))
-        
+        table.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         table.register(UITableViewCell.self, forCellReuseIdentifier: "cellIdentifier")
-        
         table.dataSource = self
-        
         view.addSubview(table)
         
         NSLayoutConstraint.activate([
-            table.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            table.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            table.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 16),
-            table.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -16),
+            table.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            table.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            table.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            table.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
         ])
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(openNewNote))
+        refresh.addTarget(self, action: #selector(refresh(sender:)), for: UIControl.Event.valueChanged)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -43,7 +44,7 @@ class MainViewController: UITableViewController {
 }
 
 extension MainViewController {
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath){
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let note = notes[indexPath.row]
         
         openNote(note)
@@ -62,9 +63,7 @@ extension MainViewController {
         
         guard let textLabel = cell.textLabel else { return cell }
         
-        let fontSize = textLabel.font.pointSize
-        
-        textLabel.font = UIFont.boldSystemFont(ofSize: fontSize)
+        textLabel.font = UIFont.boldSystemFont(ofSize: textLabel.font.pointSize)
         textLabel.text = note.title ?? "Untitled note*"
         cell.detailTextLabel?.text = note.body
         
@@ -73,6 +72,12 @@ extension MainViewController {
 }
 
 extension MainViewController {
+    @objc func refresh(sender: AnyObject) {
+        getNotes { [weak self] in
+            self?.refreshControl?.endRefreshing()
+        }
+    }
+    
     @objc private func openNewNote(_ sender: UIBarButtonItem) {
         openNote(nil)
     }
@@ -83,10 +88,18 @@ extension MainViewController {
         self.navigationController?.pushViewController(noteController, animated: true)
     }
     
-    private func getNotes() {
+    private func getNotes(completion: (() -> Void)? = nil) {
         notes = NoteService.notes
         
         // TODO - Figure out how to update the table view
         // so that the table shoes the updated list of notes
+        
+        print("FETCHING NOTES")
+        
+        tableView.reloadData()
+        
+        if let completion = completion {
+            completion()
+        }
     }
 }

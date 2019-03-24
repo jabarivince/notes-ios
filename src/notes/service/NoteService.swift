@@ -21,8 +21,8 @@ class NoteService {
         Note(title: nil, body: "The seventh note")
     ]
     
-    static private var notesById: [String: Note] = {
-        var map: [String: Note] = [: ]
+    static private var notesById: [UUID: Note] = {
+        var map: [UUID: Note] = [: ]
         
         for note in initialNotes {
             map[note.uuid] = note
@@ -44,9 +44,8 @@ class NoteService {
     static func saveNote(note: Note, completion: (() -> Void)? = nil) {
         
         // TODO - Figure out how to save?
-        
         notesById[note.uuid] = note
-        
+                
         if let completion = completion {
             completion()
         }

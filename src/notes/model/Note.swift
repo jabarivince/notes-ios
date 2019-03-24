@@ -11,11 +11,11 @@ import Foundation
 struct Note: Equatable {
     var title: String?
     var body: String?
-    var uuid: String
+    var uuid: UUID
     
     init(title: String?, body: String?) {
         self.title = title
         self.body = body
-        self.uuid = UUID().uuidString
+        self.uuid = UUID()
     }
 }

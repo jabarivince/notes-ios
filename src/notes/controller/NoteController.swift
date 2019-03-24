@@ -58,6 +58,8 @@ extension NoteController {
     }
     
     func save(completion: (() -> Void)? = nil) {
+        note.body = textView.text
+        
         NoteService.saveNote(note: note, completion: completion)
     }
 }

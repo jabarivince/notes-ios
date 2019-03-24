@@ -10,6 +10,7 @@
 		0CE0BD9E2246E3C5001C6401 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BD9D2246E3C5001C6401 /* Note.swift */; };
 		0CE0BDA32246E4B6001C6401 /* NoteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDA22246E4B6001C6401 /* NoteService.swift */; };
 		0CE0BDA92246F71B001C6401 /* NoteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDA82246F71B001C6401 /* NoteController.swift */; };
+		0CE0BDAE22472C02001C6401 /* NotesDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDAC22472C02001C6401 /* NotesDataModel.xcdatamodeld */; };
 		0CFAB6DB2246CC75004AA4C7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFAB6DA2246CC75004AA4C7 /* AppDelegate.swift */; };
 		0CFAB6DD2246CC75004AA4C7 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFAB6DC2246CC75004AA4C7 /* MainViewController.swift */; };
 		0CFAB6E22246CC75004AA4C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CFAB6E12246CC75004AA4C7 /* Assets.xcassets */; };
@@ -31,6 +32,7 @@
 		0CE0BD9D2246E3C5001C6401 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		0CE0BDA22246E4B6001C6401 /* NoteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteService.swift; sourceTree = "<group>"; };
 		0CE0BDA82246F71B001C6401 /* NoteController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteController.swift; sourceTree = "<group>"; };
+		0CE0BDAD22472C02001C6401 /* NotesDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = NotesDataModel.xcdatamodel; sourceTree = "<group>"; };
 		0CFAB6D72246CC75004AA4C7 /* notes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = notes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CFAB6DA2246CC75004AA4C7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0CFAB6DC2246CC75004AA4C7 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 				0CFAB6DA2246CC75004AA4C7 /* AppDelegate.swift */,
 				0CFAB6E12246CC75004AA4C7 /* Assets.xcassets */,
 				0CFAB6E32246CC75004AA4C7 /* LaunchScreen.storyboard */,
+				0CE0BDAC22472C02001C6401 /* NotesDataModel.xcdatamodeld */,
 				0CFAB6E62246CC75004AA4C7 /* Info.plist */,
 			);
 			path = notes;
@@ -227,6 +230,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0CFAB6DD2246CC75004AA4C7 /* MainViewController.swift in Sources */,
+				0CE0BDAE22472C02001C6401 /* NotesDataModel.xcdatamodeld in Sources */,
 				0CFAB6DB2246CC75004AA4C7 /* AppDelegate.swift in Sources */,
 				0CE0BD9E2246E3C5001C6401 /* Note.swift in Sources */,
 				0CE0BDA32246E4B6001C6401 /* NoteService.swift in Sources */,
@@ -491,6 +495,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		0CE0BDAC22472C02001C6401 /* NotesDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				0CE0BDAD22472C02001C6401 /* NotesDataModel.xcdatamodel */,
+			);
+			currentVersion = 0CE0BDAD22472C02001C6401 /* NotesDataModel.xcdatamodel */;
+			path = NotesDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 0CFAB6CF2246CC75004AA4C7 /* Project object */;
 }

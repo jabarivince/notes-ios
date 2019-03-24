@@ -1,7 +1,14 @@
 # https://dev.to/geojow/deploying-an-ios-app-with-travisci--testflight-1naa
 
+# language: objective-c
+# osx_image: xcode10.1
+#
+# script:
+#   - ./travis/build.sh
+
+
 language: objective-c
 osx_image: xcode10.1
-
-script:
-  - ./travis/build.sh
+xcode_project: src/notes.xcodeproj
+xcode_scheme: src/notesTests
+xcode_destination: platform=iOS Simulator,OS=12.1,name=iPhone X

@@ -13,5 +13,21 @@ import CoreData
 /// automatically and available at runtime. No fields
 /// or functions are required. However, additional
 /// convenience functions can be writting here.
-class Note: NSManagedObject {}
+class Note: NSManagedObject {
+    func delete() {
+        managedObjectContext?.delete(self)
+        save()
+    }
+    
+    func save() {
+        let now = Date()
+        
+        if createdDate == nil {
+            createdDate = now
+        }
+        
+        lastEditedDate = now
+        try? managedObjectContext?.save()
+    }
+}
 

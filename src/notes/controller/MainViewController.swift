@@ -17,8 +17,7 @@ class MainViewController: UITableViewController {
     private var notes = [Note]()
     private let noteFactory = NoteService.noteFactory
     
-    /// Initialize the view for the first time.
-    /// This only gets called once.
+    /// Initialize the view for the first time. This only gets called once.
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.refreshControl = refresh
@@ -71,7 +70,16 @@ extension MainViewController {
         // Style / font setup
         textLabel.font = UIFont.boldSystemFont(ofSize: textLabel.font.pointSize)
         textLabel.text = note.title
-        cell.detailTextLabel?.text = note.body
+        
+        var detail = ""
+        
+        if let date = note.lastEditedDate?.formatted {
+            detail += "\(date)\n"
+        }
+        
+        detail += note.body?.firstLine.truncated(after: 30) ?? ""
+        cell.detailTextLabel?.numberOfLines = 0
+        cell.detailTextLabel?.text = detail
         
         return cell
     }
@@ -105,13 +113,9 @@ extension MainViewController {
         
         // Callback for "ok" tapped
         let ok = UIAlertAction(title: "Ok", style: .default) { [weak self, weak alert] _ in
-            var title = alert?.textFields?[0].text ?? ""
-            
-            if title == "" {
-                title = "Untitled"
-            }
-            
-            if let note = self?.noteFactory.createNote(title: title) {
+            let title = alert?.textFields?[0].text
+        
+            if let note = self?.noteFactory.createNote(with: title) {
                self?.openNote(note)
             }
         }

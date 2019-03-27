@@ -39,7 +39,7 @@ class NoteController: UIViewController {
     
     /// One time function call to setup
     /// initial state of view
-    override func viewDidLoad() { 
+    override func viewDidLoad() {
         title = note.title
         
         // Navigation buttons for back and send

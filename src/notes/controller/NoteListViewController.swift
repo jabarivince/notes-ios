@@ -19,7 +19,7 @@ class NoteListViewController: UITableViewController {
     private let searchController = UISearchController(searchResultsController: nil)
     private let refresh = UIRefreshControl()
     private let table = UITableView()
-    private let noteService = NoteService()
+    private let noteService = NoteService.singleton
     private var notes = [Note]()
     
     override func viewDidLoad() {
@@ -69,6 +69,9 @@ extension NoteListViewController: UISearchResultsUpdating {
 
 extension NoteListViewController: UISearchBarDelegate {
     
+    /// Override cancel button on-click handler
+    /// because it acts up when popping the NoteController
+    /// of the navigation stack.
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
         
@@ -140,7 +143,6 @@ extension NoteListViewController {
             textField.placeholder = "Untitled"
         }
         
-        // Callback for "ok" tapped
         let ok = UIAlertAction(title: "Ok", style: .default) { [weak self, weak alert] _ in
             let title = alert?.textFields?[0].text
         
@@ -149,7 +151,6 @@ extension NoteListViewController {
             }
         }
         
-        // Callback for "cancel" tapped
         let cancel = UIAlertAction(title: "cancel", style: .default) { [weak alert] _ in
             alert?.dismiss(animated: true, completion: nil)
         }

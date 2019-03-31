@@ -7,6 +7,18 @@
 //
 
 class NoteService {
+    private static var instance: NoteService? = nil
+    
+    static var singleton: NoteService {
+        if instance == nil {
+            instance = NoteService()
+        }
+        
+        return instance!
+    }
+    
     let noteFactory = DefaultNoteFactory.singleton
     let noteSender = DefaultNoteSender.singleton
+    
+    private init() {}
 }

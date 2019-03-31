@@ -11,20 +11,16 @@ import UIKit
 /// Clase responsible for displaying a note
 /// and handling events such as save and send.
 class NoteController: UIViewController {
-    let noteFactory: NoteFactory
-    let noteSender: NoteSender
-    
-    private let textView = UITextView()
+    private let noteService: NoteService
     private let note: Note
+    private let textView = UITextView()
     
     init(note: Note, noteService: NoteService) {
         self.note = note
-        self.noteFactory = noteService.noteFactory
-        self.noteSender = noteService.noteSender
+        self.noteService = noteService
         super.init(nibName: nil, bundle: nil)
     }
     
-    /// Boilerplate. NEVER call this
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -39,18 +35,15 @@ class NoteController: UIViewController {
         textView.frame.size.height = view.bounds.height
     }
     
-    /// One time function call to setup
-    /// initial state of view
+    /// One time function call to setup initial state of view
     override func viewDidLoad() {
         title = note.title
         
-        // Navigation buttons for back and send
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(close))
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(send))
                 
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.text = note.body
-        
         view.addSubview(textView)
     }
     
@@ -66,20 +59,12 @@ class NoteController: UIViewController {
 /// the currently opened note
 extension NoteController {
     @objc private func send() {
-        noteSender.sendNote(note: note, viewController: self)
+        noteService.noteSender.sendNote(note: note, viewController: self)
     }
     
     @objc private func close() {
-        save()
-        
-        // This is what closes the current view and returns
-        // us to the previous view.
-        navigationController?.popViewController(animated: true)
-    }
-    
-    private func save() {
         note.body = textView.text
-        
-        noteFactory.saveNote(note: note)
+        noteService.noteFactory.saveNote(note: note)
+        navigationController?.popViewController(animated: true)
     }
 }

@@ -74,7 +74,7 @@ class DefaultNoteFactory: NoteFactory {
         return note
     }
     
-    func deleteNote(note: Note) {        
+    func deleteNote(note: Note) {
         note.delete()
     }
     

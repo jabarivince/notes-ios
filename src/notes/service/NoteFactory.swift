@@ -14,7 +14,7 @@ protocol NoteFactory {
     var notes: [Note] { get }
     func createNote(with title: String?) -> Note
     func deleteNote(note: Note)
-    func saveNote(note : Note, completion: (() -> Void)?)
+    func saveNote(note : Note)
 }
 
 /// Note factory for CRUD operations on notes that
@@ -78,12 +78,8 @@ class DefaultNoteFactory: NoteFactory {
         note.delete()
     }
     
-    func saveNote(note : Note, completion: (() -> Void)?) {
+    func saveNote(note : Note) {
         note.save()
-        
-        if let completion = completion {
-            completion()
-        }
     }
     
     private init() {}

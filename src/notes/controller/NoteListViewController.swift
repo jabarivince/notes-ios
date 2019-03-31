@@ -6,24 +6,39 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
+// https://stackoverflow.com/questions/29664315/how-to-implement-uisearchcontroller-in-uitableview-swift
+// https://www.raywenderlich.com/472-uisearchcontroller-tutorial-getting-started
+// https://shrikar.com/swift-ios-tutorial-uisearchbar-and-uisearchbardelegate/
+
+import Foundation
 import UIKit
 
-/// Main view controller that has the list
-/// (table view) of cells thar correspond
-/// to the notes that are on the device.
-class MainViewController: UITableViewController {
+/// Main view controller that has the list (table view)
+/// of cells thar correspond to the notes that are on the device.
+class NoteListViewController: UITableViewController {
+    private let searchController = UISearchController(searchResultsController: nil)
     private let refresh = UIRefreshControl()
     private let table = UITableView()
+    private let noteService = NoteService()
     private var notes = [Note]()
-    private let noteFactory = NoteService.noteFactory
     
-    /// Initialize the view for the first time. This only gets called once.
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.refreshControl = refresh
+        
         title = "Notes"
         
-        // Initialize the main table view
+        // TableView won't add empty cells if there is a footer
+        tableView.refreshControl = refresh
+        tableView.tableHeaderView = searchController.searchBar
+        tableView.tableFooterView = UIView(frame: .zero)
+        tableView.allowsSelectionDuringEditing = true
+        
+        searchController.searchResultsUpdater = self
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.sizeToFit()
+        searchController.searchBar.delegate = self
+        
         table.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         table.dataSource = self
@@ -31,22 +46,39 @@ class MainViewController: UITableViewController {
         
         // Set callbacks for button taps
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(openNewNote))
-        refresh.addTarget(self, action: #selector(refreshNoteList), for: UIControl.Event.valueChanged)
+        refresh.addTarget(self, action: #selector(refreshNoteList), for: .valueChanged)
     }
     
-    /// Updates the view. This gets called every time
-    /// this view becomes active. This occurs on first
-    /// load, returning to the app, or returning from
-    /// editting a note.
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.prefersLargeTitles = true
+//        self.navigationController?.navigationBar.prefersLargeTitles = true
+        getNotes()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        searchController.dismiss(animated: false, completion: nil)
+    }
+}
+
+extension NoteListViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
         getNotes()
     }
 }
 
-/// TableView callbacks
-extension MainViewController {
+extension NoteListViewController: UISearchBarDelegate {
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = nil
+        
+        getNotes {
+            searchBar.showsCancelButton = false
+        }
+    }
+}
+
+extension NoteListViewController {
     
     /// Callback for tapping a cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -67,8 +99,7 @@ extension MainViewController {
         
         guard let textLabel = cell.textLabel else { return cell }
         
-        // Style / font setup
-        textLabel.font = UIFont.boldSystemFont(ofSize: textLabel.font.pointSize)
+        textLabel.font = .boldSystemFont(ofSize: textLabel.font.pointSize)
         textLabel.text = note.title
         
         var detail = ""
@@ -80,25 +111,25 @@ extension MainViewController {
         detail += note.body?.firstLine.truncated(after: 30) ?? ""
         cell.detailTextLabel?.numberOfLines = 0
         cell.detailTextLabel?.text = detail
+        cell.detailTextLabel?.textColor = .gray
         
         return cell
     }
     
     /// Enables the deletion function for each cell.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        guard editingStyle == UITableViewCell.EditingStyle.delete else { return }
+        guard editingStyle == .delete else { return }
         
         let note = notes.remove(at: indexPath.row)
         
-        noteFactory.deleteNote(note: note)
-        tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.automatic)
+        noteService.noteFactory.deleteNote(note: note)
+        tableView.deleteRows(at: [indexPath], with: .automatic)
     }
 }
 
-/// Functions associated with naming the
-/// note prior to it being passes to the
-/// Note view controller.
-extension MainViewController {
+/// Functions associated with naming the note prior
+/// to it being passes to the NoteViewController.
+extension NoteListViewController {
     
     /// Builds and displays a prompt for the user
     /// to enter the title / name of the newly created note
@@ -106,8 +137,6 @@ extension MainViewController {
         let alert = UIAlertController(title: nil, message: "Give your note a name", preferredStyle: .alert)
         
         alert.addTextField { textField in
-            // dynamicall name unamed notes
-            // TODO: Untitled, Untitled (1), Untitled (2), ...
             textField.placeholder = "Untitled"
         }
         
@@ -115,7 +144,7 @@ extension MainViewController {
         let ok = UIAlertAction(title: "Ok", style: .default) { [weak self, weak alert] _ in
             let title = alert?.textFields?[0].text
         
-            if let note = self?.noteFactory.createNote(with: title) {
+            if let note = self?.noteService.noteFactory.createNote(with: title) {
                self?.openNote(note)
             }
         }
@@ -126,37 +155,33 @@ extension MainViewController {
         }
         
         cancel.setValue(UIColor.red, forKey: "titleTextColor")
-        
         alert.addAction(ok)
         alert.addAction(cancel)
 
-        self.present(alert, animated: true, completion: nil)
+        present(alert, animated: true, completion: nil)
     }
 }
 
 /// Callbacks associated with button taps and gestures.
-extension MainViewController {
+extension NoteListViewController {
     @objc func refreshNoteList() {
         
-        // Get the notes, then after one
-        // second hide the loading spinner.
-        // The delay fixes jittery synchronization issues
+        // Get the notes, then after one second hide the loading
+        // spinner. The delay fixes jittery synchronization issues
         getNotes { [weak self] in
             if self?.tableView.refreshControl?.isRefreshing == true {
                 
-                // Async defered call on main thread with a 1 second delay
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                     self?.refreshControl?.endRefreshing()
                 }
             }
         }
     }
     
-    /// Creates instance of NoteController
-    /// and presents it with note that corresponds
-    /// to the cell that was tapped
+    /// Creates instance of NoteController and presents it
+    /// with note that corresponds  to the cell that was tapped
     private func openNote(_ note: Note) {
-        let noteController = NoteController(note: note)
+        let noteController = NoteController(note: note, noteService: noteService)
         
         self.navigationController?.pushViewController(noteController, animated: true)
     }
@@ -164,7 +189,14 @@ extension MainViewController {
     /// Gets the updated list of notes from the note service,
     /// refreshes the table and performs any callbacks
     private func getNotes(completion: (() -> Void)? = nil) {
-        notes = noteFactory.notes
+        notes = noteService.noteFactory.notes
+        
+        if let searchText = searchController.searchBar.text, !searchText.isEmpty {
+            
+            notes = notes.filter { note in
+                return note.contains(text: searchText)
+            }
+        }
         
         tableView.reloadData()
         

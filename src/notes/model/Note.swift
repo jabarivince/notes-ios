@@ -7,6 +7,7 @@
 //
 
 import CoreData
+import Foundation
 
 /// Class that is connected to the Note entity
 /// in Core Data database. The fields are generated
@@ -28,6 +29,26 @@ class Note: NSManagedObject {
         
         lastEditedDate = now
         try? managedObjectContext?.save()
+    }
+    
+    /// Determines if note contains a string
+    /// in either the title or the body
+    func contains(text: String?) -> Bool {
+        var titleContains = false
+        var bodyContains = false
+        
+        if let text = text?.lowercased() {
+            
+            if let title = title?.lowercased() {
+                titleContains =  title.contains(text)
+            }
+            
+            if let body = body?.lowercased() {
+                bodyContains = body.contains(text)
+            }
+        }
+        
+        return titleContains || bodyContains
     }
 }
 

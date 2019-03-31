@@ -40,7 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     /// Manually sets the default view controller
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        let viewController = MainViewController()
+        let viewController = NoteListViewController()
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.backgroundColor = .white

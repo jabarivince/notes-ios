@@ -11,14 +11,16 @@ import UIKit
 /// Clase responsible for displaying a note
 /// and handling events such as save and send.
 class NoteController: UIViewController {
-    let noteFactory = NoteService.noteFactory
-    let noteSender = NoteService.noteSender
+    let noteFactory: NoteFactory
+    let noteSender: NoteSender
     
     private let textView = UITextView()
     private let note: Note
     
-    init(note: Note) {
+    init(note: Note, noteService: NoteService) {
         self.note = note
+        self.noteFactory = noteService.noteFactory
+        self.noteSender = noteService.noteSender
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -39,7 +41,7 @@ class NoteController: UIViewController {
     
     /// One time function call to setup
     /// initial state of view
-    override func viewDidLoad() { 
+    override func viewDidLoad() {
         title = note.title
         
         // Navigation buttons for back and send
@@ -75,9 +77,9 @@ extension NoteController {
         navigationController?.popViewController(animated: true)
     }
     
-    private func save(completion: (() -> Void)? = nil) {
+    private func save() {
         note.body = textView.text
         
-        noteFactory.saveNote(note: note, completion: completion)
+        noteFactory.saveNote(note: note)
     }
 }

@@ -51,7 +51,6 @@ class NoteListViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        self.navigationController?.navigationBar.prefersLargeTitles = true
         getNotes()
     }
     
@@ -61,13 +60,22 @@ class NoteListViewController: UITableViewController {
     }
 }
 
+/// Function that get called every time search bar is modified.
 extension NoteListViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         getNotes()
     }
 }
 
+/// Delegate functions for search bar events.
 extension NoteListViewController: UISearchBarDelegate {
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        navigationController?.setNavigationBarHidden(false, animated: true)
+    }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
@@ -78,6 +86,7 @@ extension NoteListViewController: UISearchBarDelegate {
     }
 }
 
+/// TableViewController functions
 extension NoteListViewController {
     
     /// Callback for tapping a cell

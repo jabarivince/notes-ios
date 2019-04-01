@@ -1,5 +1,6 @@
 language: objective-c
 osx_image: xcode10.1
-xcode_project: src/notes.xcodeproj
+podfile: src/Podfile
+xcode_workspace: src/notes.xcworkspace
 xcode_scheme: notesTests
 xcode_destination: platform=iOS Simulator,OS=12.1,name=iPhone X

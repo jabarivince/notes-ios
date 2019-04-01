@@ -1,0 +1,13 @@
+platform :ios, '12.0'
+
+target 'notes' do
+  use_frameworks!
+
+  pod 'Alamofire', '~> 5.0.0-beta.3'
+
+  target 'notesTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end

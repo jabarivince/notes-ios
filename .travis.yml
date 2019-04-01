@@ -4,3 +4,7 @@ podfile: src/Podfile
 xcode_workspace: src/notes.xcworkspace
 xcode_scheme: notesTests
 xcode_destination: platform=iOS Simulator,OS=12.0,name=iPhone X
+
+before_install:
+    # - rvm use system
+    - sudo gem install cocoapods -v '1.6.1'

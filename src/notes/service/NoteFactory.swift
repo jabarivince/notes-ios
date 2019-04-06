@@ -14,6 +14,7 @@ protocol NoteFactory {
     var notes: [Note] { get }
     func createNote(with title: String?) -> Note
     func deleteNote(note: Note)
+    func deleteNotes(_ notes: Set<Note>, completion: (() -> Void)?)
     func saveNote(note : Note)
 }
 
@@ -76,6 +77,18 @@ class DefaultNoteFactory: NoteFactory {
     
     func deleteNote(note: Note) {        
         note.delete()
+    }
+    
+    func deleteNotes(_ notes: Set<Note>, completion: (() -> Void)?) {
+        
+        // NOTE: This can be optimized!!
+        for note in notes {
+            deleteNote(note: note)
+        }
+        
+        if let completion = completion {
+            completion()
+        }
     }
     
     func saveNote(note : Note) {

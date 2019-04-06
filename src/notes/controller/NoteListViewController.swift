@@ -19,7 +19,7 @@ class NoteListViewController: UITableViewController {
     private var searchController: UISearchController!
     private var table: UITableView!
     private var addButtomItem: UIBarButtonItem!
-    private var trashButton: UIBarButtonItem!
+    private var trashButton: UIBarButtonItem!       // TODO: Abstract trash can to extension for reuse
     private var spacer: UIBarButtonItem!
     
     private var noteService: NoteService!
@@ -65,9 +65,10 @@ class NoteListViewController: UITableViewController {
         navigationItem.rightBarButtonItem = addButtomItem
     
         // Configure tool bar
-        trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteSelectedNotes))
         spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteSelectedNotes))
         trashButton.isEnabled = false
+        trashButton.tintColor = .red
         toolbarItems = [spacer, trashButton]
         navigationController?.setToolbarHidden(false, animated: false)
     }
@@ -139,9 +140,7 @@ extension NoteListViewController {
         } else {
             trashButton.isEnabled = false
             
-            // Do not allow addition if we
-            // are searching. This causes issues
-            // with View Controllers, presenting, etc.
+            // No adding while searching
             if !isSearching {
                 addButtomItem.isEnabled = true
             }
@@ -159,9 +158,7 @@ extension NoteListViewController {
         }
     }
     
-    /// If we are in editing mode, we add the tapped note
-    /// to the set of notes that will are selected. Otherwise,
-    /// we open the note that was tapped for editing.
+    /// Handle event where a cell is tapped
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let note = notes[indexPath.row]
         
@@ -174,14 +171,16 @@ extension NoteListViewController {
         }
     }
     
-    /// Boilerplate to let TablewView know
-    /// how many cells it must display on screen
+    /// Number of cells to display
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notes.count
     }
     
     /// Initializes a (each) cell in table view
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        // TODO: Abstract this to an extension of UITableViewCell
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         let note = notes[indexPath.row]
         
@@ -221,6 +220,9 @@ extension NoteListViewController {
     /// Builds and displays a prompt for the user
     /// to enter the title / name of the newly created note
     @objc private func openNewNote(_ sender: UIBarButtonItem) {
+        
+        // TODO: Refactor this to an extension of UIViewController
+        
         let alert = UIAlertController(title: nil, message: "Give your note a name", preferredStyle: .alert)
         
         alert.addTextField { textField in
@@ -268,13 +270,17 @@ extension NoteListViewController {
     @objc private func deleteSelectedNotes() {
         guard selectedNotes.count > 0 else { return }
         
-        noteService.noteFactory.deleteNotes(selectedNotes) { [weak self] in
-            guard let sself = self else { return }
-            
-            sself.setEditing(false, animated: true)
-            sself.selectedNotes.removeAll()
-            sself.getNotes()
+        func onYes() {
+            noteService.noteFactory.deleteNotes(selectedNotes) { [weak self] in
+                guard let sself = self else { return }
+                
+                sself.setEditing(false, animated: true)
+                sself.selectedNotes.removeAll()
+                sself.getNotes()
+            }
         }
+        
+        promptYesOrNo(withMessage: "Are you sure you would like to delete \(selectedNotes.count) note(s)", onYes: onYes)
     }
     
     /// Gets the updated list of notes from the note service,

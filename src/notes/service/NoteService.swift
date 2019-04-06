@@ -8,10 +8,6 @@
 
 class NoteService {
     
-    // TODO: Get rid of this service, this is no longer
-    // necessary because we will not be supporting cloud
-    // storage, so there is no need to abstract note operations.
-    
     let noteFactory = DefaultNoteFactory.singleton
     let noteSender = DefaultNoteSender.singleton
 }

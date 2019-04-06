@@ -48,7 +48,6 @@ extension UIViewController {
             alert?.dismiss(animated: true, completion: nil)
         }
         
-        cancel.setValue(UIColor.red, forKey: "titleTextColor")
         alert.addAction(ok)
         alert.addAction(cancel)
         
@@ -75,7 +74,7 @@ extension UIViewController {
             alert?.dismiss(animated: true, completion: nil)
         }
         
-        no.setValue(UIColor.red, forKey: "titleTextColor")
+        yes.setValue(UIColor.red, forKey: "titleTextColor")
         alert.addAction(yes)
         alert.addAction(no)
         

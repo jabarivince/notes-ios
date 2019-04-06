@@ -9,11 +9,6 @@
 import CoreData
 import Foundation
 
-/// Class that is connected to the Note entity
-/// in Core Data database. The fields are generated
-/// automatically and available at runtime. No fields
-/// or functions are required. However, additional
-/// convenience functions can be writting here.
 class Note: NSManagedObject {
     func delete() {
         guard let context = managedObjectContext else { return }
@@ -33,8 +28,6 @@ class Note: NSManagedObject {
         try? managedObjectContext?.save()
     }
     
-    /// Determines if note contains a string
-    /// in either the title or the body
     func contains(text: String?) -> Bool {
         var titleContains = false
         var bodyContains = false

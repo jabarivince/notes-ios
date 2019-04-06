@@ -8,7 +8,6 @@
 
 import CoreData
 
-/// Protocol that specifies the CRUD operations on notes
 protocol NoteFactory {
     static var singleton: NoteFactory { get }
     var notes: [Note] { get }
@@ -18,8 +17,6 @@ protocol NoteFactory {
     func saveNote(note : Note)
 }
 
-/// Note factory for CRUD operations on notes that
-/// will be stored and read from the local database
 class DefaultNoteFactory: NoteFactory {
     private static var instance: NoteFactory?
     
@@ -75,7 +72,7 @@ class DefaultNoteFactory: NoteFactory {
         return note
     }
     
-    func deleteNote(note: Note) {        
+    func deleteNote(note: Note) {
         note.delete()
     }
     

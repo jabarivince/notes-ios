@@ -6,10 +6,6 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-// https://stackoverflow.com/questions/29664315/how-to-implement-uisearchcontroller-in-uitableview-swift
-// https://www.raywenderlich.com/472-uisearchcontroller-tutorial-getting-started
-// https://shrikar.com/swift-ios-tutorial-uisearchbar-and-uisearchbardelegate/
-
 import UIKit
 
 class NoteListViewController: UITableViewController {
@@ -21,7 +17,7 @@ class NoteListViewController: UITableViewController {
     
     private var noteService: NoteService!
     private var selectedNotes: Set<Note>!
-    private var notes:[Note]!
+    private var notes: [Note]!
     private var isSearching = false {
         
         // Cannot search and add at same time
@@ -149,7 +145,7 @@ extension NoteListViewController {
         
         selectedNotes.remove(note)
         
-        if selectedNotes.count < 1 {
+        if selectedNotes.isEmpty {
             trashButton.isEnabled = false
         }
     }
@@ -179,7 +175,7 @@ extension NoteListViewController {
         
         guard let textLabel = cell.textLabel else { return cell }
         
-        textLabel.font = .boldSystemFont(ofSize: textLabel.font.pointSize)
+        textLabel.font = textLabel.font.bolded
         textLabel.text = note.title
         
         var detail = ""
@@ -245,7 +241,7 @@ extension NoteListViewController {
     
     /// Deletes all selected notes from database
     @objc private func deleteSelectedNotes() {
-        guard selectedNotes.count > 0 else { return }
+        guard !selectedNotes.isEmpty else { return }
         
         let message = "Are you sure you would like to delete \(selectedNotes.count) note(s)"
         

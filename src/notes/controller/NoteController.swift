@@ -14,13 +14,11 @@ class NoteController: UIViewController {
     private var spacer: UIBarButtonItem!
     
     private let note: Note
-    private let noteFactory: NoteFactory
-    private let noteSender: NoteSender
+    private let noteService: NoteService
     
     init(note: Note, noteService: NoteService) {
         self.note = note
-        self.noteFactory = noteService.noteFactory
-        self.noteSender = noteService.noteSender
+        self.noteService = noteService
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -62,7 +60,7 @@ class NoteController: UIViewController {
 extension NoteController {
     @objc private func sendNote() {
         saveNote()
-        noteSender.sendNote(note: note, viewController: self)
+        noteService.noteSender.sendNote(note: note, viewController: self)
     }
     
     @objc private func closeNote(withoutSaving: Bool = false) {
@@ -73,17 +71,19 @@ extension NoteController {
         navigationController?.popViewController(animated: true)
     }
     
-    @objc private func deleteNote() {        
+    @objc private func deleteNote() {
+        let message = "Are you sure you want to delete this note?"
+        
         func onYes() {
-            noteFactory.deleteNote(note: note)
+            noteService.noteFactory.deleteNote(note: note)
             closeNote(withoutSaving: true)
         }
 
-        promptYesOrNo(withMessage: "Are you sure you want to delete this note?", onYes: onYes)
+        promptYesOrNo(withMessage: message, onYes: onYes)
     }
     
     private func saveNote() {
         note.body = textView.text
-        noteFactory.saveNote(note: note)
+        noteService.noteFactory.saveNote(note: note)
     }
 }

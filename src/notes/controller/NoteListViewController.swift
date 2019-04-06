@@ -10,22 +10,6 @@
 // https://www.raywenderlich.com/472-uisearchcontroller-tutorial-getting-started
 // https://shrikar.com/swift-ios-tutorial-uisearchbar-and-uisearchbardelegate/
 
-// TODO: Find a way to search for the currently presenting
-// view controller. That way we can eradicate the "warning" presenting
-// while another view controller is presenting issue. This
-// will also allow us to re-enable the add button while searching.
-// In fact, they should all tie into each other via some communication
-// mechanism so that they do not step on each other's toes. Perhaps
-// find a basic fix for now, then after merging with PR that
-// adds 3rd party library support, we will use RxSwift to observe
-// key properties (easier than KVO). This will allow us to retain less state and
-// employ a more reactive programming model. Otherwise, a long-term
-// solution that does not include 3rd party libraries could be to
-// create protocols that takes search, prompt, etc. into account
-// and expose delegate methods to the concrete view controller,
-// but manage state in the protocol (via a default implementation)
-// of the necessary functions.
-
 import UIKit
 
 class NoteListViewController: UITableViewController {
@@ -51,7 +35,7 @@ class NoteListViewController: UITableViewController {
         
         title = "Notes"
         
-        // Configur search bar
+        // Configure search bar
         searchController = UISearchController(searchResultsController: nil)
         searchController.searchResultsUpdater = self
         searchController.hidesNavigationBarDuringPresentation = false

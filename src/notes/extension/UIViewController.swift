@@ -10,6 +10,12 @@ import UIKit
 
 extension UIViewController {
     
+    // Determine which View Controller to present with
+    // that way we avoid the warning for already presenting
+    var presentedVC: UIViewController {
+        return presentedViewController ?? self
+    }
+    
     /// Prompt for text with callback for confirm and cancel events
     func promptForText(withMessage message: String,
                        placeholder: String? = nil,
@@ -46,7 +52,7 @@ extension UIViewController {
         alert.addAction(ok)
         alert.addAction(cancel)
         
-        present(alert, animated: true, completion: nil)
+        presentedVC.present(alert, animated: true, completion: nil)
     }
     
     /// Prompt yes or no with callbacks for both actions
@@ -73,6 +79,6 @@ extension UIViewController {
         alert.addAction(yes)
         alert.addAction(no)
         
-        present(alert, animated: true, completion: nil)
+        presentedVC.present(alert, animated: true, completion: nil)
     }
 }

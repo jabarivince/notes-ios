@@ -16,29 +16,21 @@ import UIKit
 /// Main view controller that has the list (table view)
 /// of cells thar correspond to the notes that are on the device.
 class NoteListViewController: UITableViewController {
-    
-    // Search / table view items
     private var searchController: UISearchController!
     private var table: UITableView!
     private var addButtomItem: UIBarButtonItem!
     private var trashButton: UIBarButtonItem!
     private var spacer: UIBarButtonItem!
     
-    // State items
-    private let noteService = NoteService()
-    private var selectedNotes = Set<Note>()
-    private var notes = [Note]()
-    
-    // Keeps track of state of search bar.
-    // That way, we to enable / disable
-    // other subviews automatically via didSet
+    private var noteService: NoteService!
+    private var selectedNotes: Set<Note>!
+    private var notes:[Note]!
     private var isSearching = false {
+        
+        // If we are searching, disable add button
+        // otherwise, we are clear to add
         didSet {
-            if isSearching {
-                navigationItem.rightBarButtonItem?.isEnabled = false
-            } else {
-                navigationItem.rightBarButtonItem?.isEnabled = true
-            }
+            navigationItem.rightBarButtonItem?.isEnabled = !isSearching
         }
     }
     
@@ -73,9 +65,8 @@ class NoteListViewController: UITableViewController {
         navigationItem.rightBarButtonItem = addButtomItem
     
         // Configure tool bar
-        trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(delectAllSelectedNotes))
+        trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteSelectedNotes))
         spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        
         trashButton.isEnabled = false
         toolbarItems = [spacer, trashButton]
         navigationController?.setToolbarHidden(false, animated: false)
@@ -90,11 +81,23 @@ class NoteListViewController: UITableViewController {
         super.viewWillDisappear(animated)
         searchController.dismiss(animated: false, completion: nil)
     }
+    
+    init() {
+        super.init(style: .plain)
+        
+        noteService = NoteService()
+        selectedNotes = Set<Note>()
+        notes = [Note]()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 extension NoteListViewController: UISearchResultsUpdating {
     
-    /// Searches for notes after each key tap
+    /// Searches for notes after each key tap while searching
     func updateSearchResults(for searchController: UISearchController) {
         getNotes()
     }
@@ -114,18 +117,20 @@ extension NoteListViewController: UISearchBarDelegate {
         isSearching = false
     }
     
-    /// After cancelling, always refresh the page
-    /// and hide the cancel button
+    /// Always refresh the page after cancelling search
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
-        
-        getNotes {
-            searchBar.showsCancelButton = false
-        }
+        searchBar.showsCancelButton = false
+        getNotes()
     }
 }
 
 extension NoteListViewController {
+    
+    /// Toggle button's isEnabled flag based off is isEditing
+    /// If we are editing, we should only be able to delete
+    /// selected items. This is with the condition that we are
+    /// NOT in searching mode.
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
         
@@ -162,7 +167,6 @@ extension NoteListViewController {
         
         if isEditing {
             selectedNotes.insert(note)
-            
             trashButton.isEnabled = true
             
         } else {
@@ -260,8 +264,8 @@ extension NoteListViewController {
         noteService.noteFactory.deleteNote(note: note)
     }
     
-    /// Delects all selected notes from database
-    @objc private func delectAllSelectedNotes() {
+    /// Deletes all selected notes from database
+    @objc private func deleteSelectedNotes() {
         guard selectedNotes.count > 0 else { return }
         
         noteService.noteFactory.deleteNotes(selectedNotes) { [weak self] in
@@ -275,7 +279,7 @@ extension NoteListViewController {
     
     /// Gets the updated list of notes from the note service,
     /// refreshes the table and performs any callbacks
-    private func getNotes(completion: (() -> Void)? = nil) {
+    private func getNotes() {
         notes = noteService.noteFactory.notes
         
         if let searchText = searchController.searchBar.text, !searchText.isEmpty {
@@ -285,9 +289,5 @@ extension NoteListViewController {
         }
         
         tableView.reloadData()
-        
-        if let completion = completion {
-            completion()
-        }
     }
 }

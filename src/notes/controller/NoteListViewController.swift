@@ -10,16 +10,29 @@
 // https://www.raywenderlich.com/472-uisearchcontroller-tutorial-getting-started
 // https://shrikar.com/swift-ios-tutorial-uisearchbar-and-uisearchbardelegate/
 
-import Foundation
+// TODO: Find a way to search for the currently presenting
+// view controller. That way we can eradicate the "warning" presenting
+// while another view controller is presenting issue. This
+// will also allow us to re-enable the add button while searching.
+// In fact, they should all tie into each other via some communication
+// mechanism so that they do not step on each other's toes. Perhaps
+// find a basic fix for now, then after merging with PR that
+// adds 3rd party library support, we will use RxSwift to observe
+// key properties (easier than KVO). This will allow us to retain less state and
+// employ a more reactive programming model. Otherwise, a long-term
+// solution that does not include 3rd party libraries could be to
+// create protocols that takes search, prompt, etc. into account
+// and expose delegate methods to the concrete view controller,
+// but manage state in the protocol (via a default implementation)
+// of the necessary functions.
+
 import UIKit
 
-/// Main view controller that has the list (table view)
-/// of cells thar correspond to the notes that are on the device.
 class NoteListViewController: UITableViewController {
     private var searchController: UISearchController!
     private var table: UITableView!
     private var addButtomItem: UIBarButtonItem!
-    private var trashButton: UIBarButtonItem!       // TODO: Abstract trash can to extension for reuse
+    private var trashButton: UIBarButtonItem!
     private var spacer: UIBarButtonItem!
     
     private var noteService: NoteService!
@@ -27,10 +40,9 @@ class NoteListViewController: UITableViewController {
     private var notes:[Note]!
     private var isSearching = false {
         
-        // If we are searching, disable add button
-        // otherwise, we are clear to add
+        // Cannot search and add at same time
         didSet {
-            navigationItem.rightBarButtonItem?.isEnabled = !isSearching
+            addButtomItem.isEnabled = !isSearching
         }
     }
     
@@ -178,9 +190,6 @@ extension NoteListViewController {
     
     /// Initializes a (each) cell in table view
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        // TODO: Abstract this to an extension of UITableViewCell
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         let note = notes[indexPath.row]
         
@@ -219,33 +228,17 @@ extension NoteListViewController {
     
     /// Builds and displays a prompt for the user
     /// to enter the title / name of the newly created note
-    @objc private func openNewNote(_ sender: UIBarButtonItem) {
+    @objc private func openNewNote() {
+        let message = "Give your not a name"
+        let placeholder = "Untitled"
         
-        // TODO: Refactor this to an extension of UIViewController
-        
-        let alert = UIAlertController(title: nil, message: "Give your note a name", preferredStyle: .alert)
-        
-        alert.addTextField { textField in
-            textField.placeholder = "Untitled"
-        }
-        
-        let ok = UIAlertAction(title: "Ok", style: .default) { [weak self, weak alert] _ in
-            let title = alert?.textFields?[0].text
-            
-            if let note = self?.createNote(with: title) {
-                self?.openNote(note)
+        func onConfirm(title: String?) {
+            if let note = createNote(with: title) {
+                openNote(note)
             }
         }
         
-        let cancel = UIAlertAction(title: "cancel", style: .default) { [weak alert] _ in
-            alert?.dismiss(animated: true, completion: nil)
-        }
-        
-        cancel.setValue(UIColor.red, forKey: "titleTextColor")
-        alert.addAction(ok)
-        alert.addAction(cancel)
-        
-        present(alert, animated: true, completion: nil)
+        promptForText(withMessage: message, placeholder: placeholder, onConfirm: onConfirm)
     }
     
     /// Creates instance of NoteController and presents it
@@ -253,7 +246,7 @@ extension NoteListViewController {
     private func openNote(_ note: Note) {
         let noteController = NoteController(note: note, noteService: noteService)
         
-        self.navigationController?.pushViewController(noteController, animated: true)
+        navigationController?.pushViewController(noteController, animated: true)
     }
     
     /// Creates a new note with a specified title
@@ -270,6 +263,8 @@ extension NoteListViewController {
     @objc private func deleteSelectedNotes() {
         guard selectedNotes.count > 0 else { return }
         
+        let message = "Are you sure you would like to delete \(selectedNotes.count) note(s)"
+        
         func onYes() {
             noteService.noteFactory.deleteNotes(selectedNotes) { [weak self] in
                 guard let sself = self else { return }
@@ -280,7 +275,7 @@ extension NoteListViewController {
             }
         }
         
-        promptYesOrNo(withMessage: "Are you sure you would like to delete \(selectedNotes.count) note(s)", onYes: onYes)
+        promptYesOrNo(withMessage: message, onYes: onYes)
     }
     
     /// Gets the updated list of notes from the note service,

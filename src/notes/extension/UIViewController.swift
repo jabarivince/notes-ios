@@ -10,10 +10,46 @@ import UIKit
 
 extension UIViewController {
     
-    /// Reusable function for opening a basic yes or no
-    /// dialog with a custom message and custom handlers
-    /// for both the case where the user taps yes and the
-    /// user taps no
+    /// Prompt for text with callback for confirm and cancel events
+    func promptForText(withMessage message: String,
+                       placeholder: String? = nil,
+                       onConfirm: ((String?) -> Void)? = nil,
+                       onCancel: ((String?) -> Void)? = nil) {
+        
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        
+        alert.addTextField { textField in
+            textField.placeholder = placeholder
+        }
+        
+        let ok = UIAlertAction(title: "Ok", style: .default) { [weak alert] _ in
+            let title = alert?.textFields?[0].text
+            
+            if let onConfirm = onConfirm {
+                onConfirm(title)
+            }
+            
+            alert?.dismiss(animated: true, completion: nil)
+        }
+        
+        let cancel = UIAlertAction(title: "Cancel", style: .default) { [weak alert] _ in
+            let title = alert?.textFields?[0].text
+            
+            if let onCancel = onCancel {
+                onCancel(title)
+            }
+            
+            alert?.dismiss(animated: true, completion: nil)
+        }
+        
+        cancel.setValue(UIColor.red, forKey: "titleTextColor")
+        alert.addAction(ok)
+        alert.addAction(cancel)
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
+    /// Prompt yes or no with callbacks for both actions
     func promptYesOrNo(withMessage message: String, onYes: (() -> Void)? = nil, onNo: (() -> Void)? = nil) {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
     

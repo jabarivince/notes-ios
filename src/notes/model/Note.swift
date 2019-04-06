@@ -16,8 +16,10 @@ import Foundation
 /// convenience functions can be writting here.
 class Note: NSManagedObject {
     func delete() {
-        managedObjectContext?.delete(self)
-        save()
+        guard let context = managedObjectContext else { return }
+        
+        context.delete(self)
+        try? context.save()
     }
     
     func save() {

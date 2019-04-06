@@ -18,9 +18,11 @@ import UIKit
 class NoteListViewController: UITableViewController {
     
     // Search / table view items
-    private let searchController = UISearchController(searchResultsController: nil)
-    private let refresh = UIRefreshControl()
-    private let table = UITableView()
+    private var searchController: UISearchController!
+    private var table: UITableView!
+    private var addButtomItem: UIBarButtonItem!
+    private var trashButton: UIBarButtonItem!
+    private var spacer: UIBarButtonItem!
     
     // State items
     private let noteService = NoteService()
@@ -46,6 +48,7 @@ class NoteListViewController: UITableViewController {
         title = "Notes"
         
         // Configur search bar
+        searchController = UISearchController(searchResultsController: nil)
         searchController.searchResultsUpdater = self
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.dimsBackgroundDuringPresentation = false
@@ -53,7 +56,7 @@ class NoteListViewController: UITableViewController {
         searchController.searchBar.delegate = self
         
         // Configure table view
-        tableView.refreshControl = refresh
+        table = UITableView()
         tableView.tableHeaderView = searchController.searchBar
         tableView.tableFooterView = UIView(frame: .zero)
         tableView.allowsSelectionDuringEditing = true
@@ -65,13 +68,15 @@ class NoteListViewController: UITableViewController {
         view.addAndPinSubview(table)
         
         // Configure nav bar
+        addButtomItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(openNewNote))
         navigationItem.leftBarButtonItem = editButtonItem
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(openNewNote))
-        refresh.addTarget(self, action: #selector(refreshNoteList), for: .valueChanged)
+        navigationItem.rightBarButtonItem = addButtomItem
     
         // Configure tool bar
-        let trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(delectAllSelectedNotes))
-        let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(delectAllSelectedNotes))
+        spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        
+        trashButton.isEnabled = false
         toolbarItems = [spacer, trashButton]
         navigationController?.setToolbarHidden(false, animated: false)
     }
@@ -121,25 +126,47 @@ extension NoteListViewController: UISearchBarDelegate {
 }
 
 extension NoteListViewController {
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        
+        if isEditing {
+            addButtomItem.isEnabled = false
+        } else {
+            trashButton.isEnabled = false
+            
+            // Do not allow addition if we
+            // are searching. This causes issues
+            // with View Controllers, presenting, etc.
+            if !isSearching {
+                addButtomItem.isEnabled = true
+            }
+        }
+    }
     
     /// Removes a note from set of selected notes
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         let note = notes[indexPath.row]
         
         selectedNotes.remove(note)
+        
+        if selectedNotes.count < 1 {
+            trashButton.isEnabled = false
+        }
     }
     
     /// If we are in editing mode, we add the tapped note
     /// to the set of notes that will are selected. Otherwise,
     /// we open the note that was tapped for editing.
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let note = notes[indexPath.row]
+        
         if isEditing {
-            let note = notes[indexPath.row]
-            
             selectedNotes.insert(note)
             
+            trashButton.isEnabled = true
+            
         } else {
-            openNote(notes[indexPath.row])
+            openNote(note)
         }
     }
     
@@ -215,22 +242,6 @@ extension NoteListViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    /// Refreshes the list of notes and then
-    /// hides the loading spinner
-    @objc private func refreshNoteList() {
-        
-        // Get the notes, then after one second hide the loading
-        // spinner. The delay fixes jittery synchronization issues
-        getNotes { [weak self] in
-            if self?.tableView.refreshControl?.isRefreshing == true {
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                    self?.refreshControl?.endRefreshing()
-                }
-            }
-        }
-    }
-    
     /// Creates instance of NoteController and presents it
     /// with note that corresponds to the cell that was tapped
     private func openNote(_ note: Note) {
@@ -251,10 +262,12 @@ extension NoteListViewController {
     
     /// Delects all selected notes from database
     @objc private func delectAllSelectedNotes() {
+        guard selectedNotes.count > 0 else { return }
+        
         noteService.noteFactory.deleteNotes(selectedNotes) { [weak self] in
             guard let sself = self else { return }
             
-            sself.isEditing = false
+            sself.setEditing(false, animated: true)
             sself.selectedNotes.removeAll()
             sself.getNotes()
         }

@@ -10,6 +10,7 @@ import CoreData
 import XCTest
 @testable import notes
 
+/// Unit Tests
 class NoteServiceTest: XCTestCase {
     override func setUp() {
         super.setUp()
@@ -27,12 +28,33 @@ class NoteServiceTest: XCTestCase {
 
         let precondition = allNotes.isEmpty
         
-        let _ = noteService.createNote(with: title)
+        let note = noteService.createNote(with: title)
 
-        let postcondition = allNotes.isOfSize(1)
+        let postcondition = allNotes.isOfSize(1)  && note.title == title
 
         XCTAssert(precondition)
         XCTAssert(postcondition)
+    }
+    
+    /// Notes should always have a created date
+    func testCreatedDateIsNeverNilOnCreateNote() {
+        let note = noteService.createNote(with: "title")
+        
+        XCTAssertNotNil(note.createdDate)
+    }
+    
+    /// Notes should always have a last edited date
+    func testLastEditedDateIsNeverNilOnCreateNote() {
+        let note = noteService.createNote(with: "title")
+        
+        XCTAssertNotNil(note.lastEditedDate)
+    }
+    
+    /// Last edit date are always equal oninitial creation
+    func testCreatedAndLastEditedDatesAreEqualOnCreateNote() {
+        let note = noteService.createNote(with: "title")
+        
+        XCTAssertEqual(note.createdDate, note.lastEditedDate)
     }
 
     /// Make a note, delete it, make sure DB has 0 notes
@@ -49,9 +71,9 @@ class NoteServiceTest: XCTestCase {
         XCTAssert(postcondition)
     }
 
-    /// Make 10 notes, delete all 10, make sure DB has 0 notes
+    /// Make N notes, delete all N, make sure DB has 0 notes
     func testDeleteMultipleNotes() {
-        let size = 10
+        let size = Int.random(in: 1...50)
         var notes = Set<Note>()
         
         for _ in 1...size {
@@ -83,6 +105,28 @@ class NoteServiceTest: XCTestCase {
         XCTAssert(postcondition)
     }
     
+    /// Make a note, edit it, save it, check lastEditedDate was updated
+    func testLastEditedDateIncreasedOnSave() {
+        var note = getNote()
+        let now = Date()
+        
+        note.createdDate = now
+        note.lastEditedDate = now
+        try! context.save()
+        
+        let precondition = note.lastEditedDate == note.createdDate
+        
+        noteService.saveNote(note: note)
+        note = allNotes[0]
+        let lastEditedDate = note.lastEditedDate!
+        let createdDate = note.createdDate!
+        
+        let postcondition = lastEditedDate > createdDate
+        
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+    
     /// Make a note, set body, check DB has a note with specified body
     func testCanSaveNoteBody() {
         let note = getNote()
@@ -95,6 +139,61 @@ class NoteServiceTest: XCTestCase {
         let postcondition = allNotes.contains(where: noteHasNilBody)
         
         XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+}
+
+/// Functional Tests
+extension NoteServiceTest {
+    
+    /// Create N notes, Delete N notes, DB should be empty.
+    func testAddingAndDeletingSameNumberOfNotes() {
+        var notes = [Note]()
+        let additions = Int.random(in: 1...50)
+        
+        let precondition = allNotes.isEmpty
+        
+        for _ in 1...additions {
+            notes.append(noteService.createNote(with: "title"))
+        }
+        
+        let midcondition = !allNotes.isEmpty && allNotes.isOfSize(notes.count)
+        
+        for note in notes {
+            noteService.deleteNote(note: note)
+        }
+        
+        let postcondition = allNotes.isEmpty
+        
+        XCTAssert(precondition)
+        XCTAssert(midcondition)
+        XCTAssert(postcondition)
+    }
+    
+    /// Add M notes, delete N notes, where M > N, DB.count == M - N
+    func testAdditionsAndDeletionsWhereNotesAreLeftOver() {
+        var notes = [Note]()
+        let addRange = 25...50
+        let deleteRange = 1...20
+        let additions = Int.random(in: addRange)
+        let deletions = Int.random(in: deleteRange)
+        
+        let precondition = allNotes.isEmpty
+        
+        for _ in 1...additions {
+            notes.append(noteService.createNote(with: "title"))
+        }
+        
+        let midcondition = !allNotes.isEmpty && allNotes.isOfSize(notes.count)
+        
+        for i in 1...deletions {
+            noteService.deleteNote(note: notes[i])
+        }
+        
+        let postcondition = allNotes.isOfSize(additions - deletions)
+        
+        XCTAssert(precondition)
+        XCTAssert(midcondition)
         XCTAssert(postcondition)
     }
 }
@@ -121,7 +220,7 @@ extension NoteServiceTest {
         return entity.body == nil
     }
     
-    /// Creates a note with values in all fields
+    /// Create a note with values in title and body fields
     private func getNote() -> Note {
         let title = "title"
         let body = "body"
@@ -140,15 +239,13 @@ extension NoteServiceTest {
         return noteService.context
     }
     
-    /// Note service for use in testing
+    /// Note service that uses in-memory DB for use in testing
     private static let noteService: NoteService = {
         let service = NoteService.instance
         
-        // Use an in-memory database rather than storing
-        // to disk. This way we avoid leaving state (test data) on
-        // on the device that the tests are running on
+        // Use an in-memory DB to avoid leaving state on device
         service.container = {
-            let container = NSPersistentContainer(name: "NotesDataModel")
+            let container = NSPersistentContainer(name: NoteService.persistentContainerName)
             let description = NSPersistentStoreDescription()
             
             description.type = NSInMemoryStoreType
@@ -167,15 +264,13 @@ extension NoteServiceTest {
     
     /// SQL: SELECT * FROM Note
     private static var allNotes: [Note] {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Note")
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: NoteService.entityName)
         
         return try! context.fetch(fetchRequest) as! [Note]
     }
     
     /// SQL: DELETE FROM Note
     static func clearDatabase() {
-        // Batch delete does not work with in-memory database
-        
         for note in allNotes {
             context.delete(note)
         }

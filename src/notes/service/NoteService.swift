@@ -10,26 +10,32 @@ import CoreData
 import UIKit
 
 class NoteService {
+    static let entityName = "Note"
+    static let persistentContainerName = "NotesDataModel"
     
-    /// Eagerly initialized Singleton. This is ok
-    /// because our persistentContainer is lazily initialized.
+    /// Singleton
     static var instance = NoteService()
     
-    // TODO: Store the number of unnamed notes?
+    // TODO: Store the number of unnamed notes to disk?
     // This way when we kill and restart the app,
     // we do not start from 0 again
     private static var newNoteNumber = 0
+    
+    private let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: NoteService.entityName)
     
     /// SQL: SELECT * FROM Note
     var notes: [Note] {
         var array: [Note] = []
         
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Note")
         let sortDescriptor = NSSortDescriptor(key: "lastEditedDate", ascending: false)
         
         fetchRequest.sortDescriptors = [sortDescriptor]
         
-        try? array = context.fetch(fetchRequest) as! [Note]
+        do {
+            try array = context.fetch(fetchRequest) as! [Note]
+        } catch _ {
+            // TODO: LOG ERROR
+        }
         
         return array
     }
@@ -37,6 +43,10 @@ class NoteService {
     /// SQL: INSERT INTO Note (title, body) values (title, null)
     func createNote(with title: String?) -> Note {
         let note = Note(context: context)
+        let now = Date()
+        
+        note.createdDate = now
+        note.lastEditedDate = now
         
         if title?.isEmpty ?? true {
             let num = NoteService.newNoteNumber
@@ -54,7 +64,11 @@ class NoteService {
         
         note.body = nil
         
-        saveNote(note: note)
+        do {
+            try context.save()
+        } catch _ {
+            // TODO: LOG ERROR
+        }
         
         return note
     }
@@ -62,15 +76,24 @@ class NoteService {
     /// SQL: DELETE FROM Note WHERE id = id
     func deleteNote(note: Note) {
         context.delete(note)
-        try? context.save()
+        
+        do {
+            try context.save()
+        } catch _ {
+            // TODO: LOG ERROR
+        }
     }
     
     /// SQL: DELETE FROM Note WHERE id IN (id_1, id_2, ...)
     func deleteNotes(_ notes: Set<Note>, completion: (() -> Void)?) {
-        
-        // NOTE: This can be optimized!!
         for note in notes {
-            deleteNote(note: note)
+            context.delete(note)
+        }
+        
+        do {
+            try context.save()
+        } catch _ {
+            // TODO: LOG ERROR
         }
         
         if let completion = completion {
@@ -88,7 +111,11 @@ class NoteService {
         
         note.lastEditedDate = now
         
-        try? context.save()
+        do {
+            try context.save()
+        } catch _ {
+            // TODO: LOG ERROR
+        }
     }
     
     /// Opens view for sending note via email, imessage, etc.
@@ -113,7 +140,8 @@ class NoteService {
     /// so we only initialize it once we actually need it. Typically, we
     /// do not want to open a database connection until we actually need it.
     lazy var container: NSPersistentContainer = {
-        let persistentContainer = NSPersistentContainer(name: "NotesDataModel")
+        let persistentContainer = NSPersistentContainer(name: NoteService.persistentContainerName)
+        
         persistentContainer.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")

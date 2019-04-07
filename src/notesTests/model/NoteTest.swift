@@ -13,59 +13,18 @@ import XCTest
 class NoteTest: XCTestCase {
     override func setUp() {
         super.setUp()
-        NoteTest.clearDatabase()
+        NoteServiceTest.clearDatabase()
     }
     
     override func tearDown() {
         super.tearDown()
-        NoteTest.clearDatabase()
-    }
-    
-    func testCanSaveNoteTitle() {
-        let note = NoteTest.getNote()
-        
-        let precondition = !NoteTest.allNotes.contains(where: noteHasNilTitle)
-        
-        note.title = nil
-        note.save()
-        
-        let postcondition = NoteTest.allNotes.contains(where: noteHasNilTitle)
-        
-        XCTAssert(precondition)
-        XCTAssert(postcondition)
-    }
-    
-    func testCanSaveNoteBody() {
-        let note = NoteTest.getNote()
-        
-        let precondition = !NoteTest.allNotes.contains(where: noteHasNilBody)
-        
-        note.body = nil
-        note.save()
-        
-        let postcondition = NoteTest.allNotes.contains(where: noteHasNilBody)
-        
-        XCTAssert(precondition)
-        XCTAssert(postcondition)
-    }
-    
-    func testCanDeleteNote() {
-        let note = NoteTest.getNote()
-        
-        let precondition = NoteTest.allNotes.count == 1
-        
-        note.delete()
-        
-        let postcondition = NoteTest.allNotes.isEmpty
-        
-        XCTAssert(precondition)
-        XCTAssert(postcondition)
+        NoteServiceTest.clearDatabase()
     }
     
     func testNoteContainsFullTitleAndBody() {
         let title = "Some title"
         let body = "Some body"
-        let note = Note(context: AppDelegate.viewContext)
+        let note = emptyNote
         
         let precondition = !note.contains(text: title) && !note.contains(text: body)
         
@@ -83,7 +42,7 @@ class NoteTest: XCTestCase {
         let body = "Some body"
         let partialTitle = "Some"
         let partialBody = "body"
-        let note = Note(context: AppDelegate.viewContext)
+        let note = emptyNote
         
         let precondition = !note.contains(text: partialTitle) && !note.contains(text: partialBody)
         
@@ -99,7 +58,7 @@ class NoteTest: XCTestCase {
     func testNoteDoesNotContainTitleOrBody() {
         let title = "Some title"
         let body = "Some body"
-        let note = Note(context: AppDelegate.viewContext)
+        let note = emptyNote
         
         note.title = title
         note.body = body
@@ -114,7 +73,7 @@ class NoteTest: XCTestCase {
         let bigBody = "BODY"
         let littleTitle = "title"
         let littleBody = "body"
-        let note = Note(context: AppDelegate.viewContext)
+        let note = emptyNote
         
         let precondition = !note.contains(text: littleTitle) && !note.contains(text: littleBody)
         
@@ -129,38 +88,7 @@ class NoteTest: XCTestCase {
 }
 
 extension NoteTest {
-    static var fetchRequest: NSFetchRequest<NSFetchRequestResult> {
-        return NSFetchRequest<NSFetchRequestResult>(entityName: "Note")
-    }
-    
-    static var deleteRequest: NSBatchDeleteRequest {
-        return NSBatchDeleteRequest(fetchRequest: fetchRequest)
-    }
-    
-    static var allNotes: [Note] {
-        return try! AppDelegate.viewContext.fetch(NoteTest.fetchRequest) as! [Note]
-    }
-    
-    static func getNote() -> Note {
-        let title = "title"
-        let body = "body"
-        
-        let note = Note(context: AppDelegate.viewContext)
-        note.title = title
-        note.body = body
-        
-        return note
-    }
-    
-    static func clearDatabase() {
-        try! AppDelegate.viewContext.execute(NoteTest.deleteRequest)
-    }
-    
-    func noteHasNilBody(entity: Note) -> Bool {
-        return entity.body == nil
-    }
-    
-    func noteHasNilTitle(entity: Note) -> Bool {
-        return entity.title == nil
+    private var emptyNote: Note {
+        return NoteServiceTest.getEmptyNote()
     }
 }

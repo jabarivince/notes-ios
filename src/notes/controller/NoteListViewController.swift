@@ -78,7 +78,7 @@ class NoteListViewController: UITableViewController {
     init() {
         super.init(style: .plain)
         
-        noteService = NoteService()
+        noteService = NoteService.instance
         selectedNotes = Set<Note>()
         notes = [Note]()
     }

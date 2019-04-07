@@ -11,14 +11,16 @@ import UIKit
 
 class NoteService {
     
-    // TODO: Dynamically grab # of unamed notes. This way
-    // if the app restarts, we do not start from zero again!
-    private static var newNoteNumber = 0
-    private var context = AppDelegate.viewContext
+    /// Eagerly initialized Singleton. This is ok
+    /// because our persistentContainer is lazily initialized.
+    static var instance = NoteService()
     
-    /// Computed property that goes out to database,
-    /// fetches all notes, and returns them in an array
-    /// as Note objects
+    // TODO: Store the number of unnamed notes?
+    // This way when we kill and restart the app,
+    // we do not start from 0 again
+    private static var newNoteNumber = 0
+    
+    /// SQL: SELECT * FROM Note
     var notes: [Note] {
         var array: [Note] = []
         
@@ -32,6 +34,7 @@ class NoteService {
         return array
     }
     
+    /// SQL: INSERT INTO Note (title, body) values (title, null)
     func createNote(with title: String?) -> Note {
         let note = Note(context: context)
         
@@ -50,15 +53,19 @@ class NoteService {
         NoteService.newNoteNumber += 1
         
         note.body = nil
-        note.save()
+        
+        saveNote(note: note)
         
         return note
     }
     
+    /// SQL: DELETE FROM Note WHERE id = id
     func deleteNote(note: Note) {
-        note.delete()
+        context.delete(note)
+        try? context.save()
     }
     
+    /// SQL: DELETE FROM Note WHERE id IN (id_1, id_2, ...)
     func deleteNotes(_ notes: Set<Note>, completion: (() -> Void)?) {
         
         // NOTE: This can be optimized!!
@@ -71,10 +78,20 @@ class NoteService {
         }
     }
     
+    /// SQL: INSERT INTO Note (title, body) VALUES (title, body)
     func saveNote(note : Note) {
-        note.save()
+        let now = Date()
+        
+        if note.createdDate == nil {
+            note.createdDate = now
+        }
+        
+        note.lastEditedDate = now
+        
+        try? context.save()
     }
     
+    /// Opens view for sending note via email, imessage, etc.
     func sendNote(note: Note, viewController: UIViewController) {
         
         // set up activity view controller
@@ -91,4 +108,22 @@ class NoteService {
         // present the controller
         viewController.presentedVC.present(activityViewController, animated: true, completion: nil)
     }
+    
+    /// Lazy init database connection because this is an expensive task
+    /// so we only initialize it once we actually need it. Typically, we
+    /// do not want to open a database connection until we actually need it.
+    lazy var container: NSPersistentContainer = {
+        let persistentContainer = NSPersistentContainer(name: "NotesDataModel")
+        persistentContainer.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        return persistentContainer
+    }()
+    
+    private(set) lazy var context = container.viewContext
+    
+    /// This class is a Singleton, so we lock down the init.
+    private init() {}
 }

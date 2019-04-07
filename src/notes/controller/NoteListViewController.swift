@@ -209,7 +209,7 @@ extension NoteListViewController {
     /// Builds and displays a prompt for the user
     /// to enter the title / name of the newly created note
     @objc private func openNewNote() {
-        let message = "Give your not a name"
+        let message = "Give your note a name"
         let placeholder = "Untitled"
         
         func onConfirm(title: String?) {
@@ -231,22 +231,22 @@ extension NoteListViewController {
     
     /// Creates a new note with a specified title
     private func createNote(with title: String?) -> Note? {
-        return noteService.noteFactory.createNote(with: title)
+        return noteService.createNote(with: title)
     }
     
     /// Deletes note from database
     private func deleteNote(_ note: Note) {
-        noteService.noteFactory.deleteNote(note: note)
+        noteService.deleteNote(note: note)
     }
     
     /// Deletes all selected notes from database
     @objc private func deleteSelectedNotes() {
         guard !selectedNotes.isEmpty else { return }
         
-        let message = "Are you sure you would like to delete \(selectedNotes.count) note(s)"
+        let message = "Are you sure you would like to delete \(selectedNotes.count) note(s)?"
         
         func onYes() {
-            noteService.noteFactory.deleteNotes(selectedNotes) { [weak self] in
+            noteService.deleteNotes(selectedNotes) { [weak self] in
                 guard let sself = self else { return }
                 
                 sself.setEditing(false, animated: true)
@@ -261,7 +261,7 @@ extension NoteListViewController {
     /// Gets the updated list of notes from the note service,
     /// refreshes the table and performs any callbacks
     private func getNotes() {
-        notes = noteService.noteFactory.notes
+        notes = noteService.notes
         
         if let searchText = searchController.searchBar.text, !searchText.isEmpty {
             notes = notes.filter { note in

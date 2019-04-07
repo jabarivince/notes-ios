@@ -33,14 +33,6 @@ class DefaultNoteSender: NoteSender {
     }
     
     func sendNote(note: Note, viewController: UIViewController) {
-        // TODO - Figure out how to send the note as an email where
-        // the title is the subject and the note body is the email body
-        
-
-     
-        
-        
-        
         
         // set up activity view controller
         let noteToShare = [note.body]
@@ -49,7 +41,6 @@ class DefaultNoteSender: NoteSender {
         
         // this adds supports for ipads
         activityViewController.popoverPresentationController?.sourceView = viewController.view
-        
         
         // set the subject line for emails
         activityViewController.setValue(note.title, forKey: "Subject")

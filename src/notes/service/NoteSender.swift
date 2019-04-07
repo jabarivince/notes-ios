@@ -33,13 +33,21 @@ class DefaultNoteSender: NoteSender {
     }
     
     func sendNote(note: Note, viewController: UIViewController) {
-        // TODO - Figure out how to send the note as an email where
-        // the title is the subject and the note body is the email body
         
-        let alert = UIAlertController(title: "Coming soon", message: "Feature not yet implemented.", preferredStyle: .alert)
+        // set up activity view controller
+        let noteToShare = [note.body]
         
-        alert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
-        viewController.present(alert, animated: true)
+        let activityViewController = UIActivityViewController(activityItems: noteToShare as [Any], applicationActivities: nil)
+        
+        // this enables support for ipads
+        activityViewController.popoverPresentationController?.sourceView = viewController.view
+        
+        // set the subject line for emails
+        activityViewController.setValue(note.title, forKey: "Subject")
+        
+        // present the controller
+        viewController.presentedVC.present(activityViewController, animated: true, completion: nil)
+        
     }
     
     private init() {}

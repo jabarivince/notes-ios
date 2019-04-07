@@ -9,7 +9,6 @@
 import Foundation
 
 extension Date {
-    
     var formatted: String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")

@@ -7,6 +7,7 @@
 //
 
 class NoteService {
+    
     let noteFactory = DefaultNoteFactory.singleton
     let noteSender = DefaultNoteSender.singleton
 }

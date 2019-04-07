@@ -8,8 +8,6 @@
 
 import UIKit
 
-/// Convenience extensions on UIView for adding subviews and applying
-/// common constraints such as filling the parent view.
 extension UIView {
     func addAndPinSubview(_ subview: UIView) {
         addSubview(subview)

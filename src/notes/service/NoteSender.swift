@@ -8,6 +8,13 @@
 
 import UIKit
 
+// TODO: We can delete this class. There is no longer
+// a need for this becuase we will not be abstracting
+// the send() operation. The logic that opens the built-in
+// sender can be written right into NoteController. If
+// auxiliary functions are needed, they can be bunched together
+// with the NoteFactory CRUD functions.
+
 /// Protocol for defining send operationd for notes.
 protocol NoteSender {
     static var singleton: NoteSender { get }

@@ -8,78 +8,82 @@
 
 import UIKit
 
-/// Clase responsible for displaying a note
-/// and handling events such as save and send.
 class NoteController: UIViewController {
-    let noteFactory: NoteFactory
-    let noteSender: NoteSender
+    private var textView: UITextView!
+    private var trashButton: UIBarButtonItem!
+    private var spacer: UIBarButtonItem!
     
-    private let textView = UITextView()
     private let note: Note
+    private let noteService: NoteService
     
     init(note: Note, noteService: NoteService) {
         self.note = note
-        self.noteFactory = noteService.noteFactory
-        self.noteSender = noteService.noteSender
+        self.noteService = noteService
         super.init(nibName: nil, bundle: nil)
     }
     
-    /// Boilerplate. NEVER call this
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    /// We set the textview size here because
-    /// we are using AutoLayout rather than LayoutConstraints
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        // Textview should take up full screen (for now)
         textView.frame.size.width = view.bounds.width
         textView.frame.size.height = view.bounds.height
     }
     
-    /// One time function call to setup
-    /// initial state of view
     override func viewDidLoad() {
         title = note.title
         
-        // Navigation buttons for back and send
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(close))
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(send))
-                
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(closeNote))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
+        
+        textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.text = note.body
-        
         view.addSubview(textView)
+        
+        spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
+        trashButton.tintColor = .red
+        toolbarItems = [spacer, trashButton]
+        navigationController?.setToolbarHidden(false, animated: false)
     }
     
-    /// Do not use large titles. Takes too much screen space.
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.prefersLargeTitles = false
     }
 }
 
-/// Callbacks for buttons presses such as sending
-/// the note in an email, text, saving it, or closing
-/// the currently opened note
 extension NoteController {
-    @objc private func send() {
-        noteSender.sendNote(note: note, viewController: self)
+    @objc private func sendNote() {
+        saveNote()
+        noteService.noteSender.sendNote(note: note, viewController: self)
     }
     
-    @objc private func close() {
-        save()
+    @objc private func closeNote(withoutSaving: Bool = false) {
+        if !withoutSaving {
+            saveNote()
+        }
         
-        // This is what closes the current view and returns
-        // us to the previous view.
         navigationController?.popViewController(animated: true)
     }
     
-    private func save() {
-        note.body = textView.text
+    @objc private func deleteNote() {
+        let message = "Are you sure you want to delete this note?"
         
-        noteFactory.saveNote(note: note)
+        func onYes() {
+            noteService.noteFactory.deleteNote(note: note)
+            closeNote(withoutSaving: true)
+        }
+
+        promptYesOrNo(withMessage: message, onYes: onYes)
+    }
+    
+    private func saveNote() {
+        note.body = textView.text
+        noteService.noteFactory.saveNote(note: note)
     }
 }

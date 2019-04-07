@@ -1,0 +1,295 @@
+//
+//  NoteServiceTest.swift
+//  notesTests
+//
+//  Created by jabari on 4/7/19.
+//  Copyright © 2019 jabari. All rights reserved.
+//
+
+import CoreData
+import XCTest
+@testable import notes
+
+/// Unit Tests
+class NoteServiceTest: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        NoteServiceTest.clearDatabase()
+    }
+    
+    override func tearDown() {
+        super.tearDown()
+        NoteServiceTest.clearDatabase()
+    }
+    
+    /// Make a note and check that DB has 1 note
+    func testCreateNote() {
+        let title = "title"
+
+        let precondition = allNotes.isEmpty
+        
+        let note = noteService.createNote(with: title)
+
+        let postcondition = allNotes.isOfSize(1)  && note.title == title
+
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+    
+    /// Notes should always have a created date
+    func testCreatedDateIsNeverNilOnCreateNote() {
+        let note = noteService.createNote(with: "title")
+        
+        XCTAssertNotNil(note.createdDate)
+    }
+    
+    /// Notes should always have a last edited date
+    func testLastEditedDateIsNeverNilOnCreateNote() {
+        let note = noteService.createNote(with: "title")
+        
+        XCTAssertNotNil(note.lastEditedDate)
+    }
+    
+    /// Last edit date are always equal oninitial creation
+    func testCreatedAndLastEditedDatesAreEqualOnCreateNote() {
+        let note = noteService.createNote(with: "title")
+        
+        XCTAssertEqual(note.createdDate, note.lastEditedDate)
+    }
+
+    /// Make a note, delete it, make sure DB has 0 notes
+    func testDeleteNote() {
+        let note = getNote()
+        
+        let precondition = allNotes.isOfSize(1)
+        
+        noteService.deleteNote(note: note)
+        
+        let postcondition = allNotes.isEmpty
+        
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+
+    /// Make N notes, delete all N, make sure DB has 0 notes
+    func testDeleteMultipleNotes() {
+        let size = Int.random(in: 1...50)
+        var notes = Set<Note>()
+        
+        for _ in 1...size {
+            notes.insert(getNote())
+        }
+        
+        let precondition = allNotes.isOfSize(size)
+        
+        noteService.deleteNotes(notes, completion: nil)
+    
+        let postcondition = allNotes.isEmpty
+        
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+
+    /// Make a note, set title, check DB has a note with specified title
+    func testSaveNoteTitle() {
+        let note = getNote()
+
+        let precondition = !allNotes.contains(where: noteHasNilTitle)
+
+        note.title = nil
+        noteService.saveNote(note: note)
+
+        let postcondition = allNotes.contains(where: noteHasNilTitle)
+
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+    
+    /// Make a note, edit it, save it, check lastEditedDate was updated
+    func testLastEditedDateIncreasedOnSave() {
+        var note = getNote()
+        let now = Date()
+        
+        note.createdDate = now
+        note.lastEditedDate = now
+        try! context.save()
+        
+        let precondition = note.lastEditedDate == note.createdDate
+        
+        noteService.saveNote(note: note)
+        note = allNotes[0]
+        let lastEditedDate = note.lastEditedDate!
+        let createdDate = note.createdDate!
+        
+        let postcondition = lastEditedDate > createdDate
+        
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+    
+    /// Make a note, set body, check DB has a note with specified body
+    func testCanSaveNoteBody() {
+        let note = getNote()
+        
+        let precondition = !allNotes.contains(where: noteHasNilBody)
+        
+        note.body = nil
+        noteService.saveNote(note: note)
+        
+        let postcondition = allNotes.contains(where: noteHasNilBody)
+        
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+}
+
+/// Functional Tests
+extension NoteServiceTest {
+    
+    /// Create N notes, Delete N notes, DB should be empty.
+    func testAddingAndDeletingSameNumberOfNotes() {
+        var notes = [Note]()
+        let additions = Int.random(in: 1...50)
+        
+        let precondition = allNotes.isEmpty
+        
+        for _ in 1...additions {
+            notes.append(noteService.createNote(with: "title"))
+        }
+        
+        let midcondition = !allNotes.isEmpty && allNotes.isOfSize(notes.count)
+        
+        for note in notes {
+            noteService.deleteNote(note: note)
+        }
+        
+        let postcondition = allNotes.isEmpty
+        
+        XCTAssert(precondition)
+        XCTAssert(midcondition)
+        XCTAssert(postcondition)
+    }
+    
+    /// Add M notes, delete N notes, where M > N, DB.count == M - N
+    func testAdditionsAndDeletionsWhereNotesAreLeftOver() {
+        var notes = [Note]()
+        let addRange = 25...50
+        let deleteRange = 1...20
+        let additions = Int.random(in: addRange)
+        let deletions = Int.random(in: deleteRange)
+        
+        let precondition = allNotes.isEmpty
+        
+        for _ in 1...additions {
+            notes.append(noteService.createNote(with: "title"))
+        }
+        
+        let midcondition = !allNotes.isEmpty && allNotes.isOfSize(notes.count)
+        
+        for i in 1...deletions {
+            noteService.deleteNote(note: notes[i])
+        }
+        
+        let postcondition = allNotes.isOfSize(additions - deletions)
+        
+        XCTAssert(precondition)
+        XCTAssert(midcondition)
+        XCTAssert(postcondition)
+    }
+}
+
+/// Private auxiliary functions and wrappers
+extension NoteServiceTest {
+    private var allNotes: [Note] {
+        return NoteServiceTest.allNotes
+    }
+    
+    private var noteService: NoteService {
+        return NoteServiceTest.noteService
+    }
+    
+    private var context: NSManagedObjectContext {
+        return NoteServiceTest.context
+    }
+    
+    private func noteHasNilTitle(element: Note) -> Bool {
+        return element.title == nil
+    }
+    
+    private func noteHasNilBody(entity: Note) -> Bool {
+        return entity.body == nil
+    }
+    
+    /// Create a note with values in title and body fields
+    private func getNote() -> Note {
+        let title = "title"
+        let body = "body"
+        
+        let note = Note(context: context)
+        note.title = title
+        note.body = body
+        
+        return note
+    }
+}
+
+/// Static reusable properties and Core Data related logic
+extension NoteServiceTest {
+    private static var context: NSManagedObjectContext {
+        return noteService.context
+    }
+    
+    /// Note service that uses in-memory DB for use in testing
+    private static let noteService: NoteService = {
+        let service = NoteService.instance
+        
+        // Use an in-memory DB to avoid leaving state on device
+        service.container = {
+            let container = NSPersistentContainer(name: NoteService.persistentContainerName)
+            let description = NSPersistentStoreDescription()
+            
+            description.type = NSInMemoryStoreType
+            container.persistentStoreDescriptions = [description]
+            
+            container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+                if let error = error as NSError? {
+                    fatalError("Unresolved error \(error), \(error.userInfo)")
+                }
+            })
+            return container
+        }()
+    
+        return service
+    }()
+    
+    /// SQL: SELECT * FROM Note
+    private static var allNotes: [Note] {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: NoteService.entityName)
+        
+        return try! context.fetch(fetchRequest) as! [Note]
+    }
+    
+    /// SQL: DELETE FROM Note
+    static func clearDatabase() {
+        for note in allNotes {
+            context.delete(note)
+        }
+        
+        try! context.save()
+    }
+    
+    /// SQL: INSERT INTO (title, body) Note VALUES (null, null)
+    static func getEmptyNote() -> Note {
+        let note = Note(context: context)
+        note.title = nil
+        note.body = nil
+        
+        return note
+    }
+}
+
+extension Array {
+    func isOfSize(_ size: Int) -> Bool {
+        return self.count == size
+    }
+}

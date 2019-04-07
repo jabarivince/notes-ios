@@ -13,50 +13,50 @@ import XCTest
 class NoteTest: XCTestCase {
     override func setUp() {
         super.setUp()
-        clearDatabase()
+        NoteTest.clearDatabase()
     }
     
     override func tearDown() {
         super.tearDown()
-        clearDatabase()
+        NoteTest.clearDatabase()
     }
     
     func testCanSaveNoteTitle() {
-        let note = getNote()
+        let note = NoteTest.getNote()
         
-        let precondition = !allNotes.contains(where: noteHasNilTitle)
+        let precondition = !NoteTest.allNotes.contains(where: noteHasNilTitle)
         
         note.title = nil
         note.save()
         
-        let postcondition = allNotes.contains(where: noteHasNilTitle)
+        let postcondition = NoteTest.allNotes.contains(where: noteHasNilTitle)
         
         XCTAssert(precondition)
         XCTAssert(postcondition)
     }
     
     func testCanSaveNoteBody() {
-        let note = getNote()
+        let note = NoteTest.getNote()
         
-        let precondition = !allNotes.contains(where: noteHasNilBody)
+        let precondition = !NoteTest.allNotes.contains(where: noteHasNilBody)
         
         note.body = nil
         note.save()
         
-        let postcondition = allNotes.contains(where: noteHasNilBody)
+        let postcondition = NoteTest.allNotes.contains(where: noteHasNilBody)
         
         XCTAssert(precondition)
         XCTAssert(postcondition)
     }
     
     func testCanDeleteNote() {
-        let note = getNote()
+        let note = NoteTest.getNote()
         
-        let precondition = allNotes.count == 1
+        let precondition = NoteTest.allNotes.count == 1
         
         note.delete()
         
-        let postcondition = allNotes.count == 0
+        let postcondition = NoteTest.allNotes.isEmpty
         
         XCTAssert(precondition)
         XCTAssert(postcondition)
@@ -129,19 +129,19 @@ class NoteTest: XCTestCase {
 }
 
 extension NoteTest {
-    var fetchRequest: NSFetchRequest<NSFetchRequestResult> {
+    static var fetchRequest: NSFetchRequest<NSFetchRequestResult> {
         return NSFetchRequest<NSFetchRequestResult>(entityName: "Note")
     }
     
-    var deleteRequest: NSBatchDeleteRequest {
+    static var deleteRequest: NSBatchDeleteRequest {
         return NSBatchDeleteRequest(fetchRequest: fetchRequest)
     }
     
-    var allNotes: [Note] {
-        return try! AppDelegate.viewContext.fetch(fetchRequest) as! [Note]
+    static var allNotes: [Note] {
+        return try! AppDelegate.viewContext.fetch(NoteTest.fetchRequest) as! [Note]
     }
     
-    func getNote() -> Note {
+    static func getNote() -> Note {
         let title = "title"
         let body = "body"
         
@@ -152,8 +152,8 @@ extension NoteTest {
         return note
     }
     
-    func clearDatabase() {
-        try! AppDelegate.viewContext.execute(deleteRequest)
+    static func clearDatabase() {
+        try! AppDelegate.viewContext.execute(NoteTest.deleteRequest)
     }
     
     func noteHasNilBody(entity: Note) -> Bool {

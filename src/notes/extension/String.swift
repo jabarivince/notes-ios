@@ -12,6 +12,6 @@ extension String {
     }
     
     func truncated(after length: Int, trailedWith trailing: String = "…") -> String {
-        return (self.count > length) ? self.prefix(length) + trailing : self
+        return (count > length) ? prefix(length) + trailing : self
     }
 }

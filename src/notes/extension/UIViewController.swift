@@ -10,6 +10,8 @@ import UIKit
 
 extension UIViewController {
     
+    /// TODO: MAKE SURE THESE CLOSURE / FUNCTIONS ARE NOT EXPOSING MEMORY CYCLES
+    
     // Determine which View Controller to present with
     // that way we avoid the warning for already presenting
     var presentedVC: UIViewController {

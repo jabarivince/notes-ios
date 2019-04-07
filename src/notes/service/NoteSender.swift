@@ -46,7 +46,7 @@ class DefaultNoteSender: NoteSender {
         activityViewController.setValue(note.title, forKey: "Subject")
         
         // present the controller
-        viewController.present(activityViewController, animated: true, completion: nil)
+        viewController.presentedVC.present(activityViewController, animated: true, completion: nil)
         
     }
     

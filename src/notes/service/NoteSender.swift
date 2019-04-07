@@ -39,7 +39,7 @@ class DefaultNoteSender: NoteSender {
         
         let activityViewController = UIActivityViewController(activityItems: noteToShare as [Any], applicationActivities: nil)
         
-        // this adds supports for ipads
+        // this enables support for ipads
         activityViewController.popoverPresentationController?.sourceView = viewController.view
         
         // set the subject line for emails

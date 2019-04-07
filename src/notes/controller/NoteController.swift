@@ -60,7 +60,7 @@ class NoteController: UIViewController {
 extension NoteController {
     @objc private func sendNote() {
         saveNote()
-        noteService.noteSender.sendNote(note: note, viewController: self)
+        noteService.sendNote(note: note, viewController: self)
     }
     
     @objc private func closeNote(withoutSaving: Bool = false) {
@@ -75,7 +75,7 @@ extension NoteController {
         let message = "Are you sure you want to delete this note?"
         
         func onYes() {
-            noteService.noteFactory.deleteNote(note: note)
+            noteService.deleteNote(note: note)
             closeNote(withoutSaving: true)
         }
 
@@ -84,6 +84,6 @@ extension NoteController {
     
     private func saveNote() {
         note.body = textView.text
-        noteService.noteFactory.saveNote(note: note)
+        noteService.saveNote(note: note)
     }
 }

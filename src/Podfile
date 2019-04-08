@@ -3,7 +3,7 @@ platform :ios, '12.0'
 target 'notes' do
   use_frameworks!
 
-  pod 'Alamofire', '~> 4.7'
+  pod 'Firebase/Core'
 
   target 'notesTests' do
     inherit! :search_paths

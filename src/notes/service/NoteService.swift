@@ -14,13 +14,14 @@ class NoteService {
     static let persistentContainerName = "NotesDataModel"
     
     /// Singleton
-    static var instance = NoteService()
+    static let instance = NoteService()
     
     // TODO: Store the number of unnamed notes to disk?
     // This way when we kill and restart the app,
     // we do not start from 0 again
     private static var newNoteNumber = 0
     
+    private let analyticsService = NoteAnalyticsService.instance
     private let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: NoteService.entityName)
     
     /// SQL: SELECT * FROM Note
@@ -70,11 +71,14 @@ class NoteService {
             // TODO: LOG ERROR
         }
         
+        analyticsService.publishCreateNoteEvent(for: note)
         return note
     }
     
     /// SQL: DELETE FROM Note WHERE id = id
     func deleteNote(note: Note) {
+        analyticsService.publishDeleteNoteEvent(for: note)
+        
         context.delete(note)
         
         do {
@@ -86,6 +90,8 @@ class NoteService {
     
     /// SQL: DELETE FROM Note WHERE id IN (id_1, id_2, ...)
     func deleteNotes(_ notes: Set<Note>, completion: (() -> Void)?) {
+        analyticsService.publishDeleteBatchNoteEvent(for: notes)
+        
         for note in notes {
             context.delete(note)
         }
@@ -116,10 +122,13 @@ class NoteService {
         } catch _ {
             // TODO: LOG ERROR
         }
+        
+        analyticsService.publishUpdateNoteEvent(for: note)
     }
     
     /// Opens view for sending note via email, imessage, etc.
     func sendNote(note: Note, viewController: UIViewController) {
+        analyticsService.publishSendNoteEvent(for: note)
         
         // set up activity view controller
         let noteToShare = [note.body]

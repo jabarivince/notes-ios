@@ -136,6 +136,37 @@ class NoteService {
         viewController.presentedVC.present(activityViewController, animated: true, completion: nil)
     }
     
+    // Opens view to send multiple notes
+    func sendNotes(_ notes: Set<Note>, viewController: UIViewController) {
+       
+        var notesToSend = ""
+    
+        for note in notes {
+            notesToSend.append(note.title ?? "")
+            notesToSend.append(":")
+            notesToSend.append("\n")
+            notesToSend.append(note.body ?? "")
+            notesToSend.append("\n")
+            notesToSend.append("\n")
+        }
+        
+        notesToSend.removeLast()
+        
+        
+        let notesToShare = [notesToSend]
+        let activityViewController = UIActivityViewController(activityItems: notesToShare as [Any], applicationActivities: nil)
+        
+        // this enables support for ipads
+        activityViewController.popoverPresentationController?.sourceView = viewController.view
+        
+        // set the subject line for emails
+        activityViewController.setValue("Notes from...", forKey: "Subject")
+        
+        // present the controller
+        viewController.presentedVC.present(activityViewController, animated: true, completion: nil)
+        
+    }
+    
     /// Lazy init database connection because this is an expensive task
     /// so we only initialize it once we actually need it. Typically, we
     /// do not want to open a database connection until we actually need it.

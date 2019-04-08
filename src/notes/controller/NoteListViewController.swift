@@ -78,7 +78,7 @@ class NoteListViewController: UITableViewController {
     init() {
         super.init(style: .plain)
         
-        noteService = NoteService()
+        noteService = NoteService.instance
         selectedNotes = Set<Note>()
         notes = [Note]()
     }
@@ -200,7 +200,9 @@ extension NoteListViewController {
         
         deleteNote(note)
         tableView.deleteRows(at: [indexPath], with: .automatic)
+        
     }
+
 }
 
 /// Custom functions
@@ -246,6 +248,11 @@ extension NoteListViewController {
         let message = "Are you sure you would like to delete \(selectedNotes.count) note(s)?"
         
         func onYes() {
+            // NOTE: https://developer.apple.com/documentation/uikit/uitableview/1614960-deleterows
+            // Animate the deletion. We will need an auxiliary structure
+            // that maps selected notes to their indices. Perhaps turn
+            // selected nots into a dictionary, and wherever selectedNotes
+            // is used, just get the key set.
             noteService.deleteNotes(selectedNotes) { [weak self] in
                 guard let sself = self else { return }
                 

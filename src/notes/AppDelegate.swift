@@ -7,6 +7,7 @@
 //
 
 import CoreData
+import Firebase
 import UIKit
 
 @UIApplicationMain
@@ -16,6 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     /// Manually sets the default view controller
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        FirebaseApp.configure()
+        
         let viewController = NoteListViewController()
         
         window = UIWindow(frame: UIScreen.main.bounds)

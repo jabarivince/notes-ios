@@ -79,7 +79,7 @@ extension NoteController {
             closeNote(withoutSaving: true)
         }
 
-        promptYesOrNo(withMessage: message, onYes: onYes)
+        promptYesOrNo(withMessage: message, onYes: onYes, onNo: nil)
     }
     
     private func saveNote() {

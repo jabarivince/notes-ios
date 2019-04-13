@@ -88,6 +88,7 @@ class NoteListViewController: UITableViewController {
     }
 }
 
+/// Callback for every update to search bar
 extension NoteListViewController: UISearchResultsUpdating {
     
     /// Searches for notes after each key tap while searching
@@ -96,16 +97,15 @@ extension NoteListViewController: UISearchResultsUpdating {
     }
 }
 
+/// Callbacks for search bar events
 extension NoteListViewController: UISearchBarDelegate {
     
-    /// Sets searching flag to true to indicate
-    /// that we are in the searching state
+    /// User started typing in search bar
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         isSearching = true
     }
     
-    /// Sets searching flag to true to indicate
-    /// that we not are in the searching state
+    /// User stopped typing in search bar
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         isSearching = false
     }
@@ -118,6 +118,7 @@ extension NoteListViewController: UISearchBarDelegate {
     }
 }
 
+/// TableView callbacks
 extension NoteListViewController {
     
     /// Toggle button's isEnabled flag based off is isEditing
@@ -168,7 +169,7 @@ extension NoteListViewController {
         return notes.count
     }
     
-    /// Initializes a (each) cell in table view
+    /// Initializes a cell in table view (called on each cell)
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         let note = notes[indexPath.row]
@@ -192,7 +193,7 @@ extension NoteListViewController {
         return cell
     }
     
-    /// Deletes a cell from tablew view and persistent storage
+    /// Deletes a note
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         guard editingStyle == .delete else { return }
         
@@ -200,40 +201,34 @@ extension NoteListViewController {
         
         deleteNote(note)
         tableView.deleteRows(at: [indexPath], with: .automatic)
-        
     }
 
 }
 
-/// Custom functions
+/// CRUD functions
 extension NoteListViewController {
     
-    /// Builds and displays a prompt for the user
-    /// to enter the title / name of the newly created note
+    /// Prompt user to enter title, then create and open new note
     @objc private func openNewNote() {
         let message = "Give your note a name"
         let placeholder = "Untitled"
         
         func onConfirm(title: String?) {
-            if let note = createNote(with: title) {
-                openNote(note)
-            }
+            let note = noteService.createNote(with: title)
+            openNote(note)
         }
         
-        promptForText(withMessage: message, placeholder: placeholder, onConfirm: onConfirm)
+        promptForText(withMessage: message,
+                      placeholder: placeholder,
+                      onConfirm: onConfirm,
+                      onCancel: nil)
     }
     
-    /// Creates instance of NoteController and presents it
-    /// with note that corresponds to the cell that was tapped
+    /// Opens note via NoteController
     private func openNote(_ note: Note) {
         let noteController = NoteController(note: note, noteService: noteService)
         
         navigationController?.pushViewController(noteController, animated: true)
-    }
-    
-    /// Creates a new note with a specified title
-    private func createNote(with title: String?) -> Note? {
-        return noteService.createNote(with: title)
     }
     
     /// Deletes note from database
@@ -245,13 +240,13 @@ extension NoteListViewController {
     @objc private func deleteSelectedNotes() {
         guard !selectedNotes.isEmpty else { return }
         
-        let message = "Are you sure you would like to delete \(selectedNotes.count) note(s)?"
+        let message = "Delete \(selectedNotes.count) note(s)?"
         
         func onYes() {
             // NOTE: https://developer.apple.com/documentation/uikit/uitableview/1614960-deleterows
             // Animate the deletion. We will need an auxiliary structure
             // that maps selected notes to their indices. Perhaps turn
-            // selected nots into a dictionary, and wherever selectedNotes
+            // selected notes into a dictionary, and wherever selectedNotes
             // is used, just get the key set.
             noteService.deleteNotes(selectedNotes) { [weak self] in
                 guard let sself = self else { return }
@@ -262,11 +257,10 @@ extension NoteListViewController {
             }
         }
         
-        promptYesOrNo(withMessage: message, onYes: onYes)
+        promptYesOrNo(withMessage: message, onYes: onYes, onNo: nil)
     }
     
-    /// Gets the updated list of notes from the note service,
-    /// refreshes the table and performs any callbacks
+    /// Refresh table with newest data from DB
     private func getNotes() {
         notes = noteService.notes
         

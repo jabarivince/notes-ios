@@ -21,8 +21,8 @@ extension UIViewController {
     /// Prompt for text with callback for confirm and cancel events
     func promptForText(withMessage message: String,
                        placeholder: String? = nil,
-                       onConfirm: ((String?) -> Void)? = nil,
-                       onCancel: ((String?) -> Void)? = nil) {
+                       onConfirm: ((String?) -> Void)?,
+                       onCancel: ((String?) -> Void)?) {
         
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         
@@ -57,7 +57,7 @@ extension UIViewController {
     }
     
     /// Prompt yes or no with callbacks for both actions
-    func promptYesOrNo(withMessage message: String, onYes: (() -> Void)? = nil, onNo: (() -> Void)? = nil) {
+    func promptYesOrNo(withMessage message: String, onYes: (() -> Void)?, onNo: (() -> Void)?) {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
     
         let yes = UIAlertAction(title: "Yes", style: .default) { [weak alert] _ in

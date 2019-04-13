@@ -10,19 +10,6 @@ import CoreData
 import UIKit
 
 class NoteService {
-    static let entityName = "Note"
-    static let persistentContainerName = "NotesDataModel"
-    
-    /// Singleton
-    static let instance = NoteService()
-    
-    // TODO: Store the number of unnamed notes to disk?
-    // This way when we kill and restart the app,
-    // we do not start from 0 again
-    private static var newNoteNumber = 0
-    
-    private let analyticsService = NoteAnalyticsService.instance
-    private let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: NoteService.entityName)
     
     /// SQL: SELECT * FROM Note
     var notes: [Note] {
@@ -67,22 +54,21 @@ class NoteService {
         
         do {
             try context.save()
+            analyticsService.publishCreateNoteEvent(for: note)
         } catch _ {
             // TODO: LOG ERROR
         }
         
-        analyticsService.publishCreateNoteEvent(for: note)
         return note
     }
     
     /// SQL: DELETE FROM Note WHERE id = id
     func deleteNote(note: Note) {
-        analyticsService.publishDeleteNoteEvent(for: note)
-        
         context.delete(note)
         
         do {
             try context.save()
+            analyticsService.publishDeleteNoteEvent(for: note)
         } catch _ {
             // TODO: LOG ERROR
         }
@@ -90,14 +76,13 @@ class NoteService {
     
     /// SQL: DELETE FROM Note WHERE id IN (id_1, id_2, ...)
     func deleteNotes(_ notes: Set<Note>, completion: (() -> Void)?) {
-        analyticsService.publishDeleteBatchNoteEvent(for: notes)
-        
         for note in notes {
             context.delete(note)
         }
         
         do {
             try context.save()
+            analyticsService.publishDeleteBatchNoteEvent(for: notes)
         } catch _ {
             // TODO: LOG ERROR
         }
@@ -119,21 +104,52 @@ class NoteService {
         
         do {
             try context.save()
+            analyticsService.publishUpdateNoteEvent(for: note)
         } catch _ {
             // TODO: LOG ERROR
         }
-        
-        analyticsService.publishUpdateNoteEvent(for: note)
     }
     
-    func sendNote(_ stringifiable: Stringifiable, withSubject subject: String = "Notes", viewController: UIViewController) {
-        let text = stringifiable.stringified
+    /// Sends a single note
+    func sendNote(_ note: Note, viewController: UIViewController) {
+        send(note, viewController: viewController, completion: analyticsService.publishSendNoteEvent)
+    }
+    
+    /// Shares a set of notes
+    func sendNotes(_ notes: Set<Note>, viewController: UIViewController) {
+        send(notes, viewController: viewController, completion: analyticsService.publishSendBatchNoteEvent)
+    }
+    
+    /// Opens view for sending a note or multiple notes
+    private func send<T>(_ value: T,
+                         withSubject subject: String = "Notes",
+                         viewController: UIViewController,
+                         completion: @escaping (T) -> Void) where T: Stringifiable, T: Loggable {
+        
+        let text = value.stringified
         let activityViewController = UIActivityViewController(activityItems:[text], applicationActivities: nil)
         
         activityViewController.popoverPresentationController?.sourceView = viewController.view
         activityViewController.setValue(subject, forKey: "Subject")
-        viewController.presentedVC.present(activityViewController, animated: true, completion: nil)
+        viewController.presentedVC.present(activityViewController, animated: true) {
+            
+            completion(value)
+        }
     }
+    
+    static let entityName = "Note"
+    static let persistentContainerName = "NotesDataModel"
+    
+    /// Singleton
+    static let instance = NoteService()
+    
+    // TODO: Store the number of unnamed notes to disk?
+    // This way when we kill and restart the app,
+    // we do not start from 0 again
+    private static var newNoteNumber = 0
+    
+    private let analyticsService = NoteAnalyticsService.instance
+    private let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: NoteService.entityName)
     
     /// Lazy init database connection because this is an expensive task
     /// so we only initialize it once we actually need it. Typically, we
@@ -153,4 +169,10 @@ class NoteService {
     
     /// This class is a Singleton, so we lock down the init.
     private init() {}
+}
+
+/// Protocol used for sending a note
+/// of multiple notes via iOS sharing view
+protocol Stringifiable {
+    var stringified: String { get }
 }

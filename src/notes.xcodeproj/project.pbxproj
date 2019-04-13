@@ -3,13 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		0C6F3743225AC21B0060EC2B /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6F3742225AC21B0060EC2B /* AnalyticsService.swift */; };
 		0C6F3745225AF72B0060EC2B /* NoteAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6F3744225AF72B0060EC2B /* NoteAnalyticsService.swift */; };
 		0C6F3747225B1D740060EC2B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0C6F3746225B1D740060EC2B /* GoogleService-Info.plist */; };
+		0C95381E2261C63600234CAC /* AnalyticsServiceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C95381D2261C63600234CAC /* AnalyticsServiceTest.swift */; };
 		0C9EE9AB2259D4C50001B4FE /* NoteTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9EE9AA2259D4C50001B4FE /* NoteTest.swift */; };
 		0C9EE9AF2259FF300001B4FE /* NoteServiceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9EE9AE2259FF300001B4FE /* NoteServiceTest.swift */; };
 		0CC2415C2247E6E300D681D4 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC2415B2247E6E300D681D4 /* UIView.swift */; };
@@ -44,6 +45,7 @@
 		0C6F3742225AC21B0060EC2B /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		0C6F3744225AF72B0060EC2B /* NoteAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteAnalyticsService.swift; sourceTree = "<group>"; };
 		0C6F3746225B1D740060EC2B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		0C95381D2261C63600234CAC /* AnalyticsServiceTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsServiceTest.swift; sourceTree = "<group>"; };
 		0C9EE9AA2259D4C50001B4FE /* NoteTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTest.swift; sourceTree = "<group>"; };
 		0C9EE9AE2259FF300001B4FE /* NoteServiceTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteServiceTest.swift; sourceTree = "<group>"; };
 		0CC2415B2247E6E300D681D4 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				0C9EE9AE2259FF300001B4FE /* NoteServiceTest.swift */,
+				0C95381D2261C63600234CAC /* AnalyticsServiceTest.swift */,
 			);
 			path = service;
 			sourceTree = "<group>";
@@ -365,11 +368,19 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-notes/Pods-notes-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-notes/Pods-notes-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-notes/Pods-notes-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-notes/Pods-notes-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -404,6 +415,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C95381E2261C63600234CAC /* AnalyticsServiceTest.swift in Sources */,
 				0C9EE9AF2259FF300001B4FE /* NoteServiceTest.swift in Sources */,
 				0C9EE9AB2259D4C50001B4FE /* NoteTest.swift in Sources */,
 			);

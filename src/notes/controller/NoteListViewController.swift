@@ -14,6 +14,8 @@ class NoteListViewController: UITableViewController {
     private var addButtomItem: UIBarButtonItem!
     private var trashButton: UIBarButtonItem!
     private var spacer: UIBarButtonItem!
+    private var shareButton: UIBarButtonItem!
+    
     
     private var noteService: NoteService!
     private var selectedNotes: Set<Note>!
@@ -59,9 +61,14 @@ class NoteListViewController: UITableViewController {
         // Configure tool bar
         spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteSelectedNotes))
+        
+        shareButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendMultipleNotes))
+        
+        
+        shareButton.isEnabled = false
         trashButton.isEnabled = false
         trashButton.tintColor = .red
-        toolbarItems = [spacer, trashButton]
+        toolbarItems = [shareButton, spacer, trashButton]
         navigationController?.setToolbarHidden(false, animated: false)
     }
     
@@ -129,8 +136,10 @@ extension NoteListViewController {
         
         if isEditing {
             addButtomItem.isEnabled = false
+            
         } else {
             trashButton.isEnabled = false
+            shareButton.isEnabled = false
             
             // No adding while searching
             if !isSearching {
@@ -147,6 +156,7 @@ extension NoteListViewController {
         
         if selectedNotes.isEmpty {
             trashButton.isEnabled = false
+            shareButton.isEnabled = false
         }
     }
     
@@ -157,6 +167,7 @@ extension NoteListViewController {
         if isEditing {
             selectedNotes.insert(note)
             trashButton.isEnabled = true
+            shareButton.isEnabled = true
             
         } else {
             openNote(note)
@@ -239,6 +250,14 @@ extension NoteListViewController {
     /// Deletes note from database
     private func deleteNote(_ note: Note) {
         noteService.deleteNote(note: note)
+    }
+    
+    // Send multiple notes
+    @objc private func sendMultipleNotes() {
+        
+        guard !selectedNotes.isEmpty else { return }
+        
+        noteService.sendNote(selectedNotes, viewController: self)
     }
     
     /// Deletes all selected notes from database

@@ -126,22 +126,12 @@ class NoteService {
         analyticsService.publishUpdateNoteEvent(for: note)
     }
     
-    /// Opens view for sending note via email, imessage, etc.
-    func sendNote(note: Note, viewController: UIViewController) {
-        analyticsService.publishSendNoteEvent(for: note)
+    func sendNote(_ stringifiable: Stringifiable, withSubject subject: String = "Notes", viewController: UIViewController) {
+        let text = stringifiable.stringified
+        let activityViewController = UIActivityViewController(activityItems:[text], applicationActivities: nil)
         
-        // set up activity view controller
-        let noteToShare = [note.body]
-        
-        let activityViewController = UIActivityViewController(activityItems: noteToShare as [Any], applicationActivities: nil)
-        
-        // this enables support for ipads
         activityViewController.popoverPresentationController?.sourceView = viewController.view
-        
-        // set the subject line for emails
-        activityViewController.setValue(note.title, forKey: "Subject")
-        
-        // present the controller
+        activityViewController.setValue(subject, forKey: "Subject")
         viewController.presentedVC.present(activityViewController, animated: true, completion: nil)
     }
     

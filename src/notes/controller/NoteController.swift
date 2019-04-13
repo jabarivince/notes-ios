@@ -60,7 +60,7 @@ class NoteController: UIViewController {
 extension NoteController {
     @objc private func sendNote() {
         saveNote()
-        noteService.sendNote(note: note, viewController: self)
+        noteService.sendNote(note, viewController: self)
     }
     
     @objc private func closeNote(withoutSaving: Bool = false) {

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -26,6 +26,7 @@
 		0CFAB6E22246CC75004AA4C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CFAB6E12246CC75004AA4C7 /* Assets.xcassets */; };
 		0CFAB6E52246CC75004AA4C7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CFAB6E32246CC75004AA4C7 /* LaunchScreen.storyboard */; };
 		28186047C557FA20AF1808CD /* Pods_notes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5DED100D189F48119165771 /* Pods_notes.framework */; };
+		2A8F3D352261615600322B55 /* Set.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A8F3D342261615600322B55 /* Set.swift */; };
 		34AA1F2CDE20F29F7234AAFE /* Pods_notesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD0CD553672359178709F12F /* Pods_notesTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -63,6 +64,7 @@
 		0CFAB6EB2246CC75004AA4C7 /* notesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = notesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CFAB6F12246CC75004AA4C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		275348E1C1C597F91A1C372F /* Pods-notesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-notesTests.release.xcconfig"; path = "Target Support Files/Pods-notesTests/Pods-notesTests.release.xcconfig"; sourceTree = "<group>"; };
+		2A8F3D342261615600322B55 /* Set.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Set.swift; sourceTree = "<group>"; };
 		58F6AE84DD580FE816F8A038 /* Pods-notes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-notes.debug.xcconfig"; path = "Target Support Files/Pods-notes/Pods-notes.debug.xcconfig"; sourceTree = "<group>"; };
 		7C2FD1ED2DE9422FB8B7FF20 /* Pods-notes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-notes.release.xcconfig"; path = "Target Support Files/Pods-notes/Pods-notes.release.xcconfig"; sourceTree = "<group>"; };
 		886BE0F09E2BDD61D0687821 /* Pods-notesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-notesTests.debug.xcconfig"; path = "Target Support Files/Pods-notesTests/Pods-notesTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 				0CC2415F224B08BA00D681D4 /* Date.swift */,
 				0CDC11C422588EEF006AE47B /* UIViewController.swift */,
 				0CDC11C62259274A006AE47B /* UIFont.swift */,
+				2A8F3D342261615600322B55 /* Set.swift */,
 			);
 			path = extension;
 			sourceTree = "<group>";
@@ -397,6 +400,7 @@
 				0CE0BDA92246F71B001C6401 /* NoteController.swift in Sources */,
 				0CDC11C72259274A006AE47B /* UIFont.swift in Sources */,
 				0CC24160224B08BA00D681D4 /* Date.swift in Sources */,
+				2A8F3D352261615600322B55 /* Set.swift in Sources */,
 				0CC2415C2247E6E300D681D4 /* UIView.swift in Sources */,
 				0C6F3743225AC21B0060EC2B /* AnalyticsService.swift in Sources */,
 				0CE0BDB022473F16001C6401 /* Note.swift in Sources */,
@@ -556,14 +560,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 62TYL29D89;
+				DEVELOPMENT_TEAM = 8MT429F374;
 				INFOPLIST_FILE = notes/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.jabaridash.notes;
+				PRODUCT_BUNDLE_IDENTIFIER = com.guillaume.notes;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -576,14 +580,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 62TYL29D89;
+				DEVELOPMENT_TEAM = 8MT429F374;
 				INFOPLIST_FILE = notes/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.jabaridash.notes;
+				PRODUCT_BUNDLE_IDENTIFIER = com.guillaume.notes;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -597,7 +601,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 62TYL29D89;
+				DEVELOPMENT_TEAM = 8MT429F374;
 				INFOPLIST_FILE = notesTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -619,7 +623,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 62TYL29D89;
+				DEVELOPMENT_TEAM = 8MT429F374;
 				INFOPLIST_FILE = notesTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

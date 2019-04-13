@@ -9,7 +9,27 @@
 import CoreData
 import Foundation
 
-class Note: NSManagedObject {
+class Note: NSManagedObject, Stringifiable {
+    var stringified: String {
+        var string = ""
+        var appendedTitle = false
+        
+        if let title = title {
+            string += title
+            appendedTitle = true
+        }
+        
+        if let body = body {
+            if appendedTitle {
+                string += ":\n"
+            }
+
+            string += body
+        }
+        
+        return string
+    }
+    
     func contains(text: String?) -> Bool {
         var titleContains = false
         var bodyContains = false
@@ -27,5 +47,11 @@ class Note: NSManagedObject {
         
         return titleContains || bodyContains
     }
+    
+}
+
+// The protocol
+protocol Stringifiable {
+    var stringified: String { get }
 }
 

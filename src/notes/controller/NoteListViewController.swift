@@ -55,11 +55,11 @@ class NoteListViewController: UITableViewController {
         addButtomItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(openNewNote))
         navigationItem.leftBarButtonItem = editButtonItem
         navigationItem.rightBarButtonItem = addButtomItem
+        editButtonItem.title = "Select"
     
         // Configure tool bar
         spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteSelectedNotes))
-        
         shareButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendMultipleNotes))
         
         
@@ -134,9 +134,11 @@ extension NoteListViewController {
         super.setEditing(editing, animated: animated)
         
         if isEditing {
+            editButtonItem.title = "Done"
             addButtomItem.isEnabled = false
             
         } else {
+            editButtonItem.title = "Select"
             trashButton.isEnabled = false
             shareButton.isEnabled = false
             
@@ -213,7 +215,7 @@ extension NoteListViewController {
     }
 }
 
-/// CRUD functions
+/// CRUD functions and other auxiliary functionality
 extension NoteListViewController {
     
     /// Prompt user to enter title, then create and open new note
@@ -246,7 +248,6 @@ extension NoteListViewController {
     
     /// Send multiple notes
     @objc private func sendMultipleNotes() {
-        
         guard !selectedNotes.isEmpty else { return }
         
         noteService.sendNotes(selectedNotes, viewController: self)

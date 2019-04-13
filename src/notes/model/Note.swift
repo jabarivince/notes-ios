@@ -8,7 +8,7 @@
 
 import CoreData
 
-class Note: NSManagedObject, Loggable {
+class Note: NSManagedObject, Loggable, Stringifiable {
     
     /// Parameters for analytics
     var parameters: [String: Any] {
@@ -59,6 +59,26 @@ class Note: NSManagedObject, Loggable {
     var length: Int {
         return titleLength + bodyLength
     }
+  
+    var stringified: String {
+        var string = ""
+        var appendedTitle = false
+        
+        if let title = title {
+            string += title
+            appendedTitle = true
+        }
+        
+        if let body = body {
+            if appendedTitle {
+                string += ":\n"
+            }
+
+            string += body
+        }
+        
+        return string
+    }
     
     /// Determines if a note has a given string in
     /// its title or in its body. This function is
@@ -80,5 +100,10 @@ class Note: NSManagedObject, Loggable {
         
         return titleContains || bodyContains
     }
+}
+
+// The protocol
+protocol Stringifiable {
+    var stringified: String { get }
 }
 

@@ -85,10 +85,242 @@ class NoteTest: XCTestCase {
         XCTAssert(precondition)
         XCTAssert(postcondition)
     }
+    
+    func testStringifyingNote() {
+        let note = emptyNote
+        let stringified = "title:\nbody"
+        
+        let precondition = stringified != note.stringified
+        
+        note.title = "title"
+        note.body = "body"
+        
+        let postcondition = stringified == note.stringified
+        
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+    
+    func testStringifyingNoteWithEmptyTitle() {
+        let note = emptyNote
+        let stringified = "body"
+        
+        let precondition = stringified != note.stringified
+        
+        note.body = "body"
+        
+        let postcondition = stringified == note.stringified
+        
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+    
+    func testStringifyingNoteWithEmptyBody() {
+        let note = emptyNote
+        let stringified = "title"
+        
+        let precondition = stringified != note.stringified
+        
+        note.title = "title"
+        
+        let postcondition = stringified == note.stringified
+        
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+    
+    func testStringifyingSetOfNotesOfSizeOne() {
+        let note = emptyNote
+        var noteSet = Set<Note>()
+        
+        note.title = "title"
+        note.body = "body"
+        noteSet.insert(note)
+        
+        let condition = noteSet.stringified == note.stringified
+        
+        XCTAssert(condition)
+    }
+    
+    func testStringifyingSetOfNotes() {
+        let quantity = Int.random(in: 10...50)
+        let notes = getNotes(quantity, withTitles: true, withBodies: true)
+        let noteSet = Set<Note>(notes)
+        var stringified = ""
+        
+        for (index, note) in notes.enumerated() {
+            stringified.append(note.stringified)
+            
+            if index != notes.count - 1 {
+                stringified.append("\n\n")
+            }
+        }
+        
+        let condition = noteSet.stringified == stringified
+        
+        XCTAssert(condition)
+    }
+    
+    func testStringifyingEmptySetOfNotes() {
+        let noteSet = Set<Note>()
+        
+        let condition = noteSet.stringified.isEmpty
+        
+        XCTAssert(condition)
+    }
+    
+    func testStringifyingSetOfAllEmptyNotes() {
+        let quantity = Int.random(in: 10...50)
+        let notes = getNotes(quantity, empty: true)
+        let noteSet = Set<Note>(notes)
+        
+        let condition = noteSet.stringified.isEmpty
+        
+        XCTAssert(condition)
+    }
+    
+    func testStringifyingNotesWithEmptyBodies() {
+        let quantity = Int.random(in: 10...50)
+        let notes = getNotes(quantity, withTitles: true, withBodies: false)
+        let noteSet = Set<Note>(notes)
+        var stringified = ""
+        
+        for (index, note) in notes.enumerated() {
+            stringified.append(note.stringified)
+            
+            if index != notes.count - 1 {
+                stringified.append("\n\n")
+            }
+        }
+        
+        let condition = noteSet.stringified == stringified
+        
+        XCTAssert(condition)
+    }
+    
+    func testStringifyingNotesWithEmptyTitles() {
+        let quantity = Int.random(in: 10...50)
+        let notes = getNotes(quantity, withTitles: false, withBodies: true)
+        let noteSet = Set<Note>(notes)
+        var stringified = ""
+        
+        for (index, note) in notes.enumerated() {
+            stringified.append(note.stringified)
+            
+            if index != notes.count - 1 {
+                stringified.append("\n\n")
+            }
+        }
+        
+        let condition = noteSet.stringified == stringified
+        
+        XCTAssert(condition)
+    }
+    
+    func testStringifyingWithRandomlyCreatedNotes() {
+        let quantity = Int.random(in: 100...150)
+        let notes = getNotes(quantity).filter { !$0.stringified.isEmpty }.sorted(by: Set.comparator)
+        let noteSet = Set<Note>(notes)
+        var stringified = ""
+        
+        for (index, note) in notes.enumerated() {
+            if !note.stringified.isEmpty {
+                stringified.append(note.stringified)
+                
+                if index != notes.count - 1 {
+                    stringified.append("\n\n")
+                }
+            }
+        }
+
+        let condition = noteSet.stringified == stringified
+        
+        XCTAssert(condition)
+    }
 }
 
 extension NoteTest {
     private var emptyNote: Note {
-        return NoteServiceTest.getEmptyNote()
+        let note = NoteServiceTest.getEmptyNote()
+        let now = Date()
+        
+        note.createdDate = now
+        note.lastEditedDate = now
+        
+        return note
+    }
+    
+    private var newNote: Note {
+        let note = emptyNote
+        
+        note.title = "title"
+        note.body = "body"
+        
+        return note
+    }
+    
+    private func getNotes(_ quantity: Int, empty: Bool = false) -> [Note] {
+        var notes = [Note]()
+        
+        if quantity < 1 {
+            assertionFailure("Quantity must be greater than 0")
+        }
+        
+        for _ in 1...quantity {
+            notes.append(empty ? emptyNote : newNote)
+        }
+        
+        return notes
+    }
+    
+    private func getNotes(_ quantity: Int, withTitles: Bool, withBodies: Bool) -> [Note] {
+        var notes = [Note]()
+        
+        if quantity < 1 {
+            assertionFailure("Quantity must be greater than 0")
+        }
+        
+        for _ in 1...quantity {
+            let note = emptyNote
+            
+            if withTitles {
+               note.title = "title"
+            }
+            
+            if withBodies {
+                note.body = "body"
+            }
+            
+            notes.append(note)
+        }
+        
+        return notes
+    }
+    
+    func getNotes(_ quantity: Int) -> [Note] {
+        var notes = [Note]()
+        
+        if quantity < 1 {
+            assertionFailure("Quantity must be greater than 0")
+        }
+        
+        for index in 1...quantity {
+            let note = emptyNote
+            
+            let title = Int.random(in: 1...100) > 50
+            let body = Int.random(in: 1...100) > 50
+            
+            if title {
+                note.title = "title\(index)"
+            }
+            
+            if body {
+                note.body = "body\(index)"
+            }
+            
+            notes.append(note)
+        }
+        
+        return notes
     }
 }

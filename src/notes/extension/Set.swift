@@ -16,6 +16,8 @@ extension Set: Stringifiable where Element == Note {
             return left < right
         }
         
+        // TODO: Handle nil cases
+        
         return false
     }
     

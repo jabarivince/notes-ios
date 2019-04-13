@@ -211,7 +211,6 @@ extension NoteListViewController {
         deleteNote(note)
         tableView.deleteRows(at: [indexPath], with: .automatic)
     }
-
 }
 
 /// CRUD functions

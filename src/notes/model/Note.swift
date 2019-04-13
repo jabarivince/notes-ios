@@ -8,9 +8,55 @@
 
 import CoreData
 
-class Note: NSManagedObject, Loggable, Stringifiable {
+class Note: NSManagedObject {
     
-    /// Parameters for analytics
+    /// Determines if a note has a given string in
+    /// its title or in its body. This function is
+    /// not case sensitive.
+    func contains(text: String?) -> Bool {
+        var titleContains = false
+        var bodyContains = false
+        
+        if let text = text?.lowercased() {
+            
+            if let title = title?.lowercased() {
+                titleContains = title.contains(text)
+            }
+            
+            if let body = body?.lowercased() {
+                bodyContains = body.contains(text)
+            }
+        }
+        
+        return titleContains || bodyContains
+    }
+}
+
+/// Sending related properties
+extension Note: Stringifiable {
+    var stringified: String {
+        var string = ""
+        var appendedTitle = false
+        
+        if let title = title {
+            string += title
+            appendedTitle = true
+        }
+        
+        if let body = body {
+            if appendedTitle {
+                string += ":\n"
+            }
+            
+            string += body
+        }
+        
+        return string
+    }
+}
+
+/// Analytics related properties
+extension Note: Loggable {
     var parameters: [String: Any] {
         return [
             "created_date": createdDate as Any,
@@ -59,46 +105,4 @@ class Note: NSManagedObject, Loggable, Stringifiable {
     var length: Int {
         return titleLength + bodyLength
     }
-  
-    var stringified: String {
-        var string = ""
-        var appendedTitle = false
-        
-        if let title = title {
-            string += title
-            appendedTitle = true
-        }
-        
-        if let body = body {
-            if appendedTitle {
-                string += ":\n"
-            }
-
-            string += body
-        }
-        
-        return string
-    }
-    
-    /// Determines if a note has a given string in
-    /// its title or in its body. This function is
-    /// not case sensitive.
-    func contains(text: String?) -> Bool {
-        var titleContains = false
-        var bodyContains = false
-        
-        if let text = text?.lowercased() {
-            
-            if let title = title?.lowercased() {
-                titleContains = title.contains(text)
-            }
-            
-            if let body = body?.lowercased() {
-                bodyContains = body.contains(text)
-            }
-        }
-        
-        return titleContains || bodyContains
-    }
 }
-

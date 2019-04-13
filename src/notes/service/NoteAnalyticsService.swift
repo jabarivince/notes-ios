@@ -50,6 +50,25 @@ class NoteAnalyticsService: AnalyticsService {
         publish(event)
     }
     
+    /// Send batch
+    func publishSendBatchNoteEvent(for notes: Set<Note>) {
+        let event = Event(type: .sendBatchNote, loggable: notes)
+        publish(event)
+    }
+    
+    /// Generic function for logging stringifiable send events
+    func publishSendStringifiableLoggableEvent<T>(for value: T) where T: Loggable, T: Stringifiable {
+        if let note = value as? Note {
+            publishSendNoteEvent(for: note)
+            
+        } else if let notes = value as? Set<Note> {
+            
+            publishSendBatchNoteEvent(for: notes)
+        } else {
+            // Error or log no associated function
+        }
+    }
+    
     /// Singleton = no public inits
     private init() {}
 }

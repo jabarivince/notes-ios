@@ -15,8 +15,6 @@ class NoteListViewController: UITableViewController {
     private var trashButton: UIBarButtonItem!
     private var spacer: UIBarButtonItem!
     private var shareButton: UIBarButtonItem!
-    
-    
     private var noteService: NoteService!
     private var selectedNotes: Set<Note>!
     private var notes: [Note]!
@@ -247,7 +245,7 @@ extension NoteListViewController {
         noteService.deleteNote(note: note)
     }
     
-    // Send multiple notes
+    /// Send multiple notes
     @objc private func sendMultipleNotes() {
         
         guard !selectedNotes.isEmpty else { return }

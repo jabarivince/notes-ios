@@ -40,8 +40,7 @@ class NoteAnalyticsService: AnalyticsService {
     
     /// Delete batch
     func publishDeleteBatchNoteEvent(for notes: Set<Note>) {
-        // TODO: Conform Set<Note> to Loggable
-        let event = Event(type: .deleteBatchNote, loggable: nil)
+        let event = Event(type: .deleteBatchNote, loggable: notes)
         publish(event)
     }
     

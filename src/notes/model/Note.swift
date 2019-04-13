@@ -102,8 +102,3 @@ class Note: NSManagedObject, Loggable, Stringifiable {
     }
 }
 
-// The protocol
-protocol Stringifiable {
-    var stringified: String { get }
-}
-

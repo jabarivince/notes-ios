@@ -154,3 +154,7 @@ class NoteService {
     /// This class is a Singleton, so we lock down the init.
     private init() {}
 }
+
+protocol Stringifiable {
+    var stringified: String { get }
+}

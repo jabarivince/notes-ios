@@ -249,7 +249,7 @@ extension NoteListViewController {
         
         guard !selectedNotes.isEmpty else { return }
         
-        noteService.sendNote(selectedNotes, viewController: self)
+        noteService.sendNotes(selectedNotes, viewController: self)
     }
     
     /// Deletes all selected notes from database

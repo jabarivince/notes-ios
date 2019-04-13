@@ -110,19 +110,30 @@ class NoteService {
         }
     }
     
-    /// Opens view for sending a note
-    func sendNote<T>(_ value: T,
-                     withSubject subject: String = "Notes",
-                     viewController: UIViewController) where T: Stringifiable, T: Loggable {
+    /// Sends a single note
+    func sendNote(_ note: Note, viewController: UIViewController) {
+        send(note, viewController: viewController, completion: analyticsService.publishSendNoteEvent)
+    }
+    
+    /// Shares a set of notes
+    func sendNotes(_ notes: Set<Note>, viewController: UIViewController) {
+        send(notes, viewController: viewController, completion: analyticsService.publishSendBatchNoteEvent)
+    }
+    
+    /// Opens view for sending a note or multiple notes
+    private func send<T>(_ value: T,
+                         withSubject subject: String = "Notes",
+                         viewController: UIViewController,
+                         completion: @escaping (T) -> Void) where T: Stringifiable, T: Loggable {
         
         let text = value.stringified
         let activityViewController = UIActivityViewController(activityItems:[text], applicationActivities: nil)
         
         activityViewController.popoverPresentationController?.sourceView = viewController.view
         activityViewController.setValue(subject, forKey: "Subject")
-        viewController.presentedVC.present(activityViewController, animated: true) { [weak self] in
+        viewController.presentedVC.present(activityViewController, animated: true) {
             
-            self?.analyticsService.publishSendStringifiableLoggableEvent(for: value)
+            completion(value)
         }
     }
     
@@ -160,6 +171,8 @@ class NoteService {
     private init() {}
 }
 
+/// Protocol used for sending a note
+/// of multiple notes via iOS sharing view
 protocol Stringifiable {
     var stringified: String { get }
 }

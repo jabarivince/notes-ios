@@ -12,9 +12,9 @@ class NoteListViewController: UITableViewController {
     private var searchController: UISearchController!
     private var table: UITableView!
     private var addButtomItem: UIBarButtonItem!
+    private var shareButtomItem: UIBarButtonItem!
     private var trashButton: UIBarButtonItem!
     private var spacer: UIBarButtonItem!
-    private var shareButton: UIBarButtonItem!
     private var noteService: NoteService!
     private var selectedNotes: Set<Note>!
     private var notes: [Note]!
@@ -53,6 +53,7 @@ class NoteListViewController: UITableViewController {
         
         // Configure nav bar
         addButtomItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(openNewNote))
+        shareButtomItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendMultipleNotes))
         navigationItem.leftBarButtonItem = editButtonItem
         navigationItem.rightBarButtonItem = addButtomItem
         editButtonItem.title = "Select"
@@ -60,13 +61,11 @@ class NoteListViewController: UITableViewController {
         // Configure tool bar
         spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteSelectedNotes))
-        shareButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendMultipleNotes))
         
-        
-        shareButton.isEnabled = false
+        shareButtomItem.isEnabled = false
         trashButton.isEnabled = false
         trashButton.tintColor = .red
-        toolbarItems = [shareButton, spacer, trashButton]
+        toolbarItems = [spacer, trashButton]
         navigationController?.setToolbarHidden(false, animated: false)
     }
     
@@ -126,6 +125,16 @@ extension NoteListViewController: UISearchBarDelegate {
 /// TableView callbacks
 extension NoteListViewController {
     
+    /// Enables the + button in top right corner
+    private func enableAddButton() {
+       navigationItem.rightBarButtonItem = addButtomItem
+    }
+    
+    /// Enables the share button in top right corner
+    private func enableShareButton() {
+        navigationItem.rightBarButtonItem = shareButtomItem
+    }
+    
     /// Toggle button's isEnabled flag based off is isEditing
     /// If we are editing, we should only be able to delete
     /// selected items. This is with the condition that we are
@@ -136,11 +145,12 @@ extension NoteListViewController {
         if isEditing {
             editButtonItem.title = "Done"
             addButtomItem.isEnabled = false
+            enableShareButton()
             
         } else {
             editButtonItem.title = "Select"
             trashButton.isEnabled = false
-            shareButton.isEnabled = false
+            enableAddButton()
             
             // No adding while searching
             if !isSearching {
@@ -157,7 +167,7 @@ extension NoteListViewController {
         
         if selectedNotes.isEmpty {
             trashButton.isEnabled = false
-            shareButton.isEnabled = false
+            shareButtomItem.isEnabled = false
         }
     }
     
@@ -168,7 +178,7 @@ extension NoteListViewController {
         if isEditing {
             selectedNotes.insert(note)
             trashButton.isEnabled = true
-            shareButton.isEnabled = true
+            shareButtomItem.isEnabled = true
             
         } else {
             openNote(note)

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class NoteController: UIViewController {
+class NoteController: UIViewController, UITextViewDelegate {
     private var textView: UITextView!
     private var trashButton: UIBarButtonItem!
     private var spacer: UIBarButtonItem!
@@ -42,6 +42,8 @@ class NoteController: UIViewController {
         textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.text = note.body
+        textView.delegate = self
+        textView.returnKeyType = .done
         view.addSubview(textView)
         
         spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
@@ -54,6 +56,16 @@ class NoteController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.prefersLargeTitles = false
+        
+    }
+    
+    // When keyboard returns, this function is called to hide the keyboard
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if (text == "\n") {
+            textView.resignFirstResponder()
+            return false
+        }
+        return true
     }
 }
 

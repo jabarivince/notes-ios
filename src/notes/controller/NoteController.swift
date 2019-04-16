@@ -112,7 +112,7 @@ extension NoteController {
     }
     
     @objc private func changeNoteName() {
-            let message = "Give your note a name"
+            let message = "Rename your note"
             let placeholder = "Untitled"
             
             func onConfirm(title: String?) {

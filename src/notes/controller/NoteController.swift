@@ -12,6 +12,7 @@ class NoteController: UIViewController {
     private var textView: UITextView!
     private var trashButton: UIBarButtonItem!
     private var spacer: UIBarButtonItem!
+    private var noteTitle = UIButton(type: .custom)
     
     private let note: Note
     private let noteService: NoteService
@@ -34,7 +35,15 @@ class NoteController: UIViewController {
     }
     
     override func viewDidLoad() {
-        title = note.title
+        // set note title
+        noteTitle.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
+        noteTitle.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0)
+        noteTitle.setTitle(note.title, for: .normal)
+        noteTitle.titleLabel?.font = noteTitle.titleLabel?.font.bolded
+        noteTitle.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+        noteTitle.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
+        navigationItem.titleView = noteTitle
+        
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
         
         textView = UITextView()
@@ -100,5 +109,23 @@ extension NoteController {
     
     @objc private func closeKeyboard() {
         textView.resignFirstResponder()
+    }
+    
+    @objc private func changeNoteName() {
+            let message = "Give your note a name"
+            let placeholder = "Untitled"
+            
+            func onConfirm(title: String?) {
+                note.title = title
+                self.viewDidLoad()
+               
+               
+            }
+            
+            promptForText(withMessage: message,
+                          placeholder: placeholder,
+                          onConfirm: onConfirm,
+                          onCancel: nil)
+        
     }
 }

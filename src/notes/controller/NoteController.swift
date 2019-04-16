@@ -37,7 +37,7 @@ class NoteController: UIViewController {
     override func viewDidLoad() {
         // set note title
         noteTitle.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
-        noteTitle.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0)
+        noteTitle.backgroundColor = .clear
         noteTitle.setTitle(note.title, for: .normal)
         noteTitle.titleLabel?.font = noteTitle.titleLabel?.font.bolded
         noteTitle.setTitleColor(.black, for: .normal)

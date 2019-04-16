@@ -56,7 +56,7 @@ class NoteService {
             try context.save()
             analyticsService.publishCreateNoteEvent(for: note)
         } catch _ {
-            // TODO: LOG ERROR
+            analyticsService.publishCreateNoteEventFailed(for: note)
         }
         
         return note
@@ -70,7 +70,7 @@ class NoteService {
             try context.save()
             analyticsService.publishDeleteNoteEvent(for: note)
         } catch _ {
-            // TODO: LOG ERROR
+            analyticsService.publishDeleteNoteEventFailed(for: note)
         }
     }
     
@@ -84,7 +84,7 @@ class NoteService {
             try context.save()
             analyticsService.publishDeleteBatchNoteEvent(for: notes)
         } catch _ {
-            // TODO: LOG ERROR
+            analyticsService.publishDeleteBatchNoteEventFailed(for: notes)
         }
         
         if let completion = completion {
@@ -106,7 +106,7 @@ class NoteService {
             try context.save()
             analyticsService.publishUpdateNoteEvent(for: note)
         } catch _ {
-            // TODO: LOG ERROR
+            analyticsService.publishUpdateNoteEventFailed(for: note)
         }
     }
     

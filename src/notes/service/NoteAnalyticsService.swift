@@ -20,9 +20,19 @@ class NoteAnalyticsService: AnalyticsService {
         publish(event)
     }
     
+    func publishCreateNoteEventFailed(for note: Note) {
+        let event = Event(type: .createNoteFailed, loggable: note)
+        publish(event)
+    }
+    
     /// Read
     func publishReadNoteEvent(for note: Note) {
         let event = Event(type: .readNote, loggable: note)
+        publish(event)
+    }
+    
+    func publishReadNoteEventFailed(for note: Note) {
+        let event = Event(type: .readNoteFailed, loggable: note)
         publish(event)
     }
     
@@ -32,9 +42,19 @@ class NoteAnalyticsService: AnalyticsService {
         publish(event)
     }
     
+    func publishUpdateNoteEventFailed(for note: Note) {
+        let event = Event(type: .updateNoteFailed, loggable: note)
+        publish(event)
+    }
+    
     /// Delete
     func publishDeleteNoteEvent(for note: Note) {
         let event = Event(type: .deleteNote, loggable: note)
+        publish(event)
+    }
+    
+    func publishDeleteNoteEventFailed(for note: Note) {
+        let event = Event(type: .deleteNoteFailed, loggable: note)
         publish(event)
     }
     
@@ -44,9 +64,19 @@ class NoteAnalyticsService: AnalyticsService {
         publish(event)
     }
     
+    func publishDeleteBatchNoteEventFailed(for notes: Set<Note>) {
+        let event = Event(type: .deleteBatchNoteFailed, loggable: notes)
+        publish(event)
+    }
+    
     /// Send
     func publishSendNoteEvent(for note: Note) {
         let event = Event(type: .sendNote, loggable: note)
+        publish(event)
+    }
+    
+    func publishSendNoteEventFailed(for note: Note) {
+        let event = Event(type: .sendNoteFailed, loggable: note)
         publish(event)
     }
     
@@ -56,7 +86,12 @@ class NoteAnalyticsService: AnalyticsService {
         publish(event)
     }
     
+    func publishSendBatchNoteEventFailed(for notes: Set<Note>) {
+        let event = Event(type: .sendBatchNoteFailed, loggable: notes)
+        publish(event)
+    }
     /// Singleton = no public inits
     private init() {}
 }
+
 

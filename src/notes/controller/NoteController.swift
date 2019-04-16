@@ -118,14 +118,11 @@ extension NoteController {
             func onConfirm(title: String?) {
                 note.title = title
                 self.viewDidLoad()
-               
-               
             }
             
             promptForText(withMessage: message,
                           placeholder: placeholder,
                           onConfirm: onConfirm,
                           onCancel: nil)
-        
     }
 }

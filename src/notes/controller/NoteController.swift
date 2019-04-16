@@ -40,7 +40,6 @@ class NoteController: UIViewController {
         textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.text = note.body
-        textView.returnKeyType = .done
         view.addSubview(textView)
         
         spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)

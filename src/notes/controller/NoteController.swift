@@ -35,13 +35,12 @@ class NoteController: UIViewController {
     
     override func viewDidLoad() {
         title = note.title
-        
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(closeNote))
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
         
         textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.text = note.body
+        textView.returnKeyType = .done
         view.addSubview(textView)
         
         spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
@@ -49,11 +48,24 @@ class NoteController: UIViewController {
         trashButton.tintColor = .red
         toolbarItems = [spacer, trashButton]
         navigationController?.setToolbarHidden(false, animated: false)
+        
+        let toolbar:UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0,  width: self.view.frame.size.width, height: 30))
+        let flexSpace = UIBarButtonItem(barButtonSystemItem:    .flexibleSpace, target: nil, action: nil)
+        let doneBtn: UIBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(closeKeyboard))
+        toolbar.setItems([flexSpace, doneBtn], animated: false)
+        toolbar.sizeToFit()
+        textView.inputAccessoryView = toolbar
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.prefersLargeTitles = false
+        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        closeNote()
     }
 }
 
@@ -85,5 +97,9 @@ extension NoteController {
     private func saveNote() {
         note.body = textView.text
         noteService.saveNote(note: note)
+    }
+    
+    @objc private func closeKeyboard() {
+        textView.resignFirstResponder()
     }
 }

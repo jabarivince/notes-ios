@@ -46,6 +46,7 @@ class NoteListViewController: UITableViewController {
         tableView.allowsSelectionDuringEditing = true
         tableView.allowsMultipleSelectionDuringEditing = true
         
+        
         table.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         table.dataSource = self
@@ -61,12 +62,12 @@ class NoteListViewController: UITableViewController {
         // Configure tool bar
         spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteSelectedNotes))
+        navigationController?.setToolbarHidden(true, animated: true)
         
         shareButtomItem.isEnabled = false
         trashButton.isEnabled = false
         trashButton.tintColor = .red
-        toolbarItems = [spacer, trashButton]
-        navigationController?.setToolbarHidden(false, animated: false)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -143,11 +144,14 @@ extension NoteListViewController {
         super.setEditing(editing, animated: animated)
         
         if isEditing {
+            navigationController?.setToolbarHidden(false, animated: true)
+            toolbarItems = [spacer, trashButton]
             editButtonItem.title = "Done"
             addButtomItem.isEnabled = false
             enableShareButton()
             
         } else {
+            navigationController?.setToolbarHidden(true, animated: true)
             editButtonItem.title = "Select"
             trashButton.isEnabled = false
             enableAddButton()

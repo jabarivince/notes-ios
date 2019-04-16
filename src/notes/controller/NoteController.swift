@@ -40,7 +40,7 @@ class NoteController: UIViewController {
         noteTitle.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0)
         noteTitle.setTitle(note.title, for: .normal)
         noteTitle.titleLabel?.font = noteTitle.titleLabel?.font.bolded
-        noteTitle.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+        noteTitle.setTitleColor(.black, for: .normal)
         noteTitle.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
         navigationItem.titleView = noteTitle
         

@@ -77,8 +77,8 @@ extension UIViewController {
         }
         
         yes.setValue(UIColor.red, forKey: "titleTextColor")
-        alert.addAction(yes)
         alert.addAction(no)
+        alert.addAction(yes)
         
         presentedVC.present(alert, animated: true, completion: nil)
     }

@@ -17,31 +17,21 @@ class NoteListViewController: UITableViewController {
     private let cellId:           String
     private let noteService:      NoteService
     
-    /// Disabled the trash can if our selection count reaches 0
+    /// Disable the trash can if our selection count reaches 0
     private var selectedNotesMap: Dictionary<IndexPath, Note> {
         didSet {
             trashButton.isEnabled = !selectedNotesMap.isEmpty
         }
     }
     
-    /// Disabled edit button if there are 0 notes to edit
+    /// Disable edit button if there are 0 notes to edit
     private var notes = [Note]() {
         didSet {
             editButtonItem.isEnabled = !notes.isEmpty
         }
     }
     
-    /// Return only the Note objects that are selected
-    private var selectedNotes: Set<Note> {
-        return selectedNotesMap.valueSet
-    }
-    
-    /// Return only the indicies of the selected cells
-    private var selectedIndices: [IndexPath] {
-        return selectedNotesMap.keyList
-    }
-    
-    /// Disabled the add button if we are searching
+    /// Disable the add button if we are searching
     private var isSearching = false {
         didSet {
             addButtomItem.isEnabled = !isSearching
@@ -150,14 +140,6 @@ extension NoteListViewController: UISearchBarDelegate {
 }
 
 extension NoteListViewController {
-    private func enableAddButton() {
-        navigationItem.rightBarButtonItem = addButtomItem
-    }
-    
-    private func enableShareButton() {
-        navigationItem.rightBarButtonItem = shareButtomItem
-    }
-    
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
         
@@ -262,8 +244,19 @@ extension NoteListViewController {
     }
 }
 
-extension NoteListViewController {
-    @objc private func openNewNote() {
+private extension NoteListViewController {
+    
+    /// Return only the Note objects that are selected
+    var selectedNotes: Set<Note> {
+        return selectedNotesMap.valueSet
+    }
+    
+    /// Return only the indicies of the selected cells
+    var selectedIndices: [IndexPath] {
+        return selectedNotesMap.keyList
+    }
+    
+    @objc func openNewNote() {
         let message     = "Give your note a name"
         let placeholder = "Untitled"
         
@@ -278,21 +271,21 @@ extension NoteListViewController {
                       onCancel: nil)
     }
     
-    private func openNote(_ note: Note) {
+    func openNote(_ note: Note) {
         let noteController = NoteController(note: note, noteService: noteService)
         navigationController?.pushViewController(noteController, animated: true)
     }
     
-    private func deleteNote(_ note: Note) {
+    func deleteNote(_ note: Note) {
         noteService.deleteNote(note: note)
     }
     
-    @objc private func sendMultipleNotes() {
+    @objc func sendMultipleNotes() {
         guard !selectedNotesMap.isEmpty else { return }
         noteService.sendNotes(selectedNotes, viewController: self)
     }
     
-    @objc private func deleteSelectedNotes() {
+    @objc func deleteSelectedNotes() {
         guard !selectedNotesMap.isEmpty else { return }
         
         let message = "Delete \(selectedNotesMap.count) note(s)?"
@@ -311,7 +304,7 @@ extension NoteListViewController {
                       onNo: nil)
     }
     
-    private func getNotes(then completion: (() -> Void)? = nil) {
+    func getNotes(then completion: (() -> Void)? = nil) {
         notes = noteService.getAllNotes(containing: searchController.searchBar.text)
         
         tableView.reloadData()
@@ -321,9 +314,17 @@ extension NoteListViewController {
         }
     }
     
-    private func resetSelectedNotes() {
+    func resetSelectedNotes() {
         guard isEditing else { return }
         
         selectedNotesMap.removeAll()
+    }
+    
+    func enableAddButton() {
+        navigationItem.rightBarButtonItem = addButtomItem
+    }
+    
+    func enableShareButton() {
+        navigationItem.rightBarButtonItem = shareButtomItem
     }
 }

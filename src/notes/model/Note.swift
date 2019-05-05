@@ -56,17 +56,25 @@ extension Note: Stringifiable {
 
 extension Note: Loggable {
     var parameters: [String: Any] {
-        return [
-            "created_date":     createdDate as Any,
-            "last_edited_date": lastEditedDate as Any,
-            "is_dirty":         isDirty,
-            "has_empty_title":  hasEmptyTitle,
-            "has_empty_body":   hasEmptyBody,
-            "is_empty":         isEmpty,
-            "title_length":     titleLength,
-            "body_length":      bodyLength,
-            "length":           length
+        var params: [String: Any] = [
+            "is_dirty": isDirty,
+            "has_empty_title": hasEmptyTitle,
+            "has_empty_body": hasEmptyBody,
+            "is_empty": isEmpty,
+            "title_length": titleLength,
+            "body_length": bodyLength,
+            "length": length,
         ]
+        
+        if let createdDate = createdDate {
+            params["created_date"] = createdDate.formatted
+        }
+        
+        if let lastEditedDate = lastEditedDate {
+            params["last_edited_date"] = lastEditedDate.formatted
+        }
+        
+        return params
     }
     
     var isDirty: Bool {

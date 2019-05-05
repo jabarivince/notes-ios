@@ -55,8 +55,9 @@ class NoteService {
         do {
             try context.save()
             analyticsService.publishCreateNoteEvent(for: note)
+
         } catch _ {
-            // TODO: LOG ERROR
+            analyticsService.publishCreateNoteEventFailed(for: note)
         }
         
         return note
@@ -69,8 +70,9 @@ class NoteService {
         do {
             try context.save()
             analyticsService.publishDeleteNoteEvent(for: note)
+            
         } catch _ {
-            // TODO: LOG ERROR
+            analyticsService.publishDeleteNoteEventFailed(for: note)
         }
     }
     
@@ -83,8 +85,9 @@ class NoteService {
         do {
             try context.save()
             analyticsService.publishDeleteBatchNoteEvent(for: notes)
+           
         } catch _ {
-            // TODO: LOG ERROR
+            analyticsService.publishDeleteBatchNoteEventFailed(for: notes)
         }
         
         if let completion = completion {
@@ -105,8 +108,9 @@ class NoteService {
         do {
             try context.save()
             analyticsService.publishUpdateNoteEvent(for: note)
+            
         } catch _ {
-            // TODO: LOG ERROR
+            analyticsService.publishUpdateNoteEventFailed(for: note)
         }
     }
     
@@ -176,3 +180,7 @@ class NoteService {
 protocol Stringifiable {
     var stringified: String { get }
 }
+
+
+
+

@@ -12,7 +12,7 @@ import UIKit
 class NoteService {
     
     /// SQL: SELECT * FROM Note
-    var notes: [Note] {
+    private var notes: [Note] {
         var array: [Note] = []
         
         let sortDescriptor = NSSortDescriptor(key: "lastEditedDate", ascending: false)
@@ -26,6 +26,14 @@ class NoteService {
         }
         
         return array
+    }
+
+    func getAllNotes(containing searchText: String? = nil) -> [Note] {
+        guard let searchText = searchText, !searchText.isEmpty else { return notes }
+        
+        return notes.filter { note in
+            note.contains(text: searchText)
+        }
     }
     
     /// SQL: INSERT INTO Note (title, body) values (title, null)

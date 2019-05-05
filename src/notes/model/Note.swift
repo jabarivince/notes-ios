@@ -58,9 +58,7 @@ extension Note: Stringifiable {
 /// Analytics related properties
 extension Note: Loggable {
     var parameters: [String: Any] {
-        return [
-            "created_date": createdDate as Any,
-            "last_edited_date": lastEditedDate as Any,
+        var params: [String: Any] = [
             "is_dirty": isDirty,
             "has_empty_title": hasEmptyTitle,
             "has_empty_body": hasEmptyBody,
@@ -69,6 +67,16 @@ extension Note: Loggable {
             "body_length": bodyLength,
             "length": length
         ]
+        
+        if let createdDate = createdDate {
+            params["created_date"] = createdDate.formatted
+        }
+        
+        if let lastEditedDate = lastEditedDate {
+            params["last_edited_date"] = lastEditedDate.formatted
+        }
+        
+        return params
     }
     
     /// If the not has been edited after 1st save

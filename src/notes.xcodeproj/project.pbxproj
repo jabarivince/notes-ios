@@ -16,6 +16,7 @@
 		0CC2415C2247E6E300D681D4 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC2415B2247E6E300D681D4 /* UIView.swift */; };
 		0CC2415E224AFFC100D681D4 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC2415D224AFFC100D681D4 /* String.swift */; };
 		0CC24160224B08BA00D681D4 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC2415F224B08BA00D681D4 /* Date.swift */; };
+		0CDBE01C227E62AF007330F9 /* Dictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDBE01B227E62AF007330F9 /* Dictionary.swift */; };
 		0CDC11C522588EEF006AE47B /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC11C422588EEF006AE47B /* UIViewController.swift */; };
 		0CDC11C72259274A006AE47B /* UIFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC11C62259274A006AE47B /* UIFont.swift */; };
 		0CE0BDA32246E4B6001C6401 /* NoteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDA22246E4B6001C6401 /* NoteService.swift */; };
@@ -51,6 +52,7 @@
 		0CC2415B2247E6E300D681D4 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		0CC2415D224AFFC100D681D4 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		0CC2415F224B08BA00D681D4 /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
+		0CDBE01B227E62AF007330F9 /* Dictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dictionary.swift; sourceTree = "<group>"; };
 		0CDC11C422588EEF006AE47B /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
 		0CDC11C62259274A006AE47B /* UIFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFont.swift; sourceTree = "<group>"; };
 		0CE0BDA22246E4B6001C6401 /* NoteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteService.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				0CDC11C422588EEF006AE47B /* UIViewController.swift */,
 				0CDC11C62259274A006AE47B /* UIFont.swift */,
 				2A8F3D342261615600322B55 /* Set.swift */,
+				0CDBE01B227E62AF007330F9 /* Dictionary.swift */,
 			);
 			path = extension;
 			sourceTree = "<group>";
@@ -230,6 +233,7 @@
 				0CFAB6D42246CC75004AA4C7 /* Frameworks */,
 				0CFAB6D52246CC75004AA4C7 /* Resources */,
 				F77688F2F6AD1A43B0AE2E07 /* [CP] Embed Pods Frameworks */,
+				0C00F9E1226D58190045FD22 /* Crashlytucs */,
 			);
 			buildRules = (
 			);
@@ -318,6 +322,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		0C00F9E1226D58190045FD22 /* Crashlytucs */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = Crashlytucs;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"${PODS_ROOT}/Fabric/run\"\n";
+		};
 		1A38F918B0A8E78C264F260D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -380,7 +403,6 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
-				"${PODS_ROOT}/Target Support Files/Pods-notes/Pods-notes-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -405,6 +427,7 @@
 				0CDC11C72259274A006AE47B /* UIFont.swift in Sources */,
 				0CC24160224B08BA00D681D4 /* Date.swift in Sources */,
 				2A8F3D352261615600322B55 /* Set.swift in Sources */,
+				0CDBE01C227E62AF007330F9 /* Dictionary.swift in Sources */,
 				0CC2415C2247E6E300D681D4 /* UIView.swift in Sources */,
 				0C6F3743225AC21B0060EC2B /* AnalyticsService.swift in Sources */,
 				0CE0BDB022473F16001C6401 /* Note.swift in Sources */,
@@ -565,6 +588,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 62TYL29D89;
 				INFOPLIST_FILE = notes/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;

@@ -32,7 +32,6 @@ class Note: NSManagedObject {
     }
 }
 
-/// Sending related properties
 extension Note: Stringifiable {
     var stringified: String {
         var string = ""
@@ -55,7 +54,6 @@ extension Note: Stringifiable {
     }
 }
 
-/// Analytics related properties
 extension Note: Loggable {
     var parameters: [String: Any] {
         var params: [String: Any] = [
@@ -65,7 +63,7 @@ extension Note: Loggable {
             "is_empty": isEmpty,
             "title_length": titleLength,
             "body_length": bodyLength,
-            "length": length
+            "length": length,
         ]
         
         if let createdDate = createdDate {
@@ -79,37 +77,30 @@ extension Note: Loggable {
         return params
     }
     
-    /// If the not has been edited after 1st save
     var isDirty: Bool {
         return createdDate != lastEditedDate
     }
     
-    /// If title is nil or empty string.
     var hasEmptyTitle: Bool {
         return title?.isEmpty ?? true
     }
     
-    /// If body is nil or empty string.
     var hasEmptyBody: Bool {
         return body?.isEmpty ?? true
     }
     
-    /// If title and body is empty.
     var isEmpty: Bool {
         return hasEmptyTitle && hasEmptyBody
     }
     
-    /// Length of title.
     var titleLength: Int {
         return title?.count ?? 0
     }
     
-    /// Length of body.
     var bodyLength: Int {
         return body?.count ?? 0
     }
     
-    /// Length of title + length of body.
     var length: Int {
         return titleLength + bodyLength
     }

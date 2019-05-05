@@ -9,7 +9,7 @@
 import UIKit
 
 class NoteController: UIViewController {
-    private var textView: UITextView!
+    private let textView: UITextView
     private var trashButton: UIBarButtonItem!
     private var spacer: UIBarButtonItem!
     private var noteTitle = UIButton(type: .custom)
@@ -20,6 +20,7 @@ class NoteController: UIViewController {
     init(note: Note, noteService: NoteService) {
         self.note = note
         self.noteService = noteService
+        self.textView = UITextView()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -29,9 +30,10 @@ class NoteController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
         textView.frame.size.width = view.bounds.width
         textView.frame.size.height = view.bounds.height
+        
+       // view.pinSubview(textView)
     }
     
     override func viewDidLoad() {
@@ -45,10 +47,10 @@ class NoteController: UIViewController {
         navigationItem.titleView = noteTitle
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
-        
-        textView = UITextView()
-        textView.translatesAutoresizingMaskIntoConstraints = false
+        view.translatesAutoresizingMaskIntoConstraints = true
+        textView.translatesAutoresizingMaskIntoConstraints = true
         textView.text = note.body
+        textView.delegate = self
         view.addSubview(textView)
         
         spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
@@ -63,6 +65,9 @@ class NoteController: UIViewController {
         toolbar.setItems([flexSpace, doneBtn], animated: false)
         toolbar.sizeToFit()
         textView.inputAccessoryView = toolbar
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardDidHideNotification, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -124,5 +129,29 @@ extension NoteController {
                           placeholder: placeholder,
                           onConfirm: onConfirm,
                           onCancel: nil)
+    }
+}
+
+extension NoteController: UITextViewDelegate {
+    func textViewDidChange(_ textView: UITextView) {
+        print("HERE")
+    }
+    
+    private func getKeyboardHeight(from notification: Notification) -> CGFloat {
+        return ((notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue ?? .zero).height
+    }
+    
+    @objc private func keyboardWillShow(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            var frame = view.frame
+            frame.origin.y -= getKeyboardHeight(from: notification)
+            view.frame = frame
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y += getKeyboardHeight(from: notification)
+        }
     }
 }

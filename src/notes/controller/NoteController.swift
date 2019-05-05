@@ -66,9 +66,7 @@ class NoteController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.prefersLargeTitles = false
-        
+        super.viewWillAppear(animated) 
     }
     
     override func viewWillDisappear(_ animated: Bool) {

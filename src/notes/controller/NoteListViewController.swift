@@ -16,17 +16,22 @@ class NoteListViewController: UITableViewController {
     private let spacer:           UIBarButtonItem
     private let cellId:           String
     private let noteService:      NoteService
-    private var selectedNotesMap: Dictionary<IndexPath, Note>
-    private var notes:            [Note]!
     
-    private var selectedNotes: Set<Note> {
-        return selectedNotesMap.valueSet
+    /// Disable the trash can if our selection count reaches 0
+    private var selectedNotesMap: Dictionary<IndexPath, Note> {
+        didSet {
+            trashButton.isEnabled = !selectedNotesMap.isEmpty
+        }
     }
     
-    private var selectedIndices: [IndexPath] {
-        return selectedNotesMap.keyList
+    /// Disable edit button if there are 0 notes to edit
+    private var notes = [Note]() {
+        didSet {
+            editButtonItem.isEnabled = !notes.isEmpty
+        }
     }
     
+    /// Disable the add button if we are searching
     private var isSearching = false {
         didSet {
             addButtomItem.isEnabled = !isSearching
@@ -37,37 +42,42 @@ class NoteListViewController: UITableViewController {
         super.viewDidLoad()
         title = "Notes"
         
+        /// Wrap the searchbar in a UIView to satisfy autolayout
         let headerView: UIView = {
             let width  = searchController.searchBar.frame.width
             let height = searchController.searchBar.frame.height
             let frame  = CGRect(x: 0, y: 0, width: width, height: height)
             let view   = UIView(frame: frame)
-            view.addAndPinSubview(searchController.searchBar)
+            view.addSubview(searchController.searchBar)
             return view
         }()
         
-        let footerView: UIView = {
-            return UIView(frame: .zero)
-        }()
+        /// Add a footer to satisfy UITableView height calculation
+        let footerView = UIView(frame: .zero)
         
+        /// Search bar
         searchController.searchBar.delegate                   = self
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.dimsBackgroundDuringPresentation     = false
         searchController.searchBar.sizeToFit()
         
+        /// Main UITableView
         tableView.allowsSelectionDuringEditing         = true
         tableView.allowsMultipleSelectionDuringEditing = true
         tableView.tableHeaderView                      = headerView
         tableView.tableFooterView                      = footerView
         
+        /// Navigation itmes
+        editButtonItem.isEnabled          = false
         editButtonItem.title              = "Select"
         navigationItem.leftBarButtonItem  = editButtonItem
         navigationItem.rightBarButtonItem = addButtomItem
         navigationController?.setToolbarHidden(true, animated: true)
         
+        /// Other call to actions CTAs
         shareButtomItem.isEnabled = false
-        trashButton.isEnabled = false
-        trashButton.tintColor = .red
+        trashButton.isEnabled     = false
+        trashButton.tintColor     = .red
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -81,6 +91,7 @@ class NoteListViewController: UITableViewController {
     }
     
     init() {
+        /// Initialize class properties
         searchController = UISearchController(searchResultsController: nil)
         addButtomItem    = UIBarButtonItem(barButtonSystemItem: .add,           target: nil, action: nil)
         shareButtomItem  = UIBarButtonItem(barButtonSystemItem: .action,        target: nil, action: nil)
@@ -89,11 +100,11 @@ class NoteListViewController: UITableViewController {
         noteService      = NoteService.instance
         notes            = [Note]()
         cellId           = "cell"
-        
         selectedNotesMap = [: ]
         
         super.init(style: .plain)
         
+        /// Set selectors on CTAs
         spacer.target          = self
         addButtomItem.target   = self
         shareButtomItem.target = self
@@ -110,7 +121,7 @@ class NoteListViewController: UITableViewController {
 
 extension NoteListViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        getNotes()
+        getNotes(then: resetSelectedNotes)
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
@@ -124,19 +135,11 @@ extension NoteListViewController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text              = nil
         searchBar.showsCancelButton = false
-        getNotes()
+        getNotes(then: resetSelectedNotes)
     }
 }
 
 extension NoteListViewController {
-    private func enableAddButton() {
-        navigationItem.rightBarButtonItem = addButtomItem
-    }
-    
-    private func enableShareButton() {
-        navigationItem.rightBarButtonItem = shareButtomItem
-    }
-    
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
         
@@ -170,10 +173,13 @@ extension NoteListViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let note = notes[indexPath.row]
         
+        /// Mark note as selected
         if isEditing {
             trashButton.isEnabled       = true
             shareButtomItem.isEnabled   = true
             selectedNotesMap[indexPath] = note
+            
+        /// Otherwise, open it
         } else {
             openNote(note)
         }
@@ -183,6 +189,7 @@ extension NoteListViewController {
         return notes.count
     }
     
+    // TODO: create a custom UITableViewCell and abstract initialization logic away
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let note = notes[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId) ?? UITableViewCell(style: .subtitle, reuseIdentifier: cellId)
@@ -220,19 +227,15 @@ extension NoteListViewController {
     override func numberOfSections(in tableView: UITableView) -> Int {
         let numberOfSections = 1
         
+        /// Hide background
         if !notes.isEmpty {
             tableView.separatorStyle  = .singleLine
             tableView.backgroundView  = nil
             tableView.isScrollEnabled = true
+            
+        // Show background
         } else {
-            let width                 = tableView.bounds.size.width
-            let height                = tableView.bounds.size.height
-            let frame                 = CGRect(x: 0, y: 0, width: width, height: height)
-            let label                 = UILabel(frame: frame)
-            label.text                = "No notes available"
-            label.textColor           = .black
-            label.textAlignment       = .center
-            tableView.backgroundView  = label
+            tableView.backgroundView  = NoNotesFoundView(frame: tableView.frame)
             tableView.separatorStyle  = .none
             tableView.isScrollEnabled = false
         }
@@ -241,8 +244,19 @@ extension NoteListViewController {
     }
 }
 
-extension NoteListViewController {
-    @objc private func openNewNote() {
+private extension NoteListViewController {
+    
+    /// Return only the Note objects that are selected
+    var selectedNotes: Set<Note> {
+        return selectedNotesMap.valueSet
+    }
+    
+    /// Return only the indicies of the selected cells
+    var selectedIndices: [IndexPath] {
+        return selectedNotesMap.keyList
+    }
+    
+    @objc func openNewNote() {
         let message     = "Give your note a name"
         let placeholder = "Untitled"
         
@@ -257,27 +271,26 @@ extension NoteListViewController {
                       onCancel: nil)
     }
     
-    private func openNote(_ note: Note) {
+    func openNote(_ note: Note) {
         let noteController = NoteController(note: note, noteService: noteService)
         navigationController?.pushViewController(noteController, animated: true)
     }
     
-    private func deleteNote(_ note: Note) {
+    func deleteNote(_ note: Note) {
         noteService.deleteNote(note: note)
     }
     
-    @objc private func sendMultipleNotes() {
+    @objc func sendMultipleNotes() {
         guard !selectedNotesMap.isEmpty else { return }
         noteService.sendNotes(selectedNotes, viewController: self)
     }
     
-    @objc private func deleteSelectedNotes() {
+    @objc func deleteSelectedNotes() {
         guard !selectedNotesMap.isEmpty else { return }
         
         let message = "Delete \(selectedNotesMap.count) note(s)?"
         
         func onYes() {
-            // TODO: Animate deletion.
             noteService.deleteNotes(selectedNotes) { [weak self] in
                 guard let self = self else { return }
                 self.setEditing(false, animated: true)
@@ -291,15 +304,27 @@ extension NoteListViewController {
                       onNo: nil)
     }
     
-    private func getNotes() {
-        notes = noteService.notes
-        
-        if let searchText = searchController.searchBar.text, !searchText.isEmpty {
-            notes = notes.filter { note in
-                return note.contains(text: searchText)
-            }
-        }
+    func getNotes(then completion: (() -> Void)? = nil) {
+        notes = noteService.getAllNotes(containing: searchController.searchBar.text)
         
         tableView.reloadData()
+        
+        if let completion = completion {
+            completion()
+        }
+    }
+    
+    func resetSelectedNotes() {
+        guard isEditing else { return }
+        
+        selectedNotesMap.removeAll()
+    }
+    
+    func enableAddButton() {
+        navigationItem.rightBarButtonItem = addButtomItem
+    }
+    
+    func enableShareButton() {
+        navigationItem.rightBarButtonItem = shareButtomItem
     }
 }

@@ -42,14 +42,9 @@ class NoteController: UIViewController {
         noteTitle.titleLabel?.font = noteTitle.titleLabel?.font.bolded
         noteTitle.setTitleColor(.black, for: .normal)
         noteTitle.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
+        
         navigationItem.titleView = noteTitle
-        
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
-        
-        textView = UITextView()
-        textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.text = note.body
-        view.addSubview(textView)
         
         spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
@@ -62,13 +57,21 @@ class NoteController: UIViewController {
         let doneBtn: UIBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(closeKeyboard))
         toolbar.setItems([flexSpace, doneBtn], animated: false)
         toolbar.sizeToFit()
+        
+        textView = UITextView()
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.text = note.body
+        textView.delegate = self
+        textView.isEditable = false
+        textView.dataDetectorTypes = .all
         textView.inputAccessoryView = toolbar
+        view.addSubview(textView)
+        
+        configureTagGesture()
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.prefersLargeTitles = false
-        
+        super.viewWillAppear(animated) 
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -124,5 +127,26 @@ extension NoteController {
                           placeholder: placeholder,
                           onConfirm: onConfirm,
                           onCancel: nil)
+    }
+}
+
+extension NoteController: UIGestureRecognizerDelegate {
+    private func configureTagGesture() {
+        let recognizer = UITapGestureRecognizer()
+        recognizer.delegate = self
+        recognizer.numberOfTapsRequired = 1
+        recognizer.addTarget(self, action: #selector(textViewTapped))
+        textView.addGestureRecognizer(recognizer)
+    }
+    
+    @objc private func textViewTapped(_ recognizer: UIGestureRecognizer) {
+        textView.isEditable = true
+        textView.becomeFirstResponder()
+    }
+}
+
+extension NoteController: UITextViewDelegate {
+    func textViewDidEndEditing(_ textView: UITextView) {
+        textView.isEditable = false
     }
 }

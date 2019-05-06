@@ -21,24 +21,17 @@ class NoteService {
     /// SQL: INSERT INTO Note (title, body) values (title, null)
     func createNote(with title: String?) -> Note {
         let note = Note(context: context)
-        let now = Date()
+        let now  = Date()
         
-        note.createdDate = now
+        note.createdDate    = now
         note.lastEditedDate = now
         
         if title?.isEmpty ?? true {
-            let num = NoteService.newNoteNumber
             
             note.title = "Untitled"
-            
-            if num > 0 {
-                note.title?.append(" \(num)")
-            }
         } else {
             note.title = title
         }
-        
-        NoteService.newNoteNumber += 1
         
         note.body = nil
         
@@ -115,11 +108,6 @@ class NoteService {
     static let entityName              = "Note"
     static let persistentContainerName = "NotesDataModel"
     static let instance                = NoteService()
-    
-    // TODO: Store the number of unnamed notes to disk?
-    // This way when we kill and restart the app,
-    // we do not start from 0 again
-    private static var newNoteNumber = 0
     
     private let analyticsService  = NoteAnalyticsService.instance
     private let fetchRequest      = NSFetchRequest<NSFetchRequestResult>(entityName: NoteService.entityName)

@@ -30,6 +30,12 @@ extension Dictionary {
         
         return values
     }
+    
+    mutating func removValues(fromKeysIn keys: Set<Key>) {
+        for key in keys {
+            removeValue(forKey: key)
+        }
+    }
 }
 
 extension Dictionary where Value: Hashable {

@@ -10,7 +10,6 @@ import CoreData
 import XCTest
 @testable import notes
 
-/// Unit Tests
 class NoteServiceTest: XCTestCase {
     override func setUp() {
         super.setUp()
@@ -141,10 +140,6 @@ class NoteServiceTest: XCTestCase {
         XCTAssert(precondition)
         XCTAssert(postcondition)
     }
-}
-
-/// Functional Tests
-extension NoteServiceTest {
     
     /// Create N notes, Delete N notes, DB should be empty.
     func testAddingAndDeletingSameNumberOfNotes() {
@@ -196,9 +191,117 @@ extension NoteServiceTest {
         XCTAssert(midcondition)
         XCTAssert(postcondition)
     }
+    
+    func testGetAllNotesWithoutArgument() {
+        let precondition = allNotes.isEmpty
+        
+        for _ in 1...Int.random(in: 1...50) {
+            let _ = getNote()
+        }
+        
+        try! context.save()
+        
+        let notes = noteService.getAllNotes()
+        
+        let postcondition = notes.count == allNotes.count
+        
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+    
+    func testGetAllNotesWithNilArgument() {
+        let precondition = allNotes.isEmpty
+        
+        for _ in 1...Int.random(in: 1...50) {
+            let _ = getNote()
+        }
+        
+        try! context.save()
+        
+        let notes = noteService.getAllNotes(containing: nil)
+        
+        let postcondition = notes.count == allNotes.count
+        
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+    
+    func testGetAllNotesWithEmptyArgument() {
+        let precondition = allNotes.isEmpty
+        
+        for _ in 1...Int.random(in: 1...50) {
+            let _ = getNote()
+        }
+        
+        try! context.save()
+        
+        let notes = noteService.getAllNotes(containing: "")
+        
+        let postcondition = notes.count == allNotes.count
+        
+        XCTAssert(precondition)
+        XCTAssert(postcondition)
+    }
+    
+    func testGetAllNotesContainingStringThatIsNotPresent() {
+        for _ in 1...Int.random(in: 1...50) {
+            let note = getNote()
+            note.title = "SOMETHING"
+            note.body  = "ELSE"
+        }
+        
+        try! context.save()
+        
+        let notes = noteService.getAllNotes(containing: "0123456789")
+        
+        let condition = notes.isEmpty
+        
+        XCTAssert(condition)
+    }
+    
+    func testGetAllNotesContainingStringThatIsPresentInAll() {
+        let title = "SOME TITLE"
+        
+        for _ in 1...Int.random(in: 1...50) {
+            let note = getNote()
+            note.title = title
+        }
+        
+        try! context.save()
+        
+        let notes = noteService.getAllNotes(containing: title)
+        
+        let condition = notes.count == allNotes.count
+        
+        XCTAssert(condition)
+    }
+    
+    func testGetAllNotesContainingStringThatIsPresentInSome() {
+        let text = "SOME TITLE"
+        let numberOfNotesToAdd = Int.random(in: 20...50)
+        let numberOfNotesWithText = Int.random(in: 1...15)
+        
+        for _ in 1...numberOfNotesToAdd {
+            let _ = getNote()
+        }
+        
+        for i in 1...numberOfNotesWithText {
+            allNotes[i].title = text
+        }
+        
+        try! context.save()
+        
+        let notes = noteService.getAllNotes(containing: text)
+        
+        let firstCondition  = notes.count < allNotes.count
+        let secondCondition = notes.count == numberOfNotesWithText
+        
+        XCTAssert(firstCondition)
+        XCTAssert(secondCondition)
+    }
 }
 
-/// Private auxiliary functions and wrappers
+/// Auxiliary functions and wrappers
 extension NoteServiceTest {
     private var allNotes: [Note] {
         return NoteServiceTest.allNotes
@@ -222,13 +325,11 @@ extension NoteServiceTest {
     
     /// Create a note with values in title and body fields
     private func getNote() -> Note {
-        let title = "title"
-        let body = "body"
-        
-        let note = Note(context: context)
+        let title  = "title"
+        let body   = "body"
+        let note   = Note(context: context)
         note.title = title
-        note.body = body
-        
+        note.body  = body
         return note
     }
 }
@@ -239,13 +340,12 @@ extension NoteServiceTest {
         return noteService.context
     }
     
-    /// Note service that uses in-memory DB for use in testing
     private static let noteService: NoteService = {
         let service = NoteService.instance
         
-        // Use an in-memory DB to avoid leaving state on device
+        // In-memory database
         service.container = {
-            let container = NSPersistentContainer(name: NoteService.persistentContainerName)
+            let container   = NSPersistentContainer(name: NoteService.persistentContainerName)
             let description = NSPersistentStoreDescription()
             
             description.type = NSInMemoryStoreType
@@ -256,6 +356,7 @@ extension NoteServiceTest {
                     fatalError("Unresolved error \(error), \(error.userInfo)")
                 }
             })
+            
             return container
         }()
     
@@ -265,7 +366,6 @@ extension NoteServiceTest {
     /// SQL: SELECT * FROM Note
     private static var allNotes: [Note] {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: NoteService.entityName)
-        
         return try! context.fetch(fetchRequest) as! [Note]
     }
     
@@ -280,10 +380,9 @@ extension NoteServiceTest {
     
     /// SQL: INSERT INTO (title, body) Note VALUES (null, null)
     static func getEmptyNote() -> Note {
-        let note = Note(context: context)
+        let note   = Note(context: context)
         note.title = nil
-        note.body = nil
-        
+        note.body  = nil
         return note
     }
 }

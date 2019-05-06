@@ -267,18 +267,8 @@ private extension NoteListViewController {
     }
     
     @objc func openNewNote() {
-        let message     = "Give your note a name"
-        let placeholder = "Untitled"
-        
-        func onConfirm(title: String?) {
-            let note = noteService.createNote(with: title)
-            openNote(note)
-        }
-        
-        promptForText(withMessage: message,
-                      placeholder: placeholder,
-                      onConfirm: onConfirm,
-                      onCancel: nil)
+        let note = noteService.createNote(with: nil)
+        openNote(note)
     }
     
     func openNote(_ note: Note) {

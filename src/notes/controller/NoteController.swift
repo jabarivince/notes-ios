@@ -47,8 +47,9 @@ class NoteController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
         
         let spacer            = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        let menuButton        = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(openMenu))
         let trashButton       = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
-        toolbarItems          = [spacer, trashButton]
+        toolbarItems          = [menuButton, spacer, trashButton]
         trashButton.tintColor = .red
         
         let keyboardToolbar: UIToolbar = {
@@ -93,107 +94,6 @@ class NoteController: UIViewController {
     }
 }
 
-extension NoteController {
-    @objc private func sendNote() {
-        saveNote()
-        noteService.sendNote(note, viewController: self)
-    }
-    
-    @objc private func closeNote(withoutSaving: Bool = false) {
-        if !withoutSaving {
-            saveNote()
-        }
-        
-        navigationController?.popViewController(animated: true)
-    }
-    
-    @objc private func deleteNote() {
-        let message = "Are you sure you want to delete this note?"
-        
-        func onYes() {
-            noteService.deleteNote(note: note)
-            closeNote(withoutSaving: true)
-        }
-        
-        promptYesOrNo(withMessage: message, onYes: onYes, onNo: nil)
-    }
-    
-    @objc private func saveNote() {
-        note.body = textView.text
-        noteService.saveNote(note: note)
-    }
-    
-    @objc private func closeKeyboard() {
-        textView.resignFirstResponder()
-    }
-    
-    @objc private func changeNoteName() {
-        let message     = "Rename your note"
-        let placeholder = "Untitled"
-        
-        func onConfirm(title: String?) {
-            note.title = title
-            self.viewDidLoad()
-        }
-        
-        promptForText(withMessage: message,
-                      placeholder: placeholder,
-                      onConfirm: onConfirm,
-                      onCancel: nil)
-    }
-}
-
-extension NoteController {
-    private func addObservers() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(keyboardWillShow),
-                                               name: UIResponder.keyboardWillShowNotification,
-                                               object: nil)
-        
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(keyboardWillHide),
-                                               name: UIResponder.keyboardWillHideNotification,
-                                               object: nil)
-    }
-    
-    private func removeObservers() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(keyboardWillShow),
-                                               name: UIResponder.keyboardWillShowNotification,
-                                               object: nil)
-        
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(keyboardWillHide),
-                                               name: UIResponder.keyboardWillHideNotification,
-                                               object: nil)
-    }
-    
-    /// Returns size frame of the keyboard
-    private func getKeyboardSize(from notification: Notification) -> CGRect? {
-        return (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue
-    }
-    
-    /// Shrinks scrollview height such that keyboard does not cover bottom
-    @objc private func keyboardWillShow(notification: Notification) {
-        guard let keyboardSize = getKeyboardSize(from: notification) else { return }
-        
-        var contentInset      = textView.contentInset
-        contentInset.bottom   = keyboardSize.height
-        textView.contentInset = contentInset
-        var frame             = textView.frame
-        frame.size.height    -= keyboardSize.height
-    }
-    
-    /// Restores scrollView height to full height
-    @objc private func keyboardWillHide(notification: Notification) {
-        UIView.animate(withDuration: 0.2) { [weak self] in
-            guard let self = self else { return }
-            let contentInset           = UIEdgeInsets.zero
-            self.textView.contentInset = contentInset
-        }
-    }
-}
-
 extension NoteController: UIGestureRecognizerDelegate {
     /// Enables editing on textView and displays keyboard,
     /// places cursor at end of line that was tapped
@@ -227,5 +127,121 @@ extension NoteController: UITextViewDelegate {
         textView.isEditable = false
         textView.resignFirstResponder()
         saveNote()
+    }
+}
+
+private extension NoteController {
+    @objc func openMenu() {
+        let alert = UIAlertController(title: "Additional options", message: nil, preferredStyle: .actionSheet)
+        
+        let changeNoteTitle: UIAlertAction = {
+            let action = UIAlertAction(title: "Change note title", style: .default) { [weak self] _ in
+                guard let self = self else { return }
+                self.changeNoteName()
+            }
+            
+            return action
+        }()
+
+        alert.addAction(changeNoteTitle)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        presentedVC.present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func sendNote() {
+        saveNote()
+        noteService.sendNote(note, viewController: self)
+    }
+    
+    @objc func closeNote(withoutSaving: Bool = false) {
+        if !withoutSaving {
+            saveNote()
+        }
+        
+        navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func deleteNote() {
+        let message = "Are you sure you want to delete this note?"
+        
+        func onYes() {
+            noteService.deleteNote(note: note)
+            closeNote(withoutSaving: true)
+        }
+        
+        promptYesOrNo(withMessage: message, onYes: onYes, onNo: nil)
+    }
+    
+    @objc func saveNote() {
+        note.body = textView.text
+        noteService.saveNote(note: note)
+    }
+    
+    @objc func closeKeyboard() {
+        textView.resignFirstResponder()
+    }
+    
+    @objc func changeNoteName() {
+        let message     = "Rename your note"
+        let placeholder = "Untitled"
+        
+        func onConfirm(title: String?) {
+            note.title = title
+            self.viewDidLoad()
+        }
+        
+        promptForText(withMessage: message,
+                      placeholder: placeholder,
+                      onConfirm: onConfirm,
+                      onCancel: nil)
+    }
+    
+    func addObservers() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillShow),
+                                               name: UIResponder.keyboardWillShowNotification,
+                                               object: nil)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillHide),
+                                               name: UIResponder.keyboardWillHideNotification,
+                                               object: nil)
+    }
+    
+    func removeObservers() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillShow),
+                                               name: UIResponder.keyboardWillShowNotification,
+                                               object: nil)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillHide),
+                                               name: UIResponder.keyboardWillHideNotification,
+                                               object: nil)
+    }
+    
+    /// Returns size frame of the keyboard
+    func getKeyboardSize(from notification: Notification) -> CGRect? {
+        return (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue
+    }
+    
+    /// Shrinks scrollview height such that keyboard does not cover bottom
+    @objc func keyboardWillShow(notification: Notification) {
+        guard let keyboardSize = getKeyboardSize(from: notification) else { return }
+        
+        var contentInset      = textView.contentInset
+        contentInset.bottom   = keyboardSize.height
+        textView.contentInset = contentInset
+        var frame             = textView.frame
+        frame.size.height    -= keyboardSize.height
+    }
+    
+    /// Restores scrollView height to full height
+    @objc func keyboardWillHide(notification: Notification) {
+        UIView.animate(withDuration: 0.2) { [weak self] in
+            guard let self = self else { return }
+            let contentInset           = UIEdgeInsets.zero
+            self.textView.contentInset = contentInset
+        }
     }
 }

@@ -9,14 +9,15 @@
 import UIKit
 
 class NoteController: UIViewController {
-    private let textView = UITextView()
+    private let textView: UITextView
     private let noteService: NoteService
     private let note: Note
-    private var timer: Timer? = nil
+    private var timer: Timer?
     
     init(note: Note, noteService: NoteService) {
-        self.note = note
+        self.note        = note
         self.noteService = noteService
+        self.textView    = UITextView()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -38,16 +39,14 @@ class NoteController: UIViewController {
         noteTitle.setTitle(note.title, for: .normal)
         noteTitle.setTitleColor(.black, for: .normal)
         noteTitle.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
-        navigationItem.titleView = noteTitle
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action,
-                                                            target: self,
-                                                            action: #selector(sendNote))
+        navigationItem.titleView          = noteTitle
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
         
         let spacer            = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         let trashButton       = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
-        trashButton.tintColor = .red
         toolbarItems          = [spacer, trashButton]
+        trashButton.tintColor = .red
         navigationController?.setToolbarHidden(false, animated: false)
         
         let toolbar   = UIToolbar(frame: CGRect(x: 0, y: 0,  width: self.view.frame.size.width, height: 30))
@@ -56,11 +55,17 @@ class NoteController: UIViewController {
         toolbar.setItems([flexSpace, doneBtn], animated: false)
         toolbar.sizeToFit()
         
-        textView.text               = note.body
-        textView.delegate           = self
-        textView.inputAccessoryView = toolbar
+        textView.font                              = .preferredFont(forTextStyle: .body)
+        textView.text                              = note.body
+        textView.delegate                          = self
+        textView.isEditable                        = false
+        textView.dataDetectorTypes                 = .all
+        textView.inputAccessoryView                = toolbar
+        textView.adjustsFontForContentSizeCategory = true
         view.addSubview(textView)
+        
         addObservers()
+        configureTagGesture()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -146,9 +151,8 @@ extension NoteController {
     @objc private func keyboardWillShow(notification: Notification) {
         guard let keyboardSize = getKeyboardSize(from: notification) else { return }
         
-        let contentInsets = UIEdgeInsets(top: 0, left: 0, bottom: keyboardSize.height, right: 0)
-        var frame         = view.frame
-        
+        let contentInsets              = UIEdgeInsets(top: 0, left: 0, bottom: keyboardSize.height, right: 0)
+        var frame                      = view.frame
         textView.contentInset          = contentInsets
         textView.scrollIndicatorInsets = contentInsets
         frame.size.height             -= keyboardSize.height
@@ -165,9 +169,25 @@ extension NoteController {
     }
 }
 
-extension NoteController: UITextViewDelegate {
+extension NoteController: UIGestureRecognizerDelegate {
+    /// Configures tag gesture on textView
+    private func configureTagGesture() {
+        let recognizer = UITapGestureRecognizer()
+        recognizer.delegate = self
+        recognizer.numberOfTapsRequired = 1
+        recognizer.addTarget(self, action: #selector(textViewTapped))
+        textView.addGestureRecognizer(recognizer)
+    }
     
-    /// Autosave half a second after stop typing
+    /// Enables editing on textView and displays keyboard
+    @objc private func textViewTapped() {
+        textView.isEditable = true
+        textView.becomeFirstResponder()
+    }
+}
+
+extension NoteController: UITextViewDelegate {
+    /// Autosaves half a second after stop typing
     func textViewDidChange(_ textView: UITextView) {
         timer?.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 0.5,
@@ -177,7 +197,9 @@ extension NoteController: UITextViewDelegate {
                                      repeats: false)
     }
     
+    /// Disabled editing (to re-anble hyperlink detection, etc) and save
     func textViewDidEndEditing(_ textView: UITextView) {
+        textView.isEditable = false
         saveNote()
     }
 }

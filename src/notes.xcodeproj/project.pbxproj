@@ -640,7 +640,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8MT429F374;
+				DEVELOPMENT_TEAM = 62TYL29D89;
 				INFOPLIST_FILE = notesTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -651,7 +651,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/notes.app/notes";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/The Note App.app/The Note App";
 			};
 			name = Debug;
 		};
@@ -662,7 +662,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8MT429F374;
+				DEVELOPMENT_TEAM = 62TYL29D89;
 				INFOPLIST_FILE = notesTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -673,7 +673,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/notes.app/notes";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/The Note App.app/The Note App";
 			};
 			name = Release;
 		};

@@ -14,6 +14,7 @@ class NoteListViewController: UITableViewController {
     private let shareButtomItem:  UIBarButtonItem
     private let trashButton:      UIBarButtonItem
     private let spacer:           UIBarButtonItem
+    private var headerView:       UIView  = UIView()
     private let cellId:           String
     private let noteService:      NoteService
     
@@ -62,6 +63,7 @@ class NoteListViewController: UITableViewController {
         searchController.searchBar.sizeToFit()
         
         /// Main UITableView
+        tableView.keyboardDismissMode                  = .interactive
         tableView.allowsSelectionDuringEditing         = true
         tableView.allowsMultipleSelectionDuringEditing = true
         tableView.tableHeaderView                      = headerView
@@ -72,7 +74,6 @@ class NoteListViewController: UITableViewController {
         editButtonItem.title              = "Select"
         navigationItem.leftBarButtonItem  = editButtonItem
         navigationItem.rightBarButtonItem = addButtomItem
-        navigationController?.setToolbarHidden(true, animated: true)
         
         /// Other call to actions CTAs
         shareButtomItem.isEnabled = false
@@ -82,12 +83,20 @@ class NoteListViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setToolbarHidden(true, animated: true)
         getNotes()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        navigationController?.setToolbarHidden(true, animated: true)
         searchController.dismiss(animated: false, completion: nil)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        coordinator.animate(alongsideTransition: { (context) in
+            self.searchController.searchBar.frame.size.width = self.view.frame.size.width
+        }, completion: nil)
     }
     
     init() {
@@ -171,6 +180,7 @@ extension NoteListViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        dismissKeyboard()
         let note = notes[indexPath.row]
         
         /// Mark note as selected
@@ -326,5 +336,9 @@ private extension NoteListViewController {
     
     func enableShareButton() {
         navigationItem.rightBarButtonItem = shareButtomItem
+    }
+    
+    private func dismissKeyboard() {
+        searchController.searchBar.resignFirstResponder()
     }
 }

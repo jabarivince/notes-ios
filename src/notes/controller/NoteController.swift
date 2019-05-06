@@ -50,7 +50,6 @@ class NoteController: UIViewController {
         let trashButton       = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
         toolbarItems          = [spacer, trashButton]
         trashButton.tintColor = .red
-        navigationController?.setToolbarHidden(false, animated: false)
         
         let keyboardToolbar: UIToolbar = {
             let bar       = UIToolbar(frame: CGRect(x: 0, y: 0,  width: self.view.frame.size.width, height: 30))
@@ -82,11 +81,13 @@ class NoteController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setToolbarHidden(false, animated: true)
         addObservers()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        navigationController?.setToolbarHidden(true, animated: true)
         removeObservers()
         closeNote()
     }

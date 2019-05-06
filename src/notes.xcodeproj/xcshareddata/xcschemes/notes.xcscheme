@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0CFAB6D62246CC75004AA4C7"
-               BuildableName = "notes.app"
+               BuildableName = "The Note App.app"
                BlueprintName = "notes"
                ReferencedContainer = "container:notes.xcodeproj">
             </BuildableReference>
@@ -57,7 +57,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0CFAB6D62246CC75004AA4C7"
-            BuildableName = "notes.app"
+            BuildableName = "The Note App.app"
             BlueprintName = "notes"
             ReferencedContainer = "container:notes.xcodeproj">
          </BuildableReference>
@@ -80,7 +80,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0CFAB6D62246CC75004AA4C7"
-            BuildableName = "notes.app"
+            BuildableName = "The Note App.app"
             BlueprintName = "notes"
             ReferencedContainer = "container:notes.xcodeproj">
          </BuildableReference>
@@ -105,7 +105,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0CFAB6D62246CC75004AA4C7"
-            BuildableName = "notes.app"
+            BuildableName = "The Note App.app"
             BlueprintName = "notes"
             ReferencedContainer = "container:notes.xcodeproj">
          </BuildableReference>

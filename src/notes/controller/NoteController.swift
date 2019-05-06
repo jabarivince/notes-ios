@@ -60,6 +60,8 @@ class NoteController: UIViewController {
         
         textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.adjustsFontForContentSizeCategory = true
+        textView.font = .preferredFont(forTextStyle: .body)
         textView.text = note.body
         textView.delegate = self
         textView.isEditable = false

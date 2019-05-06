@@ -6,7 +6,12 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-// Conform Set<Note> to Stringifiable for sending sets of notes
+extension Set {
+    var asArray: [Element] {
+        return [Element](self)
+    }
+}
+
 extension Set: Stringifiable where Element == Note {
     static func comparator(lhs: Note, rhs: Note) -> Bool {
         if

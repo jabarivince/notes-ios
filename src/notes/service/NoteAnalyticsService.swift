@@ -8,13 +8,10 @@
 
 import Firebase
 
-/// Events related to Notes
 class NoteAnalyticsService: AnalyticsService {
     
-    /// Singleton
     static let instance = NoteAnalyticsService()
     
-    /// Create
     func publishCreateNoteEvent(for note: Note) {
         let event = Event(type: .createNote, loggable: note)
         publish(event)
@@ -25,7 +22,6 @@ class NoteAnalyticsService: AnalyticsService {
         publish(event)
     }
     
-    /// Read
     func publishReadNoteEvent(for note: Note) {
         let event = Event(type: .readNote, loggable: note)
         publish(event)
@@ -36,7 +32,6 @@ class NoteAnalyticsService: AnalyticsService {
         publish(event)
     }
     
-    /// Update
     func publishUpdateNoteEvent(for note: Note) {
         let event = Event(type: .updateNote, loggable: note)
         publish(event)
@@ -47,7 +42,6 @@ class NoteAnalyticsService: AnalyticsService {
         publish(event)
     }
     
-    /// Delete
     func publishDeleteNoteEvent(for note: Note) {
         let event = Event(type: .deleteNote, loggable: note)
         publish(event)
@@ -58,7 +52,6 @@ class NoteAnalyticsService: AnalyticsService {
         publish(event)
     }
     
-    /// Delete batch
     func publishDeleteBatchNoteEvent(for notes: Set<Note>) {
         let event = Event(type: .deleteBatchNote, loggable: notes)
         publish(event)
@@ -69,7 +62,6 @@ class NoteAnalyticsService: AnalyticsService {
         publish(event)
     }
     
-    /// Send
     func publishSendNoteEvent(for note: Note) {
         let event = Event(type: .sendNote, loggable: note)
         publish(event)
@@ -80,7 +72,6 @@ class NoteAnalyticsService: AnalyticsService {
         publish(event)
     }
     
-    /// Send batch
     func publishSendBatchNoteEvent(for notes: Set<Note>) {
         let event = Event(type: .sendBatchNote, loggable: notes)
         publish(event)
@@ -90,7 +81,7 @@ class NoteAnalyticsService: AnalyticsService {
         let event = Event(type: .sendBatchNoteFailed, loggable: notes)
         publish(event)
     }
-    /// Singleton = no public inits
+    
     private init() {}
 }
 

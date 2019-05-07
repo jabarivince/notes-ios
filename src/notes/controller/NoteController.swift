@@ -76,6 +76,10 @@ class NoteController: UIViewController {
         textView.font                              = .preferredFont(forTextStyle: .body)
         textView.text                              = note.body
         textView.inputAccessoryView                = keyboardToolbar
+        textView.linkTextAttributes                = [
+            .foregroundColor: view.tintColor ?? UIColor(red: 0, green: 122/255, blue: 1, alpha: 1),
+            .underlineStyle : NSUnderlineStyle.single.rawValue
+        ]
         textView.addGestureRecognizer(tapRecognizer)
         view.addSubview(textView)
     }

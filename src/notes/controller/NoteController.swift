@@ -192,6 +192,7 @@ private extension NoteController {
         
         promptForText(withMessage: message,
                       placeholder: placeholder,
+                      initialValue: note.title,
                       onConfirm: onConfirm,
                       onCancel: nil)
     }

@@ -14,7 +14,6 @@ class NoteListViewController: UITableViewController {
     private let shareButtomItem:  UIBarButtonItem
     private let trashButton:      UIBarButtonItem
     private let spacer:           UIBarButtonItem
-    private var headerView:       UIView  = UIView()
     private let cellId:           String
     private let noteService:      NoteService
     
@@ -99,8 +98,28 @@ class NoteListViewController: UITableViewController {
         }, completion: nil)
     }
     
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        
+        if isEditing {
+            toolbarItems            = [spacer, trashButton]
+            editButtonItem.title    = "Done"
+            addButtomItem.isEnabled = false
+            enableShareButton()
+            navigationController?.setToolbarHidden(false, animated: true)
+        } else {
+            editButtonItem.title  = "Select"
+            trashButton.isEnabled = false
+            enableAddButton()
+            navigationController?.setToolbarHidden(true, animated: true)
+            
+            if !isSearching {
+                addButtomItem.isEnabled = true
+            }
+        }
+    }
+    
     init() {
-        /// Initialize class properties
         searchController = UISearchController(searchResultsController: nil)
         addButtomItem    = UIBarButtonItem(barButtonSystemItem: .add,           target: nil, action: nil)
         shareButtomItem  = UIBarButtonItem(barButtonSystemItem: .action,        target: nil, action: nil)
@@ -113,7 +132,6 @@ class NoteListViewController: UITableViewController {
         
         super.init(style: .plain)
         
-        /// Set selectors on CTAs
         spacer.target          = self
         addButtomItem.target   = self
         shareButtomItem.target = self
@@ -149,27 +167,6 @@ extension NoteListViewController: UISearchBarDelegate {
 }
 
 extension NoteListViewController {
-    override func setEditing(_ editing: Bool, animated: Bool) {
-        super.setEditing(editing, animated: animated)
-        
-        if isEditing {
-            toolbarItems            = [spacer, trashButton]
-            editButtonItem.title    = "Done"
-            addButtomItem.isEnabled = false
-            enableShareButton()
-            navigationController?.setToolbarHidden(false, animated: true)
-        } else {
-            editButtonItem.title  = "Select"
-            trashButton.isEnabled = false
-            enableAddButton()
-            navigationController?.setToolbarHidden(true, animated: true)
-            
-            if !isSearching {
-                addButtomItem.isEnabled = true
-            }
-        }
-    }
-    
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         selectedNotesMap.removeValue(forKey: indexPath)
         
@@ -199,34 +196,14 @@ extension NoteListViewController {
         return notes.count
     }
     
-    // TODO: create a custom UITableViewCell and abstract initialization logic away
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let note = notes[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId) ?? UITableViewCell(style: .subtitle, reuseIdentifier: cellId)
-        
-        guard let textLabel = cell.textLabel else { return cell }
-        textLabel.font = textLabel.font.bolded
-        textLabel.text = note.title
-        
-        var detail = ""
-        
-        if let date = note.lastEditedDate?.formatted {
-            detail += "\(date)\n"
-        }
-        
-        detail += note.body?.firstLine.truncated(after: 30) ?? ""
-        
-        cell.detailTextLabel?.text          = detail
-        cell.detailTextLabel?.textColor     = .gray
-        cell.detailTextLabel?.numberOfLines = 0
-        
+        cell.initialize(from: note)
         return cell
     }
     
-    override func tableView(_ tableView: UITableView,
-                            commit editingStyle: UITableViewCell.EditingStyle,
-                            forRowAt indexPath: IndexPath) {
-        
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         guard editingStyle == .delete else { return }
         
         let note = notes.remove(at: indexPath.row)

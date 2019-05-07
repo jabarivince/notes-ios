@@ -8,7 +8,7 @@
 
 import UIKit
 
-class NoteController: UIViewController {
+class NoteViewController: UIViewController {
     private let textView:    UITextView
     private let titleButton: UIButton
     private var timer:       Timer?
@@ -25,72 +25,10 @@ class NoteController: UIViewController {
         return textView.text
     }
     
-    init(note: Note, noteService: NoteService) {
-        self.textView    = UITextView()
-        self.titleButton = UIButton(type: .custom)
-        self.note        = note
-        self.noteService = noteService
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         textView.frame.size.width  = view.bounds.width
         textView.frame.size.height = view.bounds.height
-    }
-    
-    override func viewDidLoad() {
-        titleButton.frame            = CGRect(x: 0, y: 0, width: 100, height: 40)
-        titleButton.backgroundColor  = .clear
-        titleButton.titleLabel?.font = titleButton.titleLabel?.font.bolded
-        titleButton.setTitleColor(.black, for: .normal)
-        titleButton.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
-        
-        navigationItem.titleView          = titleButton
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
-        
-        let spacer            = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        let menuButton        = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(openMenu))
-        let trashButton       = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
-        toolbarItems          = [menuButton, spacer, trashButton]
-        trashButton.tintColor = .red
-        
-        let keyboardToolbar: UIToolbar = {
-            let bar       = UIToolbar(frame: CGRect(x: 0, y: 0,  width: self.view.frame.size.width, height: 30))
-            let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-            let doneBtn   = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(closeKeyboard))
-            bar.setItems([flexSpace, doneBtn], animated: false)
-            bar.sizeToFit()
-            return bar
-        }()
-        
-        let tapRecognizer: UITapGestureRecognizer = {
-            let r = UITapGestureRecognizer(target: self, action: #selector(textViewTapped))
-            r.delegate = self
-            r.numberOfTapsRequired = 1
-            return r
-        }()
-        
-        textView.delegate                          = self
-        textView.isEditable                        = false
-        textView.adjustsFontForContentSizeCategory = true
-        textView.dataDetectorTypes                 = .all
-        textView.keyboardDismissMode               = .interactive
-        textView.font                              = .preferredFont(forTextStyle: .body)
-        textView.text                              = note.body
-        textView.inputAccessoryView                = keyboardToolbar
-        textView.linkTextAttributes                = [
-            .foregroundColor: view.tintColor ?? UIColor(red: 0, green: 122/255, blue: 1, alpha: 1),
-            .underlineStyle : NSUnderlineStyle.single.rawValue
-        ]
-        textView.addGestureRecognizer(tapRecognizer)
-        view.addSubview(textView)
-        
-        noteTitle = note.title
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -105,9 +43,27 @@ class NoteController: UIViewController {
         removeObservers()
         closeNote()
     }
+    
+    override func viewDidLoad() {
+        setupToolbars()
+        setupTitleButton()
+        setupTextView()
+    }
+    
+    init(note: Note, noteService: NoteService) {
+        self.textView    = UITextView()
+        self.titleButton = UIButton(type: .custom)
+        self.note        = note
+        self.noteService = noteService
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
-extension NoteController: UIGestureRecognizerDelegate {
+extension NoteViewController: UIGestureRecognizerDelegate {
     /// Enables editing on textView and displays keyboard,
     /// places cursor at end of line that was tapped
     @objc private func textViewTapped(_ recognizer: UITapGestureRecognizer) {
@@ -124,7 +80,7 @@ extension NoteController: UIGestureRecognizerDelegate {
     }
 }
 
-extension NoteController: UITextViewDelegate {
+extension NoteViewController: UITextViewDelegate {
     /// Autosaves half a second after stop typing
     func textViewDidChange(_ textView: UITextView) {
         timer?.invalidate()
@@ -143,7 +99,7 @@ extension NoteController: UITextViewDelegate {
     }
 }
 
-private extension NoteController {
+private extension NoteViewController {
     private var isDirty: Bool  {
         return noteTitle != note.title || noteBody != note.body
     }
@@ -262,5 +218,60 @@ private extension NoteController {
             let contentInset           = UIEdgeInsets.zero
             self.textView.contentInset = contentInset
         }
+    }
+}
+
+private extension NoteViewController {
+    func setupToolbars() {
+        let shareButton       = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
+        let spacer            = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        let menuButton        = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(openMenu))
+        let trashButton       = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
+        toolbarItems          = [menuButton, spacer, trashButton]
+        trashButton.tintColor = .red
+        navigationItem.rightBarButtonItem = shareButton
+    }
+    
+    func setupTitleButton() {
+        titleButton.setTitleColor(.black, for: .normal)
+        titleButton.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
+        titleButton.frame            = CGRect(x: 0, y: 0, width: 100, height: 40)
+        titleButton.backgroundColor  = .clear
+        titleButton.titleLabel?.font = titleButton.titleLabel?.font.bolded
+        noteTitle                    = note.title
+        navigationItem.titleView     = titleButton
+    }
+    
+    func setupTextView() {
+        let keyboardToolbar: UIToolbar = {
+            let bar       = UIToolbar(frame: CGRect(x: 0, y: 0,  width: self.view.frame.size.width, height: 30))
+            let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+            let doneBtn   = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(closeKeyboard))
+            bar.setItems([flexSpace, doneBtn], animated: false)
+            bar.sizeToFit()
+            return bar
+        }()
+        
+        let tapRecognizer: UITapGestureRecognizer = {
+            let r = UITapGestureRecognizer(target: self, action: #selector(textViewTapped))
+            r.delegate = self
+            r.numberOfTapsRequired = 1
+            return r
+        }()
+        
+        textView.delegate                          = self
+        textView.isEditable                        = false
+        textView.adjustsFontForContentSizeCategory = true
+        textView.dataDetectorTypes                 = .all
+        textView.keyboardDismissMode               = .interactive
+        textView.font                              = .preferredFont(forTextStyle: .body)
+        textView.text                              = note.body
+        textView.inputAccessoryView                = keyboardToolbar
+        textView.linkTextAttributes                = [
+            .foregroundColor: view.tintColor ?? UIColor(red: 0, green: 122/255, blue: 1, alpha: 1),
+            .underlineStyle : NSUnderlineStyle.single.rawValue
+        ]
+        textView.addGestureRecognizer(tapRecognizer)
+        view.addSubview(textView)
     }
 }

@@ -21,7 +21,7 @@
 		0CDC11C522588EEF006AE47B /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC11C422588EEF006AE47B /* UIViewController.swift */; };
 		0CDC11C72259274A006AE47B /* UIFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC11C62259274A006AE47B /* UIFont.swift */; };
 		0CE0BDA32246E4B6001C6401 /* NoteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDA22246E4B6001C6401 /* NoteService.swift */; };
-		0CE0BDA92246F71B001C6401 /* NoteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDA82246F71B001C6401 /* NoteController.swift */; };
+		0CE0BDA92246F71B001C6401 /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDA82246F71B001C6401 /* NoteViewController.swift */; };
 		0CE0BDAE22472C02001C6401 /* NotesDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDAC22472C02001C6401 /* NotesDataModel.xcdatamodeld */; };
 		0CE0BDB022473F16001C6401 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDAF22473F16001C6401 /* Note.swift */; };
 		0CE821262281594900BEE37E /* UITableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE821252281594900BEE37E /* UITableViewCell.swift */; };
@@ -59,7 +59,7 @@
 		0CDC11C422588EEF006AE47B /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
 		0CDC11C62259274A006AE47B /* UIFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFont.swift; sourceTree = "<group>"; };
 		0CE0BDA22246E4B6001C6401 /* NoteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteService.swift; sourceTree = "<group>"; };
-		0CE0BDA82246F71B001C6401 /* NoteController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteController.swift; sourceTree = "<group>"; };
+		0CE0BDA82246F71B001C6401 /* NoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
 		0CE0BDAD22472C02001C6401 /* NotesDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = NotesDataModel.xcdatamodel; sourceTree = "<group>"; };
 		0CE0BDAF22473F16001C6401 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		0CE821252281594900BEE37E /* UITableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITableViewCell.swift; sourceTree = "<group>"; };
@@ -162,7 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				0CFAB6DC2246CC75004AA4C7 /* NoteListViewController.swift */,
-				0CE0BDA82246F71B001C6401 /* NoteController.swift */,
+				0CE0BDA82246F71B001C6401 /* NoteViewController.swift */,
 			);
 			path = controller;
 			sourceTree = "<group>";
@@ -440,7 +440,7 @@
 				0CFAB6DB2246CC75004AA4C7 /* AppDelegate.swift in Sources */,
 				0C6F3745225AF72B0060EC2B /* NoteAnalyticsService.swift in Sources */,
 				0CE0BDA32246E4B6001C6401 /* NoteService.swift in Sources */,
-				0CE0BDA92246F71B001C6401 /* NoteController.swift in Sources */,
+				0CE0BDA92246F71B001C6401 /* NoteViewController.swift in Sources */,
 				0CDC11C72259274A006AE47B /* UIFont.swift in Sources */,
 				0CC24160224B08BA00D681D4 /* Date.swift in Sources */,
 				0CAB8D8322817C6600D61DDD /* UITableView.swift in Sources */,

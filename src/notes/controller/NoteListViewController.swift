@@ -273,7 +273,7 @@ private extension NoteListViewController {
     }
     
     func openNote(_ note: Note) {
-        let noteController = NoteController(note: note, noteService: noteService)
+        let noteController = NoteViewController(note: note, noteService: noteService)
         navigationController?.pushViewController(noteController, animated: true)
     }
     

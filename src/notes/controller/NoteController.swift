@@ -9,15 +9,19 @@
 import UIKit
 
 class NoteController: UIViewController {
-    private let textView: UITextView
+    private let textView:    UITextView
+    private let titleButton: UIButton
     private let noteService: NoteService
-    private let note: Note
-    private var timer: Timer?
+    private let note:        Note
+    private var isDirty:     Bool
+    private var timer:       Timer?
     
     init(note: Note, noteService: NoteService) {
+        self.isDirty     = false
         self.note        = note
         self.noteService = noteService
         self.textView    = UITextView()
+        self.titleButton = UIButton(type: .custom)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -32,18 +36,15 @@ class NoteController: UIViewController {
     }
     
     override func viewDidLoad() {
-        let noteTitle: UIButton = {
-            let button              = UIButton(type: .custom)
-            button.frame            = CGRect(x: 0, y: 0, width: 100, height: 40)
-            button.backgroundColor  = .clear
-            button.titleLabel?.font = button.titleLabel?.font.bolded
-            button.setTitle(note.title, for: .normal)
-            button.setTitleColor(.black, for: .normal)
-            button.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
-            return button
-        }()
+        titleButton.frame            = CGRect(x: 0, y: 0, width: 100, height: 40)
+        titleButton.backgroundColor  = .clear
+        titleButton.titleLabel?.font = titleButton.titleLabel?.font.bolded
+        titleButton.setTitleColor(.black, for: .normal)
+        titleButton.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
         
-        navigationItem.titleView          = noteTitle
+        titleButton.setTitle(note.title, for: .normal)
+        
+        navigationItem.titleView          = titleButton
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
         
         let spacer            = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
@@ -118,6 +119,7 @@ extension NoteController: UIGestureRecognizerDelegate {
 extension NoteController: UITextViewDelegate {
     /// Autosaves half a second after stop typing
     func textViewDidChange(_ textView: UITextView) {
+        isDirty = true
         timer?.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 0.5,
                                      target: self,
@@ -128,6 +130,7 @@ extension NoteController: UITextViewDelegate {
     
     /// Disabled editing (to re-anble hyperlink detection, etc) and save
     func textViewDidEndEditing(_ textView: UITextView) {
+        isDirty = true
         textView.isEditable = false
         textView.resignFirstResponder()
         saveNote()
@@ -190,6 +193,7 @@ private extension NoteController {
         let placeholder = "Untitled"
         
         func onConfirm(title: String?) {
+            isDirty    = title != note.title
             note.title = title
             self.viewDidLoad()
         }

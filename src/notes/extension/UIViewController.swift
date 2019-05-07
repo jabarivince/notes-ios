@@ -21,12 +21,14 @@ extension UIViewController {
     /// Prompt for text with callback for confirm and cancel events
     func promptForText(withMessage message: String,
                        placeholder: String? = nil,
+                       initialValue: String? = nil,
                        onConfirm: ((String?) -> Void)?,
                        onCancel: ((String?) -> Void)?) {
         
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         
         alert.addTextField { textField in
+            textField.text = initialValue
             textField.placeholder = placeholder
         }
         

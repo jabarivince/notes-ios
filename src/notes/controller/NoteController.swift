@@ -11,17 +11,25 @@ import UIKit
 class NoteController: UIViewController {
     private let textView:    UITextView
     private let titleButton: UIButton
+    private var timer:       Timer?
     private let noteService: NoteService
     private let note:        Note
-    private var isDirty:     Bool
-    private var timer:       Timer?
+    
+    private var noteTitle: String? {
+        didSet {
+            titleButton.setTitle(noteTitle, for: .normal)
+        }
+    }
+    
+    private var noteBody: String? {
+        return textView.text
+    }
     
     init(note: Note, noteService: NoteService) {
-        self.isDirty     = false
-        self.note        = note
-        self.noteService = noteService
         self.textView    = UITextView()
         self.titleButton = UIButton(type: .custom)
+        self.note        = note
+        self.noteService = noteService
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -41,8 +49,6 @@ class NoteController: UIViewController {
         titleButton.titleLabel?.font = titleButton.titleLabel?.font.bolded
         titleButton.setTitleColor(.black, for: .normal)
         titleButton.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
-        
-        titleButton.setTitle(note.title, for: .normal)
         
         navigationItem.titleView          = titleButton
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
@@ -83,6 +89,8 @@ class NoteController: UIViewController {
         ]
         textView.addGestureRecognizer(tapRecognizer)
         view.addSubview(textView)
+        
+        noteTitle = note.title
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -119,7 +127,6 @@ extension NoteController: UIGestureRecognizerDelegate {
 extension NoteController: UITextViewDelegate {
     /// Autosaves half a second after stop typing
     func textViewDidChange(_ textView: UITextView) {
-        isDirty = true
         timer?.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 0.5,
                                      target: self,
@@ -130,7 +137,6 @@ extension NoteController: UITextViewDelegate {
     
     /// Disabled editing (to re-anble hyperlink detection, etc) and save
     func textViewDidEndEditing(_ textView: UITextView) {
-        isDirty = true
         textView.isEditable = false
         textView.resignFirstResponder()
         saveNote()
@@ -138,6 +144,10 @@ extension NoteController: UITextViewDelegate {
 }
 
 private extension NoteController {
+    private var isDirty: Bool  {
+        return noteTitle != note.title || noteBody != note.body
+    }
+    
     @objc func openMenu() {
         let alert = UIAlertController(title: "Additional options", message: nil, preferredStyle: .actionSheet)
         
@@ -180,7 +190,9 @@ private extension NoteController {
     }
     
     @objc func saveNote() {
-        note.body = textView.text
+        guard isDirty else { return }
+        note.title = noteTitle
+        note.body  = noteBody
         noteService.saveNote(note: note)
     }
     
@@ -193,14 +205,12 @@ private extension NoteController {
         let placeholder = "Untitled"
         
         func onConfirm(title: String?) {
-            isDirty    = title != note.title
-            note.title = title
-            self.viewDidLoad()
+            noteTitle = title
         }
         
         promptForText(withMessage: message,
                       placeholder: placeholder,
-                      initialValue: note.title,
+                      initialValue: noteTitle,
                       onConfirm: onConfirm,
                       onCancel: nil)
     }

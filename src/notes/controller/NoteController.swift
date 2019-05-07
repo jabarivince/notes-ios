@@ -9,15 +9,27 @@
 import UIKit
 
 class NoteController: UIViewController {
-    private let textView: UITextView
+    private let textView:    UITextView
+    private let titleButton: UIButton
+    private var timer:       Timer?
     private let noteService: NoteService
-    private let note: Note
-    private var timer: Timer?
+    private let note:        Note
+    
+    private var noteTitle: String? {
+        didSet {
+            titleButton.setTitle(noteTitle, for: .normal)
+        }
+    }
+    
+    private var noteBody: String? {
+        return textView.text
+    }
     
     init(note: Note, noteService: NoteService) {
+        self.textView    = UITextView()
+        self.titleButton = UIButton(type: .custom)
         self.note        = note
         self.noteService = noteService
-        self.textView    = UITextView()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -32,18 +44,13 @@ class NoteController: UIViewController {
     }
     
     override func viewDidLoad() {
-        let noteTitle: UIButton = {
-            let button              = UIButton(type: .custom)
-            button.frame            = CGRect(x: 0, y: 0, width: 100, height: 40)
-            button.backgroundColor  = .clear
-            button.titleLabel?.font = button.titleLabel?.font.bolded
-            button.setTitle(note.title, for: .normal)
-            button.setTitleColor(.black, for: .normal)
-            button.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
-            return button
-        }()
+        titleButton.frame            = CGRect(x: 0, y: 0, width: 100, height: 40)
+        titleButton.backgroundColor  = .clear
+        titleButton.titleLabel?.font = titleButton.titleLabel?.font.bolded
+        titleButton.setTitleColor(.black, for: .normal)
+        titleButton.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
         
-        navigationItem.titleView          = noteTitle
+        navigationItem.titleView          = titleButton
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
         
         let spacer            = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
@@ -82,6 +89,8 @@ class NoteController: UIViewController {
         ]
         textView.addGestureRecognizer(tapRecognizer)
         view.addSubview(textView)
+        
+        noteTitle = note.title
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -135,6 +144,10 @@ extension NoteController: UITextViewDelegate {
 }
 
 private extension NoteController {
+    private var isDirty: Bool  {
+        return noteTitle != note.title || noteBody != note.body
+    }
+    
     @objc func openMenu() {
         let alert = UIAlertController(title: "Additional options", message: nil, preferredStyle: .actionSheet)
         
@@ -177,7 +190,9 @@ private extension NoteController {
     }
     
     @objc func saveNote() {
-        note.body = textView.text
+        guard isDirty else { return }
+        note.title = noteTitle
+        note.body  = noteBody
         noteService.saveNote(note: note)
     }
     
@@ -190,13 +205,12 @@ private extension NoteController {
         let placeholder = "Untitled"
         
         func onConfirm(title: String?) {
-            note.title = title
-            self.viewDidLoad()
+            noteTitle = title
         }
         
         promptForText(withMessage: message,
                       placeholder: placeholder,
-                      initialValue: note.title,
+                      initialValue: noteTitle,
                       onConfirm: onConfirm,
                       onCancel: nil)
     }

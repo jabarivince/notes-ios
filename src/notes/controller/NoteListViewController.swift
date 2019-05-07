@@ -13,21 +13,37 @@ class NoteListViewController: UITableViewController {
     private let addButtomItem:    UIBarButtonItem
     private let shareButtomItem:  UIBarButtonItem
     private let trashButton:      UIBarButtonItem
+    private let selectAllButton:  UIBarButtonItem
     private let spacer:           UIBarButtonItem
     private let cellId:           String
     private let noteService:      NoteService
     
-    /// Disable the trash can if our selection count reaches 0
     private var selectedNotesMap: Dictionary<IndexPath, Note> {
         didSet {
-            trashButton.isEnabled = !selectedNotesMap.isEmpty
+            let notesAreSelected  = atLeastOneNoteSelected
+            let selectedNoteCount = numberOfSelectedRows
+            
+            if selectedNoteCount == 0 {
+                title = "Notes"
+                selectAllButton.title = "Select all"
+                shareButtomItem.isEnabled = false
+            } else {
+                let singularOrPlural = selectedNoteCount == 1 ? "note" : "notes"
+                
+                title = "\(selectedNoteCount) Selected"
+                selectAllButton.title = "Unselect \(selectedNoteCount) \(singularOrPlural)"
+                shareButtomItem.isEnabled = true
+            }
+            
+            trashButton.isEnabled = notesAreSelected
         }
     }
     
-    /// Disable edit button if there are 0 notes to edit
     private var notes = [Note]() {
         didSet {
-            editButtonItem.isEnabled = !notes.isEmpty
+            let isEmpty = notes.isEmpty
+            
+            editButtonItem.isEnabled  = !isEmpty
         }
     }
     
@@ -35,6 +51,46 @@ class NoteListViewController: UITableViewController {
     private var isSearching = false {
         didSet {
             addButtomItem.isEnabled = !isSearching
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setToolbarHidden(true, animated: true)
+        getNotes()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setToolbarHidden(true, animated: true)
+        searchController.dismiss(animated: false, completion: nil)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        coordinator.animate(alongsideTransition: { (context) in
+            self.searchController.searchBar.frame.size.width = self.view.frame.size.width
+        }, completion: nil)
+    }
+    
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        
+        if isEditing {
+            toolbarItems            = [selectAllButton, spacer, trashButton]
+            editButtonItem.title    = "Done"
+            addButtomItem.isEnabled = false
+            enableShareButton()
+            navigationController?.setToolbarHidden(false, animated: true)
+        } else {
+            title                 = "Notes"
+            editButtonItem.title  = "Select"
+            trashButton.isEnabled = false
+            enableAddButton()
+            navigationController?.setToolbarHidden(true, animated: true)
+            
+            if !isSearching {
+                addButtomItem.isEnabled = true
+            }
         }
     }
     
@@ -80,51 +136,13 @@ class NoteListViewController: UITableViewController {
         trashButton.tintColor     = .red
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setToolbarHidden(true, animated: true)
-        getNotes()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setToolbarHidden(true, animated: true)
-        searchController.dismiss(animated: false, completion: nil)
-    }
-    
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        coordinator.animate(alongsideTransition: { (context) in
-            self.searchController.searchBar.frame.size.width = self.view.frame.size.width
-        }, completion: nil)
-    }
-    
-    override func setEditing(_ editing: Bool, animated: Bool) {
-        super.setEditing(editing, animated: animated)
-        
-        if isEditing {
-            toolbarItems            = [spacer, trashButton]
-            editButtonItem.title    = "Done"
-            addButtomItem.isEnabled = false
-            enableShareButton()
-            navigationController?.setToolbarHidden(false, animated: true)
-        } else {
-            editButtonItem.title  = "Select"
-            trashButton.isEnabled = false
-            enableAddButton()
-            navigationController?.setToolbarHidden(true, animated: true)
-            
-            if !isSearching {
-                addButtomItem.isEnabled = true
-            }
-        }
-    }
-    
     init() {
         searchController = UISearchController(searchResultsController: nil)
         addButtomItem    = UIBarButtonItem(barButtonSystemItem: .add,           target: nil, action: nil)
         shareButtomItem  = UIBarButtonItem(barButtonSystemItem: .action,        target: nil, action: nil)
         spacer           = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         trashButton      = UIBarButtonItem(barButtonSystemItem: .trash,         target: nil, action: nil)
+        selectAllButton  = UIBarButtonItem(title: "Select all", style: .plain,  target: nil, action: nil)
         noteService      = NoteService.instance
         notes            = [Note]()
         cellId           = "cell"
@@ -136,9 +154,11 @@ class NoteListViewController: UITableViewController {
         addButtomItem.target   = self
         shareButtomItem.target = self
         trashButton.target     = self
+        selectAllButton.target = self
         addButtomItem.action   = #selector(openNewNote)
         shareButtomItem.action = #selector(sendMultipleNotes)
         trashButton.action     = #selector(deleteSelectedNotes)
+        selectAllButton.action = #selector(selectAllOrDeselectAllNotes)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -197,9 +217,8 @@ extension NoteListViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let note = notes[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId) ?? UITableViewCell(style: .subtitle, reuseIdentifier: cellId)
-        cell.initialize(from: note)
+        cell.initialize(from: notes[indexPath.row])
         return cell
     }
     
@@ -232,13 +251,18 @@ extension NoteListViewController {
 }
 
 private extension NoteListViewController {
+    var numberOfSelectedRows: Int {
+        return tableView.indexPathsForSelectedRows?.count ?? 0
+    }
     
-    /// Return only the Note objects that are selected
+    var atLeastOneNoteSelected: Bool {
+        return numberOfSelectedRows > 0
+    }
+    
     var selectedNotes: Set<Note> {
         return selectedNotesMap.valueSet
     }
     
-    /// Return only the indicies of the selected cells
     var selectedIndices: [IndexPath] {
         return selectedNotesMap.keyList
     }
@@ -305,7 +329,17 @@ private extension NoteListViewController {
         navigationItem.rightBarButtonItem = shareButtomItem
     }
     
-    private func dismissKeyboard() {
+    func dismissKeyboard() {
         searchController.searchBar.resignFirstResponder()
+    }
+    
+    @objc func selectAllOrDeselectAllNotes() {
+        guard isEditing else { return }
+        
+        if atLeastOneNoteSelected {
+            tableView.deselectAllRows()
+        } else {
+            tableView.selectAllRows()
+        }
     }
 }

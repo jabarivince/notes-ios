@@ -10,20 +10,29 @@ import UIKit
 
 extension UITableViewCell {
     func initialize(from note: Note) {
-        guard let textLabel = textLabel else { return }
+        guard
+            let textLabel       = textLabel,
+            let detailTextLabel = detailTextLabel
+        else { return }
+        
         textLabel.font = textLabel.font.bolded
         textLabel.text = note.title
         
-        var detail = ""
+        var accessibility = ""
+        var detail = note.body?.firstLine.truncated(after: 30) ?? ""
         
-        if let date = note.lastEditedDate?.formatted {
-            detail += "\(date)\n"
+        if !detail.isEmpty {
+            accessibility += "Subject: \(detail)"
         }
         
-        detail += note.body?.firstLine.truncated(after: 30) ?? ""
+        if let date = note.lastEditedDate?.formatted {
+            detail        += "\n\(date)"
+            accessibility += ", Last edited at: \(date)"
+        }
         
-        detailTextLabel?.text          = detail
-        detailTextLabel?.textColor     = .gray
-        detailTextLabel?.numberOfLines = 0
+        detailTextLabel.numberOfLines      = 0
+        detailTextLabel.textColor          = .gray
+        detailTextLabel.text               = detail
+        detailTextLabel.accessibilityLabel = accessibility
     }
 }

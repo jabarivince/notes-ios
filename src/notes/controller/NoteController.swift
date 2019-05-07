@@ -54,7 +54,7 @@ class NoteController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
         
         let spacer            = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        let menuButton        = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(openMenu))
+        let menuButton        = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(openMenu))
         let trashButton       = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
         toolbarItems          = [menuButton, spacer, trashButton]
         trashButton.tintColor = .red

@@ -8,24 +8,17 @@
 
 import Firebase
 
-/// Publishes events to Firebase
 protocol AnalyticsService {
-    
-    /// Publish the event
     func publish(_ event: Event)
 }
 
-/// Default implementation of publish()
 extension AnalyticsService {
-    
-    /// Publishes event to Firebase
     func publish(_ event: Event) {
         let name = event.type.rawValue
         Analytics.logEvent(name, parameters: event.loggable?.parameters)
     }
 }
 
-/// Wrapper that lists all loggable events
 struct Event {
     var type: EventType
     var loggable: Loggable?
@@ -55,9 +48,6 @@ struct Event {
     }
 }
 
-/// Object that can be logged to Firebase
 protocol Loggable {
-    
-    /// Parameters that are logged to Firebase
     var parameters: [String: Any] { get }
 }

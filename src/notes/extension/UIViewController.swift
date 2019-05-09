@@ -12,20 +12,66 @@ extension UIViewController {
     
     /// TODO: MAKE SURE THESE CLOSURE / FUNCTIONS ARE NOT EXPOSING MEMORY CYCLES
     
-    // Determine which View Controller to present with
-    // that way we avoid the warning for already presenting
+    // Avoids the issue for already presenting
     var presentedVC: UIViewController {
         return presentedViewController ?? self
     }
     
-    /// Prompt for text with callback for confirm and cancel events
+    func presentActionSheet(title: String? = nil,
+                            message: String? = nil,
+                            for actions: [(title: String, action: () -> Void)]) {
+        
+        let alert = getActionSheet(title: title,
+                                   message: message,
+                                   for: actions)
+        
+        presentedVC.present(alert, animated: true, completion: nil)
+    }
+    
+    func getActionSheet(title: String? = nil,
+                        message: String? = nil,
+                        for actions: [(title: String, action: () -> Void)]) -> UIAlertController {
+        
+        let alert = UIAlertController(title: title,
+                                      message: nil,
+                                      preferredStyle: .actionSheet)
+        
+        for (title, action) in actions {
+            let alertAction = UIAlertAction(title: title, style: .default) { _ in
+                action()
+            }
+            
+            alert.addAction(alertAction)
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel",
+                                      style: .cancel,
+                                      handler: nil))
+        
+        return alert
+    }
+    
+    func promptForText(withMessage message: String,
+                       placeholder: String? = nil,
+                       initialValue: String? = nil,
+                       onConfirm: ((String?) -> Void)?) {
+        
+        promptForText(withMessage: message,
+                      placeholder: placeholder,
+                      initialValue: initialValue,
+                      onConfirm: onConfirm,
+                      onCancel: nil)
+    }
+    
     func promptForText(withMessage message: String,
                        placeholder: String? = nil,
                        initialValue: String? = nil,
                        onConfirm: ((String?) -> Void)?,
                        onCancel: ((String?) -> Void)?) {
         
-        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: nil,
+                                      message: message,
+                                      preferredStyle: .alert)
         
         alert.addTextField { textField in
             textField.text = initialValue
@@ -42,7 +88,7 @@ extension UIViewController {
             alert?.dismiss(animated: true, completion: nil)
         }
         
-        let cancel = UIAlertAction(title: "Cancel", style: .default) { [weak alert] _ in
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { [weak alert] _ in
             let title = alert?.textFields?[0].text
             
             if let onCancel = onCancel {
@@ -58,11 +104,20 @@ extension UIViewController {
         presentedVC.present(alert, animated: true, completion: nil)
     }
     
-    /// Prompt yes or no with callbacks for both actions
-    func promptYesOrNo(withMessage message: String, onYes: (() -> Void)?, onNo: (() -> Void)?) {
-        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+    func promptToContinue(withMessage message: String, onYes: @escaping () -> Void) {
+        promptYesOrNo(withMessage: message,
+                      onYes: onYes,
+                      onNo: nil)
+    }
     
-        let yes = UIAlertAction(title: "Yes", style: .default) { [weak alert] _ in
+    func promptYesOrNo(withTitle title: String? = "Are you sure?",
+                       withMessage message: String,
+                       onYes: (() -> Void)?,
+                       onNo: (() -> Void)?) {
+        
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    
+        let yes = UIAlertAction(title: "Yes", style: .destructive) { [weak alert] _ in
             if let onYes = onYes {
                 onYes()
             }
@@ -78,7 +133,6 @@ extension UIViewController {
             alert?.dismiss(animated: true, completion: nil)
         }
         
-        yes.setValue(UIColor.red, forKey: "titleTextColor")
         alert.addAction(no)
         alert.addAction(yes)
         

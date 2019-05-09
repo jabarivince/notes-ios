@@ -10,15 +10,12 @@ import CoreData
 
 class Note: NSManagedObject {
     
-    /// Determines if a note has a given string in
-    /// its title or in its body. This function is
-    /// not case sensitive.
+    /// Case insensitive check against title and body
     func contains(text: String?) -> Bool {
         var titleContains = false
-        var bodyContains = false
+        var bodyContains  = false
         
         if let text = text?.lowercased() {
-            
             if let title = title?.lowercased() {
                 titleContains = title.contains(text)
             }
@@ -57,13 +54,13 @@ extension Note: Stringifiable {
 extension Note: Loggable {
     var parameters: [String: Any] {
         var params: [String: Any] = [
-            "is_dirty": isDirty,
+            "is_dirty":        isDirty,
             "has_empty_title": hasEmptyTitle,
-            "has_empty_body": hasEmptyBody,
-            "is_empty": isEmpty,
-            "title_length": titleLength,
-            "body_length": bodyLength,
-            "length": length,
+            "has_empty_body":  hasEmptyBody,
+            "is_empty":        isEmpty,
+            "title_length":    titleLength,
+            "body_length":     bodyLength,
+            "length":          length,
         ]
         
         if let createdDate = createdDate {
@@ -77,19 +74,19 @@ extension Note: Loggable {
         return params
     }
     
-    var isDirty: Bool {
+    private var isDirty: Bool {
         return createdDate != lastEditedDate
     }
     
-    var hasEmptyTitle: Bool {
+    private var hasEmptyTitle: Bool {
         return title?.isEmpty ?? true
     }
     
-    var hasEmptyBody: Bool {
+    private var hasEmptyBody: Bool {
         return body?.isEmpty ?? true
     }
     
-    var isEmpty: Bool {
+    private var isEmpty: Bool {
         return hasEmptyTitle && hasEmptyBody
     }
     
@@ -101,7 +98,7 @@ extension Note: Loggable {
         return body?.count ?? 0
     }
     
-    var length: Int {
+    private var length: Int {
         return titleLength + bodyLength
     }
 }

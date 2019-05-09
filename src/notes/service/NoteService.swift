@@ -60,7 +60,7 @@ class NoteService {
     }
     
     /// SQL: DELETE FROM Note WHERE id IN (id_1, id_2, ...)
-    func deleteNotes(_ notes: Set<Note>, completion: (() -> Void)?) {
+    func deleteNotes(_ notes: Set<Note>, completion: (() -> Void)? = nil) {
         for note in notes {
             context.delete(note)
         }
@@ -146,9 +146,9 @@ private extension NoteService {
     }
     
     func send<T>(_ value: T,
-                         withSubject subject: String = "Notes",
-                         viewController: UIViewController,
-                         completion: @escaping (T) -> Void) where T: Stringifiable, T: Loggable {
+                 withSubject subject: String = "Notes",
+                 viewController: UIViewController,
+                 completion: @escaping (T) -> Void) where T: Stringifiable, T: Loggable {
         
         let text = value.stringified
         let activityViewController = UIActivityViewController(activityItems:[text], applicationActivities: nil)

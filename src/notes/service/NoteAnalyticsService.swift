@@ -9,7 +9,6 @@
 import Firebase
 
 class NoteAnalyticsService: AnalyticsService {
-    
     static let instance = NoteAnalyticsService()
     
     func publishCreateNoteEvent(for note: Note) {

@@ -15,7 +15,14 @@ class NoteListBackgroundView: UIView {
         case noNotesAvailableState = "Click + to create a new note"
     }
     
-    private let label = UILabel()
+    private let label      = LabelView()
+    private let recognizer = UITapGestureRecognizer(target: nil, action: nil)
+    
+    private var text: String {
+        return label.text ?? ""
+    }
+    
+    var callback: (() -> Void)?
     
     var state: State? = .hiddenState {
         didSet {
@@ -25,22 +32,21 @@ class NoteListBackgroundView: UIView {
             case .noNotesAvailableState:
                 let text     = state.rawValue
                 let attrText = NSMutableAttributedString(string: text)
-                let range    = (text as NSString).range(of: "+")
+                let range    = text.asNSString.range(of: "+")
                 let color    = tintColor ?? UIColor(red: 0, green: 122/255, blue: 1, alpha: 1)
-                
                 attrText.addAttribute(.foregroundColor, value: color, range: range)
                 label.attributedText = attrText
+                label.addGestureRecognizer(recognizer)
                 
             case .noNotesFoundState, .hiddenState:
                 callback = nil
                 fallthrough
             default:
                 label.text = state.rawValue
+                label.removeGestureRecognizer(recognizer)
             }
         }
     }
-    
-    var callback: (() -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -75,26 +81,44 @@ private extension NoteListBackgroundView {
     }
     
     func setupTapGestureRecognizer() {
-        let recognizer                  = UITapGestureRecognizer(target: nil, action: nil)
         recognizer.delegate             = self
         recognizer.numberOfTapsRequired = 1
         recognizer.addTarget(self, action: #selector(labelTapped))
-        label.addGestureRecognizer(recognizer)
     }
 }
 
-
 extension NoteListBackgroundView: UIGestureRecognizerDelegate {
+    
+    /// Called when the UILabel detects a single tap anywhere on the UILabel
+    /// However, we chose to respond to the tap if and only if the user tapped
+    /// on the target text that indicates the call to action.
     @objc private func labelTapped(_ recognizer: UITapGestureRecognizer) {
-        if attributedTextTapped(recognizer) {
+        guard recognizer.state == .ended else { return }
+        
+        if shouldRespondTo(recognizer) {
             callback?()
         }
     }
     
-    private func attributedTextTapped(_ recognizer: UITapGestureRecognizer) -> Bool {
+    /// Determines whether or not we should respond to the tap gesture.
+    /// Presently, we only want to respond to tap gestures if we are in
+    /// the .noNotesAvailable state and the tap location is on the call to
+    /// action text (the +).
+    private func shouldRespondTo(_ recognizer: UITapGestureRecognizer) -> Bool {
         guard state == .noNotesAvailableState else { return false }
         
-        // TODO: Implement logic to determine if attributed text was clicked
-        return true
+        let point  = recognizer.location(in: label)
+        let range  = text.asNSString.range(of: " + ")
+        let prefix = text.asNSString.substring(to: range.location)
+        let size   = prefix.size(withAttributes: [.font: label.font as Any])
+        let target = CGPoint(x: size.width , y: size.height)
+        
+        return distance(from: point, to: target) < 31
+    }
+    
+    private func distance(from: CGPoint, to: CGPoint) -> CGFloat {
+        let dx = from.x - to.x
+        let dy = from.y - to.y
+        return ( (dx * dx) + (dy * dy) ).squareRoot()
     }
 }

@@ -76,14 +76,13 @@ extension UIViewController {
         alert.addTextField { textField in
             textField.text = initialValue
             textField.placeholder = placeholder
+            textField.clearButtonMode = .whileEditing
         }
         
         let ok = UIAlertAction(title: "Ok", style: .default) { [weak alert] _ in
             let title = alert?.textFields?[0].text
             
-            if let onConfirm = onConfirm {
-                onConfirm(title)
-            }
+            onConfirm?(title)
             
             alert?.dismiss(animated: true, completion: nil)
         }
@@ -91,9 +90,7 @@ extension UIViewController {
         let cancel = UIAlertAction(title: "Cancel", style: .cancel) { [weak alert] _ in
             let title = alert?.textFields?[0].text
             
-            if let onCancel = onCancel {
-                onCancel(title)
-            }
+            onCancel?(title)
             
             alert?.dismiss(animated: true, completion: nil)
         }

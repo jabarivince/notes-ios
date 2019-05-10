@@ -145,21 +145,12 @@ private extension NoteViewController {
 
 // MARK:- Notification observers
 private extension NoteViewController {
-    func respondTo(notification: NSNotification.Name?, with selector: Selector) {
-        NotificationCenter.default.addObserver(self,
-                                               selector: selector,
-                                               name: notification,
-                                               object: nil)
-    }
-    
     func addObservers() {
         respondTo(notification: UIResponder.keyboardWillShowNotification, with: #selector(keyboardWillShow))
         respondTo(notification: UIResponder.keyboardWillHideNotification, with: #selector(keyboardWillHide))
     }
     
-    func removeObservers() {
-        NotificationCenter.default.removeObserver(self)
-    }
+    
     
     /// Returns size frame of the keyboard
     func getKeyboardSize(from notification: Notification) -> CGRect? {

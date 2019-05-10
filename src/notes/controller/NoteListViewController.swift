@@ -68,6 +68,7 @@ class NoteListViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setToolbarHidden(true, animated: true)
+        addObservers()
         getNotes()
     }
     
@@ -75,6 +76,7 @@ class NoteListViewController: UITableViewController {
         super.viewWillDisappear(animated)
         navigationController?.setToolbarHidden(true, animated: false)
         searchController.dismiss(animated: false, completion: nil)
+        removeObservers()
     }
     
     /// Animate screen rotation between portrait and landscape
@@ -98,6 +100,14 @@ class NoteListViewController: UITableViewController {
         } else {
             setInitialState()
         }
+    }
+    
+    func addObservers() {
+        respondTo(notification: UIApplication.significantTimeChangeNotification, with: #selector(timeChanged))
+    }
+    
+    @objc func timeChanged() {
+        tableView.reloadData()
     }
 }
 

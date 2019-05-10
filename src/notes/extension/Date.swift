@@ -10,18 +10,21 @@ import Foundation
 
 extension Date {
     var formatted: String {
-        let formatter      = DateFormatter()
-        formatter.locale   = Locale(identifier: "en_US_POSIX")
-        formatter.amSymbol = "AM"
-        formatter.pmSymbol = "PM"
+        let format: Format
         
-        if isToday {
-            formatter.dateFormat = Date.today
-        } else if isThisWeek {
-            formatter.dateFormat = Date.thisWeek
+        if occursToday {
+            format = .time
+        } else if occursThisWeek {
+            format = .day
         } else {
-            formatter.dateFormat = Date.beyondLastWeek
+            format = .date
         }
+        
+        let formatter        = DateFormatter()
+        formatter.locale     = Locale(identifier: "en_US_POSIX")
+        formatter.amSymbol   = "AM"
+        formatter.pmSymbol   = "PM"
+        formatter.dateFormat = format.rawValue
         
         return formatter.string(from: self)
     }
@@ -32,27 +35,17 @@ private extension Date {
         return Date()
     }
     
-    var isToday: Bool {
-        return daysFromToday == 0
+    var occursToday: Bool {
+        return Calendar.current.isDateInToday(self)
     }
     
-    var isThisWeek: Bool {
-        return daysFromToday <= 6
+    var occursThisWeek: Bool {
+        return Calendar.current.isDate(self, equalTo: today, toGranularity: .weekOfYear)
     }
     
-    var daysFromToday: Int {
-        return Calendar.current.dateComponents([.day], from: self, to: today).day!
-    }
-    
-    static var today: String {
-        return "h:mm a"
-    }
-    
-    static var thisWeek: String {
-        return "EEEE"
-    }
-    
-    static var beyondLastWeek: String {
-        return "h:mm a 'on' MMMM dd, yyyy"
+    enum Format: String {
+        case date = "h:mm a 'on' MMMM dd, yyyy"
+        case day  = "EEEE"
+        case time = "h:mm a"
     }
 }

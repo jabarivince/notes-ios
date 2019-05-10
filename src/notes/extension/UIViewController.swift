@@ -135,4 +135,15 @@ extension UIViewController {
         
         presentedVC.present(alert, animated: true, completion: nil)
     }
+    
+    func respondTo(notification: NSNotification.Name?, with selector: Selector) {
+        NotificationCenter.default.addObserver(self,
+                                               selector: selector,
+                                               name: notification,
+                                               object: nil)
+    }
+    
+    func removeObservers() {
+        NotificationCenter.default.removeObserver(self)
+    }
 }

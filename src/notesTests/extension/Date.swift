@@ -23,7 +23,7 @@ class DateTest: XCTestCase {
         
         let today    = Date()
         let actual   = today.formatted
-        let expected = formatter.string(from: today)
+        let expected = formatter.string(from: today)    
         XCTAssert(actual == expected)
     }
     

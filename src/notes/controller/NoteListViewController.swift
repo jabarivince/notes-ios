@@ -110,8 +110,6 @@ private extension NoteListViewController {
             state = .hiddenState
         } else {
             state = isSearching ? .noNotesFoundState : .noNotesAvailableState
-            
-            print(isSearching)
         }
         
         setupBackground(in: state)
@@ -121,6 +119,7 @@ private extension NoteListViewController {
         switch state {
         case .noNotesAvailableState, .noNotesFoundState:
             let backgroundView        = NoteListBackgroundView(frame: tableView.frame)
+            backgroundView.callback   = openNewNote
             backgroundView.state      = state
             tableView.backgroundView  = backgroundView
             tableView.separatorStyle  = .none

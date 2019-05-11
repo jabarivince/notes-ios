@@ -219,7 +219,7 @@ class NoteTest: XCTestCase {
     
     func testStringifyingWithRandomlyCreatedNotes() {
         let quantity = Int.random(in: 100...150)
-        let notes = getNotes(quantity).filter { !$0.stringified.isEmpty }.sorted(by: Set.comparator)
+        let notes = getNotes(quantity).filter { !$0.stringified.isEmpty }.sorted(by: Note.comparator)
         let noteSet = Set<Note>(notes)
         var stringified = ""
         

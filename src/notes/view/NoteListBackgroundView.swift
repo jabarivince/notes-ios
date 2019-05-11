@@ -107,13 +107,17 @@ extension NoteListBackgroundView: UIGestureRecognizerDelegate {
     private func shouldRespondTo(_ recognizer: UITapGestureRecognizer) -> Bool {
         guard state == .noNotesAvailableState else { return false }
         
-        let point  = recognizer.location(in: label)
-        let range  = text.asNSString.range(of: " + ")
+        let point = recognizer.location(in: label)
+        return withinRadius(point: point, raduis: 31, of: " + ")
+    }
+    
+    private func withinRadius(point: CGPoint, raduis: CGFloat, of target: String) -> Bool {
+        let range  = text.asNSString.range(of: target)
         let prefix = text.asNSString.substring(to: range.location)
         let size   = prefix.size(withAttributes: [.font: label.font as Any])
         let target = CGPoint(x: size.width , y: size.height)
         
-        return distance(from: point, to: target) < 31
+        return distance(from: point, to: target) < raduis
     }
     
     private func distance(from: CGPoint, to: CGPoint) -> CGFloat {

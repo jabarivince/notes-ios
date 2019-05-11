@@ -24,7 +24,7 @@ class NoteTableViewCell: UITableViewCell {
             
             if let date = note.lastEditedDate?.formatted {
                 detail        += "\n\(date)"
-                accessibility += ", Last edited at: \(date)"
+                accessibility += ", Last edited: \(date)"
             }
             
             detailTextLabel?.numberOfLines      = 0

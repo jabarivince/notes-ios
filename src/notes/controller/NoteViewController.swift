@@ -80,7 +80,7 @@ private extension NoteViewController {
     }
     
     @objc func changeNoteName() {
-        promptForText(withMessage: "Rename your note", placeholder: "Untitled", initialValue: noteTitle) { [weak self] title in
+        promptForText(saying: "Rename your note", placeholder: "Untitled", initialValue: noteTitle) { [weak self] title in
             guard let self = self else { return }
             self.noteTitle = title
         }
@@ -149,8 +149,6 @@ private extension NoteViewController {
         respondTo(notification: UIResponder.keyboardWillShowNotification, with: #selector(keyboardWillShow))
         respondTo(notification: UIResponder.keyboardWillHideNotification, with: #selector(keyboardWillHide))
     }
-    
-    
     
     /// Returns size frame of the keyboard
     func getKeyboardSize(from notification: Notification) -> CGRect? {

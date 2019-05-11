@@ -13,21 +13,8 @@ extension Set {
 }
 
 extension Set: Stringifiable where Element == Note {
-    static func comparator(lhs: Note, rhs: Note) -> Bool {
-        if
-            let left = lhs.lastEditedDate,
-            let right = rhs.lastEditedDate {
-            
-            return left < right
-        }
-        
-        // TODO: Handle nil cases
-        
-        return false
-    }
-    
     var stringified: String {
-        return sorted(by: Set.comparator)
+        return sorted(by: Note.comparator)
             .map { $0.stringified }
             .filter { !$0.isEmpty }
             .joined(separator: "\n\n")
@@ -35,6 +22,18 @@ extension Set: Stringifiable where Element == Note {
 }
 
 extension Set: Loggable where Element == Note {
+    var parameters: [String : Any] {
+        return [
+            "count": count,
+            "average_title_length": averageTitleLength,
+            "average_body_length":  averageBodyLength,
+            "max_title_length":     maxTitleLength,
+            "max_body_length":      maxBodyLength,
+            "min_title_length":     minTitleLength,
+            "min_body_length":      minBodyLength,
+        ]
+    }
+    
     private var averageTitleLength: Float {
         guard count > 0 else { return 0 }
         let sum = Float(map { $0.titleLength }.reduce(0, +))
@@ -61,17 +60,5 @@ extension Set: Loggable where Element == Note {
     
     private var minBodyLength: Int {
         return map { $0.bodyLength }.min() ?? 0
-    }
-    
-    var parameters: [String : Any] {
-        return [
-            "count": count,
-            "average_title_length": averageTitleLength,
-            "average_body_length":  averageBodyLength,
-            "max_title_length":     maxTitleLength,
-            "max_body_length":      maxBodyLength,
-            "min_title_length":     minTitleLength,
-            "min_body_length":      minBodyLength,
-        ]
     }
 }

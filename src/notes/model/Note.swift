@@ -102,3 +102,16 @@ extension Note: Loggable {
         return titleLength + bodyLength
     }
 }
+
+extension Note {
+    static func comparator(lhs: Note, rhs: Note) -> Bool {
+        if
+            let left = lhs.lastEditedDate,
+            let right = rhs.lastEditedDate {
+            
+            return left < right
+        }
+        
+        return lhs.lastEditedDate == nil
+    }
+}

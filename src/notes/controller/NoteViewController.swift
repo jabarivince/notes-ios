@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import notesServices
 
 class NoteViewController: UIViewController {
     private let titleButton: UIButton

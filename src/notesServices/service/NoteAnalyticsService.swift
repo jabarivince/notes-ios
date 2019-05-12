@@ -6,13 +6,10 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-import Firebase
-import notesServices
-
-extension AnalyticsService {
+public extension AnalyticsService {
     func publish(_ event: Event) {
         let name = event.type.rawValue
-        Analytics.logEvent(name, parameters: event.loggable?.parameters)
+//        Analytics.logEvent(name, parameters: event.loggable?.parameters)
     }
 }
 
@@ -91,5 +88,7 @@ class NoteAnalyticsService: AnalyticsService {
     
     private init() {}
 }
+
+
 
 

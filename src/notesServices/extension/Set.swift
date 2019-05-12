@@ -6,7 +6,7 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-import notesServices
+//import notesServices
 
 extension Set: Stringifiable where Element == Note {
     public var stringified: String {

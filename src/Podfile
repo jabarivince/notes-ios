@@ -1,15 +1,21 @@
 platform :ios, '10.0'
 
+target 'notesServices' do
+  use_frameworks!
+  
+  target 'notesServicesTests' do
+    inherit! :search_paths
+  end
+end
+
 target 'notes' do
   use_frameworks!
-
+  
   pod 'Firebase/Core'
   pod 'Fabric', '~> 1.9.0'
   pod 'Crashlytics', '~> 3.12.0'
 
   target 'notesTests' do
     inherit! :search_paths
-    # Pods for testing
   end
-
 end

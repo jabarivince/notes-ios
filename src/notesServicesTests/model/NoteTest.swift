@@ -8,7 +8,7 @@
 
 import CoreData
 import XCTest
-@testable import The_Note_App
+@testable import notesServices
 
 class NoteTest: XCTestCase {
     override func setUp() {

@@ -8,10 +8,9 @@
 
 import CoreData
 import UIKit
-import notesServices
 
-class NoteService {
-    func getAllNotes(containing searchText: String? = nil) -> [Note] {
+public class NoteService {
+    public func getAllNotes(containing searchText: String? = nil) -> [Note] {
         guard let searchText = searchText, !searchText.isEmpty else { return notes }
         
         return notes.filter { note in
@@ -20,7 +19,7 @@ class NoteService {
     }
     
     /// SQL: INSERT INTO Note (title, body) values (title, null)
-    func createNote(with title: String?) -> Note {
+    public func createNote(with title: String?) -> Note {
         let note = Note(context: context)
         let now  = Date()
         
@@ -47,7 +46,7 @@ class NoteService {
     }
     
     /// SQL: DELETE FROM Note WHERE id = id
-    func deleteNote(note: Note) {
+    public func deleteNote(note: Note) {
         context.delete(note)
         
         do {
@@ -60,7 +59,7 @@ class NoteService {
     }
     
     /// SQL: DELETE FROM Note WHERE id IN (id_1, id_2, ...)
-    func deleteNotes(_ notes: Set<Note>, completion: (() -> Void)? = nil) {
+    public func deleteNotes(_ notes: Set<Note>, completion: (() -> Void)? = nil) {
         for note in notes {
             context.delete(note)
         }
@@ -79,7 +78,7 @@ class NoteService {
     }
     
     /// SQL: INSERT INTO Note (title, body) VALUES (title, body)
-    func saveNote(note : Note) {
+    public func saveNote(note : Note) {
         let now = Date()
         
         if note.createdDate == nil {
@@ -97,17 +96,17 @@ class NoteService {
         }
     }
     
-    func sendNote(_ note: Note, viewController: UIViewController) {
+    public func sendNote(_ note: Note, viewController: UIViewController) {
         send(note, viewController: viewController, completion: analyticsService.publishSendNoteEvent)
     }
     
-    func sendNotes(_ notes: Set<Note>, viewController: UIViewController) {
+    public func sendNotes(_ notes: Set<Note>, viewController: UIViewController) {
         send(notes, viewController: viewController, completion: analyticsService.publishSendBatchNoteEvent)
     }
     
     static let entityName              = "Note"
     static let persistentContainerName = "NotesDataModel"
-    static let instance                = NoteService()
+    public static let instance         = NoteService()
     
     private let analyticsService  = NoteAnalyticsService.instance
     private let fetchRequest      = NSFetchRequest<NSFetchRequestResult>(entityName: NoteService.entityName)

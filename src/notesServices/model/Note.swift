@@ -7,12 +7,12 @@
 //
 
 import CoreData
-import notesServices
+//import notesServices
 
 public class Note: NSManagedObject {
     
     /// Case insensitive check against title and body
-    func contains(text: String?) -> Bool {
+    public func contains(text: String?) -> Bool {
         var titleContains = false
         var bodyContains  = false
         
@@ -29,7 +29,7 @@ public class Note: NSManagedObject {
         return titleContains || bodyContains
     }
     
-    static func comparator(lhs: Note, rhs: Note) -> Bool {
+    public static func comparator(lhs: Note, rhs: Note) -> Bool {
         if let left = lhs.lastEditedDate, let right = rhs.lastEditedDate {
             return left < right
         } else {
@@ -99,11 +99,11 @@ extension Note: Loggable {
         return hasEmptyTitle && hasEmptyBody
     }
     
-    var titleLength: Int {
+    public var titleLength: Int {
         return title?.count ?? 0
     }
     
-    var bodyLength: Int {
+    public var bodyLength: Int {
         return body?.count ?? 0
     }
     

@@ -8,6 +8,7 @@
 
 import CoreData
 import XCTest
+import notesServices
 @testable import The_Note_App
 
 class NoteServiceTest: XCTestCase {

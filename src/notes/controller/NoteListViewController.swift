@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import notesServices
 
 // MARK:- UITableViewController
 class NoteListViewController: UITableViewController {

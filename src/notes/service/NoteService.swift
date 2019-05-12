@@ -8,6 +8,7 @@
 
 import CoreData
 import UIKit
+import notesServices
 
 class NoteService {
     func getAllNotes(containing searchText: String? = nil) -> [Note] {
@@ -113,7 +114,7 @@ class NoteService {
     private(set) lazy var context = container.viewContext
     
     internal lazy var container: NSPersistentContainer = {
-        let persistentContainer = NSPersistentContainer(name: NoteService.persistentContainerName)
+        let persistentContainer = PersistantContainer(name: NoteService.persistentContainerName)
         
         persistentContainer.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
@@ -161,6 +162,13 @@ private extension NoteService {
     }
 }
 
-
-
-
+class PersistantContainer : NSPersistentContainer {
+    private static let id = "group.com.jabaridash.notes"
+    
+    static let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: id)!
+    let storeDescription = NSPersistentStoreDescription(url: url)
+    
+    override class func defaultDirectoryURL() -> URL {
+        return url
+    }
+}

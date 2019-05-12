@@ -6,31 +6,22 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-import Firebase
-
-protocol AnalyticsService {
+public protocol AnalyticsService {
     func publish(_ event: Event)
 }
 
-extension AnalyticsService {
-    func publish(_ event: Event) {
-        let name = event.type.rawValue
-        Analytics.logEvent(name, parameters: event.loggable?.parameters)
-    }
-}
-
-struct Event {
-    var type: EventType
-    var loggable: Loggable?
+public struct Event {
+    public var type: EventType
+    public var loggable: Loggable?
     
-    init(type: EventType, loggable: Loggable?) {
+    public init(type: EventType, loggable: Loggable?) {
         self.type = type
         self.loggable = loggable
     }
     
     /// All events in alphabetical order.
     /// All events must be lowercase annd snakecase.
-    enum EventType: String, CaseIterable {
+    public enum EventType: String, CaseIterable {
         case createNote = "create_note_succeeded"
         case createNoteFailed = "create_note_failed"
         case deleteBatchNote = "delete_batch_note_succeeded"

@@ -8,6 +8,6 @@
 
 /// Protocol used for sending a note,
 /// or multiple notes via iOS sharing view
-protocol Stringifiable {
+public protocol Stringifiable {
     var stringified: String { get }
 }

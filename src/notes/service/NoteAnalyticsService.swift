@@ -7,6 +7,14 @@
 //
 
 import Firebase
+import notesServices
+
+extension AnalyticsService {
+    func publish(_ event: Event) {
+        let name = event.type.rawValue
+        Analytics.logEvent(name, parameters: event.loggable?.parameters)
+    }
+}
 
 class NoteAnalyticsService: AnalyticsService {
     static let instance = NoteAnalyticsService()

@@ -6,8 +6,10 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
+import notesServices
+
 extension Set: Stringifiable where Element == Note {
-    var stringified: String {
+    public var stringified: String {
         return sorted(by: Note.comparator)
             .map { $0.stringified }
             .filter { !$0.isEmpty }
@@ -16,7 +18,7 @@ extension Set: Stringifiable where Element == Note {
 }
 
 extension Set: Loggable where Element == Note {
-    var parameters: [String : Any] {
+    public var parameters: [String : Any] {
         return [
             "count": count,
             "average_title_length": averageTitleLength,
@@ -28,31 +30,31 @@ extension Set: Loggable where Element == Note {
         ]
     }
     
-    private var averageTitleLength: Float {
+    public var averageTitleLength: Float {
         guard count > 0 else { return 0 }
         let sum = Float(map { $0.titleLength }.reduce(0, +))
         return sum / Float(count)
     }
     
-    private var averageBodyLength: Float {
+    public var averageBodyLength: Float {
         guard count > 0 else { return 0 }
         let sum = Float(map { $0.bodyLength }.reduce(0, +))
         return sum / Float(count)
     }
     
-    private var maxTitleLength: Int {
+    public var maxTitleLength: Int {
         return map { $0.titleLength }.max() ?? 0
     }
     
-    private var maxBodyLength: Int {
+    public var maxBodyLength: Int {
         return map { $0.bodyLength }.max() ?? 0
     }
     
-    private var minTitleLength: Int {
+    public var minTitleLength: Int {
         return map { $0.titleLength }.min() ?? 0
     }
     
-    private var minBodyLength: Int {
+    public var minBodyLength: Int {
         return map { $0.bodyLength }.min() ?? 0
     }
 }

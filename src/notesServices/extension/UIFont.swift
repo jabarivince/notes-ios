@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension UIFont {
+public extension UIFont {
     var bolded: UIFont {
         return UIFont.boldSystemFont(ofSize: pointSize)
     }

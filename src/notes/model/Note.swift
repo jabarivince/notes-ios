@@ -7,8 +7,9 @@
 //
 
 import CoreData
+import notesServices
 
-class Note: NSManagedObject {
+public class Note: NSManagedObject {
     
     /// Case insensitive check against title and body
     func contains(text: String?) -> Bool {
@@ -38,7 +39,7 @@ class Note: NSManagedObject {
 }
 
 extension Note: Stringifiable {
-    var stringified: String {
+    public var stringified: String {
         var string = ""
         var appendedTitle = false
         
@@ -60,7 +61,7 @@ extension Note: Stringifiable {
 }
 
 extension Note: Loggable {
-    var parameters: [String: Any] {
+    public var parameters: [String: Any] {
         var params: [String: Any] = [
             "is_dirty":        isDirty,
             "has_empty_title": hasEmptyTitle,

@@ -6,6 +6,8 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
+import notesServices
+
 struct NoteTableViewCellState {
     let text: String
     let detailText: String

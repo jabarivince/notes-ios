@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import The_Note_App
+@testable import notesServices
 
 class AnalyticsServiceTest: XCTestCase {
     func testThatallEventTypesAreLowercasedSnakeCase() {

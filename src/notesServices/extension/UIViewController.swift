@@ -9,7 +9,7 @@
 import UIKit
 
 // MARK:- UIAlertController
-extension UIViewController {
+public extension UIViewController {
         
     /// Avoids the issue for already presenting
     var presentedVC: UIViewController {
@@ -133,7 +133,7 @@ extension UIViewController {
 }
 
 // MARK:- Notification Center
-extension UIViewController {
+public extension UIViewController {
     func respondTo(notification: NSNotification.Name?, with selector: Selector) {
         NotificationCenter.default.addObserver(self,
                                                selector: selector,

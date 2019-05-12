@@ -8,6 +8,6 @@
 
 /// Protocol used for sending a note,
 /// or multiple notes CRUD events to Firebase
-protocol Loggable {
+public protocol Loggable {
     var parameters: [String: Any] { get }
 }

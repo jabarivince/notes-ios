@@ -28,7 +28,8 @@ struct Event {
         self.loggable = loggable
     }
     
-    /// All events in alphabetical order
+    /// All events in alphabetical order.
+    /// All events must be lowercase annd snakecase.
     enum EventType: String, CaseIterable {
         case createNote = "create_note_succeeded"
         case createNoteFailed = "create_note_failed"
@@ -46,8 +47,4 @@ struct Event {
         case updateNote = "update_note_succeeded"
         case updateNoteFailed = "update_note_failed"
     }
-}
-
-protocol Loggable {
-    var parameters: [String: Any] { get }
 }

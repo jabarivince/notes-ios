@@ -10,9 +10,7 @@ import UIKit
 
 // MARK:- UIAlertController
 extension UIViewController {
-    
-    /// TODO: MAKE SURE THESE CLOSURE / FUNCTIONS ARE NOT EXPOSING MEMORY CYCLES
-    
+        
     /// Avoids the issue for already presenting
     var presentedVC: UIViewController {
         return presentedViewController ?? self

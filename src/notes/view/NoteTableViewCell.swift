@@ -8,34 +8,20 @@
 
 import UIKit
 
-// TODO:- Convert to MVVM
 class NoteTableViewCell: UITableViewCell {
-    var note: Note! {
+    var state: NoteTableViewCellState! {
         didSet {
-            textLabel?.font = textLabel?.font.bolded
-            textLabel?.text = note.title
-            
-            var accessibility = ""
-            var detail = note.body?.firstLine.truncated(after: 30) ?? ""
-            
-            if !detail.isEmpty {
-                accessibility += "Subject: \(detail)"
-            }
-            
-            if let date = note.lastEditedDate?.formatted {
-                detail        += "\n\(date)"
-                accessibility += ", Last edited: \(date)"
-            }
-            
-            detailTextLabel?.numberOfLines      = 0
-            detailTextLabel?.textColor          = .gray
-            detailTextLabel?.text               = detail
-            detailTextLabel?.accessibilityLabel = accessibility
+            textLabel?.text = state.text
+            detailTextLabel?.text = state.detailText
+            detailTextLabel?.accessibilityLabel = state.accessibilityText
         }
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
+        textLabel?.font                = textLabel?.font.bolded
+        detailTextLabel?.numberOfLines = 0
+        detailTextLabel?.textColor     = .gray
     }
     
     required init?(coder aDecoder: NSCoder) {

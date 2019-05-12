@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import notesServices
 
 class NoteTableViewCell: UITableViewCell {
     var state: NoteTableViewCellState! {

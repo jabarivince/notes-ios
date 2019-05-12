@@ -8,30 +8,20 @@
 
 import UIKit
 import Social
+import notesServices
 
 class ShareViewController: SLComposeServiceViewController {
-    private var textString: String {
-        get {
-            return textView.text ?? ""
-        }
-    }
-    
     private var urlString: String? {
-        didSet {
-            guard let urlString = urlString else { return }
-            
-            if textString.isEmpty {
-                textView.text = urlString
-            } else {
-                textView.text = textString + "\n\n" + urlString
-            }
-        }
+        didSet { refreshView() }
     }
     
-    private lazy var selectNote: SLComposeSheetConfigurationItem = {
+    private var note: Note? {
+        didSet { refreshView() }
+    }
+    
+    private lazy var selectedNoteTitle: SLComposeSheetConfigurationItem = {
         let select        = SLComposeSheetConfigurationItem()!
         select.title      = "Selected Note:"
-        select.value      = "New note"
         select.tapHandler = saveButtonTapped
         return select
     }()
@@ -41,20 +31,22 @@ class ShareViewController: SLComposeServiceViewController {
     }
 
     override func didSelectPost() {
-        // This is called after the user selects Post. Do the upload of contentText and/or NSExtensionContext attachments.
-    
-        // Inform the host that we're done, so it un-blocks its UI. Note: Alternatively you could call super's -didSelectPost, which will similarly complete the extension context.
+        saveNote()
         self.extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
     }
 
     override func configurationItems() -> [Any]! {
-        return [selectNote]
+        return [selectedNoteTitle]
     }
         
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Notes"
         self.navigationController?.navigationBar.topItem?.rightBarButtonItem?.title = "Save"
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         findURL(then: appendURL)
     }
 }
@@ -90,11 +82,46 @@ private extension ShareViewController {
             urlString = url.absoluteString
         }
     }
+    
+    func saveNote() {
+        var noteToSave = note
+        
+        if noteToSave == nil {
+            let title = "New Note"
+            let body = textView.text
+            noteToSave = NoteService.instance.createNote(with: title, body: body)
+        }
+        
+        guard let toSave = noteToSave else { return }
+        
+        NoteService.instance.saveNote(note: toSave)
+    }
+    
+    func refreshView() {
+        var text = ""
+        
+        if note == nil {
+            selectedNoteTitle.value = "New Note"
+        } else {
+            selectedNoteTitle.value = note?.title ?? "Untitled"
+            text = note?.body ?? ""
+        }
+        
+        if let urlString = urlString {
+            if text.isEmpty {
+                text = urlString
+            } else {
+                text += "\n\n\(urlString)"
+            }
+        }
+        
+        textView.text = text
+    }
 }
 
 extension ShareViewController: ShareNoteListViewControllerDelegate {
-    func noteSelected(_ title: String) {
-        selectNote.value = title
+    func noteSelected(_ note: Note?) {
+        self.note = note
         navigationController?.popViewController(animated: true)
     }
 }

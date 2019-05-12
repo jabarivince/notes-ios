@@ -19,7 +19,7 @@ public class NoteService {
     }
     
     /// SQL: INSERT INTO Note (title, body) values (title, null)
-    public func createNote(with title: String?) -> Note {
+    public func createNote(with title: String?, body: String? = nil) -> Note {
         let note = Note(context: context)
         let now  = Date()
         
@@ -32,7 +32,7 @@ public class NoteService {
             note.title = title
         }
         
-        note.body = nil
+        note.body = body
         
         do {
             try context.save()

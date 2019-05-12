@@ -7,7 +7,6 @@
 //
 
 import CoreData
-//import notesServices
 
 public class Note: NSManagedObject {
     
@@ -83,6 +82,14 @@ extension Note: Loggable {
         return params
     }
     
+    public var titleLength: Int {
+        return title?.count ?? 0
+    }
+    
+    public var bodyLength: Int {
+        return body?.count ?? 0
+    }
+    
     private var isDirty: Bool {
         return createdDate != lastEditedDate
     }
@@ -97,14 +104,6 @@ extension Note: Loggable {
     
     private var isEmpty: Bool {
         return hasEmptyTitle && hasEmptyBody
-    }
-    
-    public var titleLength: Int {
-        return title?.count ?? 0
-    }
-    
-    public var bodyLength: Int {
-        return body?.count ?? 0
     }
     
     private var length: Int {

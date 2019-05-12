@@ -6,14 +6,12 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-import notesServices
-
-struct NoteTableViewCellState {
-    let text: String
-    let detailText: String
-    let accessibilityText: String
+public struct NoteTableViewCellState {
+    public let text: String
+    public let detailText: String
+    public let accessibilityText: String
     
-    init(from note: Note) {
+    public init(from note: Note) {
         let title = note.title ?? "Untitled"
         var accessibility = ""
         var detail = note.body?.firstLine.truncated(after: 30) ?? ""

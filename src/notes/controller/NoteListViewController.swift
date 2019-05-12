@@ -268,8 +268,10 @@ extension NoteListViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellId) as! NoteTableViewCell
-        cell.note = notes[indexPath.row]
+        let cell   = tableView.dequeueReusableCell(withIdentifier: cellId) as! NoteTableViewCell
+        let note   = notes[indexPath.row]
+        let state  = NoteTableViewCellState(from: note)
+        cell.state = state
         return cell
     }
     

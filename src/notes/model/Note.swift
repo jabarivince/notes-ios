@@ -27,6 +27,14 @@ class Note: NSManagedObject {
         
         return titleContains || bodyContains
     }
+    
+    static func comparator(lhs: Note, rhs: Note) -> Bool {
+        if let left = lhs.lastEditedDate, let right = rhs.lastEditedDate {
+            return left < right
+        } else {
+            return lhs.lastEditedDate == nil
+        }
+    }
 }
 
 extension Note: Stringifiable {
@@ -100,18 +108,5 @@ extension Note: Loggable {
     
     private var length: Int {
         return titleLength + bodyLength
-    }
-}
-
-extension Note {
-    static func comparator(lhs: Note, rhs: Note) -> Bool {
-        if
-            let left = lhs.lastEditedDate,
-            let right = rhs.lastEditedDate {
-            
-            return left < right
-        }
-        
-        return lhs.lastEditedDate == nil
     }
 }

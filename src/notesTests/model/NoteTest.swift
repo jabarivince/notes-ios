@@ -217,6 +217,7 @@ class NoteTest: XCTestCase {
         XCTAssert(condition)
     }
     
+    // TODO: Do not use Note.compaitor. Sort manually
     func testStringifyingWithRandomlyCreatedNotes() {
         let quantity = Int.random(in: 100...150)
         let notes = getNotes(quantity).filter { !$0.stringified.isEmpty }.sorted(by: Note.comparator)
@@ -323,4 +324,6 @@ extension NoteTest {
         
         return notes
     }
+    
+    // TODO: Test sorting notes with Note.comparitor
 }

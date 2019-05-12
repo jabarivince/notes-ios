@@ -6,12 +6,6 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-extension Set {
-    var asArray: [Element] {
-        return [Element](self)
-    }
-}
-
 extension Set: Stringifiable where Element == Note {
     var stringified: String {
         return sorted(by: Note.comparator)

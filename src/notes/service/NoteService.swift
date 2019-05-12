@@ -27,7 +27,6 @@ class NoteService {
         note.lastEditedDate = now
         
         if title?.isEmpty ?? true {
-            
             note.title = "Untitled"
         } else {
             note.title = title
@@ -160,13 +159,6 @@ private extension NoteService {
             completion(value)
         }
     }
-    
-}
-
-/// Protocol used for sending a note,
-/// or multiple notes via iOS sharing view
-protocol Stringifiable {
-    var stringified: String { get }
 }
 
 

@@ -9,14 +9,13 @@
 import UIKit
 
 class NoteListBackgroundView: UIView {
-    enum State: String {
-        case hiddenState           = ""
-        case noNotesFoundState     = "No search results found"
-        case noNotesAvailableState = "Click + to create a new note"
-    }
-    
-    private let label      = LabelView()
     private let recognizer = UITapGestureRecognizer(target: nil, action: nil)
+    
+    private let label: LabelView = {
+        let labelView = LabelView()
+        labelView.adjustsFontForContentSizeCategory = true
+        return labelView
+    }()
     
     private var text: String {
         return label.text ?? ""
@@ -58,6 +57,12 @@ class NoteListBackgroundView: UIView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    enum State: String {
+        case hiddenState           = ""
+        case noNotesFoundState     = "No search results found"
+        case noNotesAvailableState = "Click + to create a new note"
+    }
 }
 
 private extension NoteListBackgroundView {
@@ -90,8 +95,6 @@ private extension NoteListBackgroundView {
 extension NoteListBackgroundView: UIGestureRecognizerDelegate {
     
     /// Called when the UILabel detects a single tap anywhere on the UILabel
-    /// However, we chose to respond to the tap if and only if the user tapped
-    /// on the target text that indicates the call to action.
     @objc private func labelTapped(_ recognizer: UITapGestureRecognizer) {
         guard recognizer.state == .ended else { return }
         
@@ -103,7 +106,7 @@ extension NoteListBackgroundView: UIGestureRecognizerDelegate {
     /// Determines whether or not we should respond to the tap gesture.
     /// Presently, we only want to respond to tap gestures if we are in
     /// the .noNotesAvailable state and the tap location is on the call to
-    /// action text (the +).
+    /// action text (the + icon).
     private func shouldRespondTo(_ recognizer: UITapGestureRecognizer) -> Bool {
         guard state == .noNotesAvailableState else { return false }
         
@@ -111,6 +114,8 @@ extension NoteListBackgroundView: UIGestureRecognizerDelegate {
         return withinRadius(point: point, raduis: 31, of: " + ")
     }
     
+    /// Determines whether or not a point falls within a
+    /// specified radius of a target substring in the label's text.
     private func withinRadius(point: CGPoint, raduis: CGFloat, of target: String) -> Bool {
         let range  = text.asNSString.range(of: target)
         let prefix = text.asNSString.substring(to: range.location)
@@ -120,6 +125,8 @@ extension NoteListBackgroundView: UIGestureRecognizerDelegate {
         return distance(from: point, to: target) < raduis
     }
     
+    /// Returns the euclidian distance between
+    /// two points in 2-dimensional cartesian plane.
     private func distance(from: CGPoint, to: CGPoint) -> CGFloat {
         let dx = from.x - to.x
         let dy = from.y - to.y

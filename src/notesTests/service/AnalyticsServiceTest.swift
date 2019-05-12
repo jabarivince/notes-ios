@@ -13,10 +13,8 @@ class AnalyticsServiceTest: XCTestCase {
     func testThatallEventTypesAreLowercasedSnakeCase() {
         let regex = NSRegularExpression("^[a-z]+(?:_[a-z]+)*$")
         
-        for eventType in Event.EventType.allCases {
-            let condition = regex.matches(eventType.rawValue)
-            
-            XCTAssert(condition)
+        for eventType in Event.EventType.allCases {            
+            XCTAssert(regex.matches(eventType.rawValue))
         }
     }
 }

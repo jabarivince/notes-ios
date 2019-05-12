@@ -9,7 +9,7 @@
 import Foundation
 
 extension Date {
-    var formatted: String {
+    var formattedForDispay: String {
         let format: Format
         
         if occursToday {
@@ -20,19 +20,29 @@ extension Date {
             format = .date
         }
         
-        let formatter        = DateFormatter()
-        formatter.locale     = Locale(identifier: "en_US_POSIX")
-        formatter.amSymbol   = "AM"
-        formatter.pmSymbol   = "PM"
-        formatter.dateFormat = format.rawValue
+        let f = formatter
+        f.dateFormat = format.rawValue
         
+        return f.string(from: self)
+    }
+    
+    var formatted: String {
         return formatter.string(from: self)
     }
 }
 
-private extension Date {
+extension Date {
     var today: Date {
-        return Date()
+        return DateService.now()
+    }
+    
+    var formatter: DateFormatter {
+        let f        = DateFormatter()
+        f.locale     = Locale(identifier: "en_US_POSIX")
+        f.amSymbol   = "AM"
+        f.pmSymbol   = "PM"
+        f.dateFormat = Format.date.rawValue
+        return f
     }
     
     var occursToday: Bool {
@@ -43,7 +53,7 @@ private extension Date {
         return Calendar.current.isDate(self, equalTo: today, toGranularity: .weekOfYear)
     }
     
-    enum Format: String {
+    private enum Format: String {
         case date = "h:mm a 'on' MMMM dd, yyyy"
         case day  = "EEEE"
         case time = "h:mm a"

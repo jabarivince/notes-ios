@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0C4A268A2285201D00E1A9B2 /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4A26892285201D00E1A9B2 /* LabelView.swift */; };
 		0C6F3747225B1D740060EC2B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0C6F3746225B1D740060EC2B /* GoogleService-Info.plist */; };
+		0C7E54F8228906B5001B7778 /* NotesDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDAC22472C02001C6401 /* NotesDataModel.xcdatamodeld */; };
 		0C86AAD42288E99100F74635 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C86AAD32288E99100F74635 /* File.swift */; };
 		0CAB8D87228287AB00D61DDD /* NoteTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAB8D86228287AB00D61DDD /* NoteTableViewCell.swift */; };
 		0CAB8D8922828F9300D61DDD /* NoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAB8D8822828F9300D61DDD /* NoteView.swift */; };
@@ -33,7 +34,6 @@
 		0CCBA38D22889B9100C1C89B /* Stringifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4A269722925E7900E1A9B2 /* Stringifiable.swift */; };
 		0CDCCD6D22889E3A00CAEB67 /* AnalyticsServiceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C95381D2261C63600234CAC /* AnalyticsServiceTest.swift */; };
 		0CDCCD6E22889E3D00CAEB67 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4A268C2285330900E1A9B2 /* Date.swift */; };
-		0CDCCD6F2288A89D00CAEB67 /* NotesDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDAC22472C02001C6401 /* NotesDataModel.xcdatamodeld */; };
 		0CDCCD702288A8A000CAEB67 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDAF22473F16001C6401 /* Note.swift */; };
 		0CDCCD722288A9A700CAEB67 /* NoteTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9EE9AA2259D4C50001B4FE /* NoteTest.swift */; };
 		0CDCCD752288AA4200CAEB67 /* NoteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDA22246E4B6001C6401 /* NoteService.swift */; };
@@ -762,11 +762,11 @@
 				0CCBA38A2288988300C1C89B /* Loggable.swift in Sources */,
 				0CDCCD772288ABE000CAEB67 /* NoteAnalyticsService.swift in Sources */,
 				0CDCCD7B2288E86D00CAEB67 /* NoteTableViewCellState.swift in Sources */,
-				0CDCCD6F2288A89D00CAEB67 /* NotesDataModel.xcdatamodeld in Sources */,
 				0CCBA38D22889B9100C1C89B /* Stringifiable.swift in Sources */,
 				0CCBA379228890E000C1C89B /* Date.swift in Sources */,
-				0CDCCD762288AA7200CAEB67 /* Set.swift in Sources */,
 				0CCBA37D2288914300C1C89B /* UIViewController.swift in Sources */,
+				0C7E54F8228906B5001B7778 /* NotesDataModel.xcdatamodeld in Sources */,
+				0CDCCD762288AA7200CAEB67 /* Set.swift in Sources */,
 				0CDCCD702288A8A000CAEB67 /* Note.swift in Sources */,
 				0CDCCD752288AA4200CAEB67 /* NoteService.swift in Sources */,
 			);
@@ -966,7 +966,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 62TYL29D89;
 				INFOPLIST_FILE = notesServicesTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -987,7 +987,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 62TYL29D89;
 				INFOPLIST_FILE = notesServicesTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -20,9 +20,9 @@ class NoteTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
-        textLabel?.font                = textLabel?.font.bolded
         detailTextLabel?.numberOfLines = 0
         detailTextLabel?.textColor     = .gray
+        textLabel?.font                = textLabel?.font.bolded
     }
     
     required init?(coder aDecoder: NSCoder) {

@@ -1,13 +1,5 @@
 platform :ios, '10.0'
 
-target 'notesServices' do
-  use_frameworks!
-  
-  target 'notesServicesTests' do
-    inherit! :search_paths
-  end
-end
-
 target 'notes' do
   use_frameworks!
   

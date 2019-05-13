@@ -115,7 +115,7 @@ public class NoteService {
     internal lazy var container: NSPersistentContainer = {
         let momdName = "NotesDataModel"
         let modelURL = Bundle(for: type(of: self)).url(forResource: momdName, withExtension:"momd")
-        let mom = NSManagedObjectModel(contentsOf: modelURL!)
+        let mom      = NSManagedObjectModel(contentsOf: modelURL!)
         
         let persistentContainer = PersistantContainer(name: momdName, managedObjectModel: mom!)
         
@@ -161,7 +161,6 @@ private extension NoteService {
         activityViewController.popoverPresentationController?.sourceView = viewController.view
         activityViewController.setValue(subject, forKey: "Subject")
         viewController.presentedVC.present(activityViewController, animated: true) {
-            
             completion(value)
         }
     }

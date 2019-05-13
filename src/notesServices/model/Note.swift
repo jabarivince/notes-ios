@@ -94,15 +94,15 @@ extension Note: Loggable {
         return createdDate != lastEditedDate
     }
     
-    private var hasEmptyTitle: Bool {
+    public var hasEmptyTitle: Bool {
         return title?.isEmpty ?? true
     }
     
-    private var hasEmptyBody: Bool {
+    public var hasEmptyBody: Bool {
         return body?.isEmpty ?? true
     }
     
-    private var isEmpty: Bool {
+    public var isEmpty: Bool {
         return hasEmptyTitle && hasEmptyBody
     }
     

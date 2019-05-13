@@ -6,8 +6,8 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-//import Firebase
-//import Fabric
+import Firebase
+import Fabric
 import UIKit
 import notesServices
 
@@ -34,8 +34,8 @@ private extension AppDelegate {
     }
     
     func setupAnalytics() {
-//        FirebaseApp.configure()
-//        Fabric.sharedSDK().debug = true
+        FirebaseApp.configure()
+        Fabric.sharedSDK().debug = true
     }
     
     func setupView() {

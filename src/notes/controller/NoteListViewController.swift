@@ -41,14 +41,6 @@ class NoteListViewController: UITableViewController {
         return searchController.searchBar
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupTableView()
-        setupNavBar()
-        setupTargets()
-        setInitialState()
-    }
-    
     init() {
         selectAllButton  = UIBarButtonItem(title: nil, style: .plain,           target: nil, action: nil)
         addButtomItem    = UIBarButtonItem(barButtonSystemItem: .add,           target: nil, action: nil)
@@ -66,11 +58,20 @@ class NoteListViewController: UITableViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupTableView()
+        setupNavBar()
+        setupTargets()
+        setInitialState()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setToolbarHidden(true, animated: true)
         addObservers()
         getNotes()
+        tableView.reloadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {

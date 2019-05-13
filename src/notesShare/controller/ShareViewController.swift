@@ -11,6 +11,12 @@ import Social
 import notesServices
 
 class ShareViewController: SLComposeServiceViewController {
+    private var originalContent: String = ""
+    
+    private var hasURL: Bool {
+        return urlString != nil
+    }
+    
     private var urlString: String? {
         didSet { refreshView() }
     }
@@ -22,6 +28,7 @@ class ShareViewController: SLComposeServiceViewController {
     private lazy var selectedNoteTitle: SLComposeSheetConfigurationItem = {
         let select        = SLComposeSheetConfigurationItem()!
         select.title      = "Selected Note:"
+        select.value      = "New Note"
         select.tapHandler = saveButtonTapped
         return select
     }()
@@ -48,6 +55,7 @@ class ShareViewController: SLComposeServiceViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         findURL(then: appendURL)
+        originalContent = contentText
     }
 }
 
@@ -84,35 +92,34 @@ private extension ShareViewController {
     }
     
     func saveNote() {
-        var noteToSave = note
+        let body = textView.text
         
-        if noteToSave == nil {
-            let title = "New Note"
-            let body = textView.text
-            noteToSave = NoteService.instance.createNote(with: title, body: body)
+        if let note = note {
+            note.body = body
+            NoteService.instance.saveNote(note: note)
+        } else {
+            let title  = selectedNoteTitle.value
+            let toSave = NoteService.instance.createNote(with: title, body: body)
+            NoteService.instance.saveNote(note: toSave)
         }
-        
-        guard let toSave = noteToSave else { return }
-        
-        NoteService.instance.saveNote(note: toSave)
     }
     
     func refreshView() {
-        var text = ""
+        var text    = ""
+        let content = hasURL ? urlString! : originalContent
         
         if note == nil {
+            text = content
             selectedNoteTitle.value = "New Note"
         } else {
-            selectedNoteTitle.value = note?.title ?? "Untitled"
             text = note?.body ?? ""
-        }
-        
-        if let urlString = urlString {
-            if text.isEmpty {
-                text = urlString
-            } else {
-                text += "\n\n\(urlString)"
+            
+            if !text.isEmpty {
+                text += "\n\n"
             }
+            
+            text += content
+            selectedNoteTitle.value = note?.title ?? "Untitled"
         }
         
         textView.text = text

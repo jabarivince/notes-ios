@@ -114,7 +114,7 @@ extension NoteListBackgroundView: UIGestureRecognizerDelegate {
         return withinRadius(point: point, raduis: 31, of: " + ")
     }
     
-    /// Determines whether or not a point falls within a
+    /// Determine whether or not a point falls within a
     /// specified radius of a target substring in the label's text.
     private func withinRadius(point: CGPoint, raduis: CGFloat, of target: String) -> Bool {
         let range  = text.asNSString.range(of: target)

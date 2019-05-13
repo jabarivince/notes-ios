@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C0244B0228910BD00DE45EC /* NotesDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0C0244AE228910BD00DE45EC /* NotesDataModel.xcdatamodeld */; };
 		0C4A268A2285201D00E1A9B2 /* LabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4A26892285201D00E1A9B2 /* LabelView.swift */; };
 		0C6F3747225B1D740060EC2B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0C6F3746225B1D740060EC2B /* GoogleService-Info.plist */; };
-		0C7E54F8228906B5001B7778 /* NotesDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0CE0BDAC22472C02001C6401 /* NotesDataModel.xcdatamodeld */; };
 		0C86AAD42288E99100F74635 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C86AAD32288E99100F74635 /* File.swift */; };
 		0CAB8D87228287AB00D61DDD /* NoteTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAB8D86228287AB00D61DDD /* NoteTableViewCell.swift */; };
 		0CAB8D8922828F9300D61DDD /* NoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAB8D8822828F9300D61DDD /* NoteView.swift */; };
@@ -115,6 +115,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0C0244AF228910BD00DE45EC /* NotesDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = NotesDataModel.xcdatamodel; sourceTree = "<group>"; };
 		0C4A26892285201D00E1A9B2 /* LabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelView.swift; sourceTree = "<group>"; };
 		0C4A268C2285330900E1A9B2 /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		0C4A268F22924F2900E1A9B2 /* NoteTableViewCellState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTableViewCellState.swift; sourceTree = "<group>"; };
@@ -151,7 +152,6 @@
 		0CDC11C62259274A006AE47B /* UIFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFont.swift; sourceTree = "<group>"; };
 		0CE0BDA22246E4B6001C6401 /* NoteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteService.swift; sourceTree = "<group>"; };
 		0CE0BDA82246F71B001C6401 /* NoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
-		0CE0BDAD22472C02001C6401 /* NotesDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = NotesDataModel.xcdatamodel; sourceTree = "<group>"; };
 		0CE0BDAF22473F16001C6401 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		0CFAB6D72246CC75004AA4C7 /* The Note App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "The Note App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CFAB6DA2246CC75004AA4C7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -254,7 +254,7 @@
 				0CCBA3652288869E00C1C89B /* model */,
 				0CCBA3472288813B00C1C89B /* notesServices.h */,
 				0CCBA3482288813B00C1C89B /* Info.plist */,
-				0CE0BDAC22472C02001C6401 /* NotesDataModel.xcdatamodeld */,
+				0C0244AE228910BD00DE45EC /* NotesDataModel.xcdatamodeld */,
 			);
 			path = notesServices;
 			sourceTree = "<group>";
@@ -764,8 +764,8 @@
 				0CDCCD7B2288E86D00CAEB67 /* NoteTableViewCellState.swift in Sources */,
 				0CCBA38D22889B9100C1C89B /* Stringifiable.swift in Sources */,
 				0CCBA379228890E000C1C89B /* Date.swift in Sources */,
+				0C0244B0228910BD00DE45EC /* NotesDataModel.xcdatamodeld in Sources */,
 				0CCBA37D2288914300C1C89B /* UIViewController.swift in Sources */,
-				0C7E54F8228906B5001B7778 /* NotesDataModel.xcdatamodeld in Sources */,
 				0CDCCD762288AA7200CAEB67 /* Set.swift in Sources */,
 				0CDCCD702288A8A000CAEB67 /* Note.swift in Sources */,
 				0CDCCD752288AA4200CAEB67 /* NoteService.swift in Sources */,
@@ -1269,12 +1269,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		0CE0BDAC22472C02001C6401 /* NotesDataModel.xcdatamodeld */ = {
+		0C0244AE228910BD00DE45EC /* NotesDataModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				0CE0BDAD22472C02001C6401 /* NotesDataModel.xcdatamodel */,
+				0C0244AF228910BD00DE45EC /* NotesDataModel.xcdatamodel */,
 			);
-			currentVersion = 0CE0BDAD22472C02001C6401 /* NotesDataModel.xcdatamodel */;
+			currentVersion = 0C0244AF228910BD00DE45EC /* NotesDataModel.xcdatamodel */;
 			path = NotesDataModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

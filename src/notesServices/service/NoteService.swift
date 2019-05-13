@@ -113,7 +113,13 @@ public class NoteService {
     private(set) lazy var context = container.viewContext
     
     internal lazy var container: NSPersistentContainer = {
-        let persistentContainer = PersistantContainer(name: NoteService.persistentContainerName)
+        let momdName = "NotesDataModel"
+        let modelURL = Bundle(for: type(of: self)).url(forResource: momdName, withExtension:"momd")
+        let mom = NSManagedObjectModel(contentsOf: modelURL!)
+        
+        let persistentContainer = PersistantContainer(name: momdName, managedObjectModel: mom!)
+        
+//        let persistentContainer = PersistantContainer(name: NoteService.persistentContainerName)
         
         persistentContainer.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {

@@ -71,7 +71,6 @@ class NoteListViewController: UITableViewController {
         navigationController?.setToolbarHidden(true, animated: true)
         addObservers()
         getNotes()
-        tableView.reloadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {

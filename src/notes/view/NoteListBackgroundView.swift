@@ -30,17 +30,14 @@ class NoteListBackgroundView: UIView {
             switch state {
             case .noNotesAvailableState:
                 let text     = state.rawValue
-                let attrText = NSMutableAttributedString(string: text)
                 let range    = text.asNSString.range(of: "+")
                 let color    = tintColor ?? UIColor(red: 0, green: 122/255, blue: 1, alpha: 1)
+                let attrText = NSMutableAttributedString(string: text)
                 attrText.addAttribute(.foregroundColor, value: color, range: range)
                 label.attributedText = attrText
                 label.addGestureRecognizer(recognizer)
-                
-            case .noNotesFoundState, .hiddenState:
-                callback = nil
-                fallthrough
             default:
+                callback   = nil
                 label.text = state.rawValue
                 label.removeGestureRecognizer(recognizer)
             }
@@ -122,12 +119,18 @@ extension NoteListBackgroundView: UIGestureRecognizerDelegate {
         let size   = prefix.size(withAttributes: [.font: label.font as Any])
         let target = CGPoint(x: size.width , y: size.height)
         
-        return distance(from: point, to: target) < raduis
+        return point.distance(from: target) < raduis
+    }
+}
+
+extension CGPoint {
+    func distance(from point: CGPoint) -> CGFloat {
+        return CGPoint.distance(from: self, to: point)
     }
     
     /// Returns the euclidian distance between
     /// two points in 2-dimensional cartesian plane.
-    private func distance(from: CGPoint, to: CGPoint) -> CGFloat {
+    static func distance(from: CGPoint, to: CGPoint) -> CGFloat {
         let dx = from.x - to.x
         let dy = from.y - to.y
         return ( (dx * dx) + (dy * dy) ).squareRoot()

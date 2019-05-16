@@ -54,12 +54,29 @@ class ShareViewController: SLComposeServiceViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        addObservers()
         findURL(then: appendURL)
         originalContent = contentText
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeObservers()
     }
 }
 
 private extension ShareViewController {
+    func addObservers() {
+        respondTo(notification: NSNotification.Name.NSExtensionHostDidBecomeActive, with: #selector(refreshNote))
+    }
+    
+    @objc func refreshNote() {
+//        guard let oldNote = note else { return }
+        
+        // Fetch from updateNew NoteService
+        // set note = oldNote
+    }
+    
     func saveButtonTapped() {
         let controller = ShareNoteListViewController()
         controller.delegate = self
@@ -96,11 +113,11 @@ private extension ShareViewController {
         
         if let note = note {
             note.body = body
-            NoteService.instance.saveNote(note: note)
+            NoteService.shared.saveNote(note: note)
         } else {
             let title  = selectedNoteTitle.value
-            let toSave = NoteService.instance.createNote(with: title, body: body)
-            NoteService.instance.saveNote(note: toSave)
+            let toSave = NoteService.shared.createNote(with: title, body: body)
+            NoteService.shared.saveNote(note: toSave)
         }
     }
     

@@ -18,7 +18,7 @@ class ShareNoteListViewController: UITableViewController {
     let cellId = "cellReuseIdentifier"
     
     var data: [Note] {
-        return NoteService.instance.getAllNotes()
+        return NoteService.shared.getAllNotes()
     }
     
     override func viewDidLoad() {

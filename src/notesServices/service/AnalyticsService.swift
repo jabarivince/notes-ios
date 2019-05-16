@@ -20,7 +20,7 @@ public struct Event {
     }
     
     /// All events in alphabetical order.
-    /// All events must be lowercase annd snakecase.
+    /// All events must be lowercase and snakecase.
     public enum EventType: String, CaseIterable {
         case createNote = "create_note_succeeded"
         case createNoteFailed = "create_note_failed"

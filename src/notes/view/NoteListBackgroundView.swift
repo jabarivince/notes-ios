@@ -11,36 +11,17 @@ import UIKit
 class NoteListBackgroundView: UIView {
     private let recognizer = UITapGestureRecognizer(target: nil, action: nil)
     
-    private let label: LabelView = {
-        let labelView = LabelView()
+    private let label: UILabel = {
+        let labelView = ExtendedTapTargetLabelView(top: -30, bottom: -30)
         labelView.adjustsFontForContentSizeCategory = true
         return labelView
     }()
     
-    private var text: String {
-        return label.text ?? ""
-    }
+    var tapHandler: (() -> Void)?
     
-    var callback: (() -> Void)?
-    
-    var state: State? = .hiddenState {
+    var state: State = .hidden {
         didSet {
-            guard let state = state else { return }
-            
-            switch state {
-            case .noNotesAvailableState:
-                let text     = state.rawValue
-                let range    = text.asNSString.range(of: "+")
-                let color    = tintColor ?? UIColor(red: 0, green: 122/255, blue: 1, alpha: 1)
-                let attrText = NSMutableAttributedString(string: text)
-                attrText.addAttribute(.foregroundColor, value: color, range: range)
-                label.attributedText = attrText
-                label.addGestureRecognizer(recognizer)
-            default:
-                callback   = nil
-                label.text = state.rawValue
-                label.removeGestureRecognizer(recognizer)
-            }
+            configure(state)
         }
     }
     
@@ -56,9 +37,9 @@ class NoteListBackgroundView: UIView {
     }
     
     enum State: String {
-        case hiddenState           = ""
-        case noNotesFoundState     = "No search results found"
-        case noNotesAvailableState = "Click + to create a new note"
+        case hidden           = ""
+        case noNotesFound     = "No search results found"
+        case noNotesAvailable = "Click + to create a new note"
     }
 }
 
@@ -89,6 +70,25 @@ private extension NoteListBackgroundView {
     }
 }
 
+private extension NoteListBackgroundView {
+    func configure(_ state: State) {
+        switch state {
+        case .noNotesAvailable:
+            let text     = state.rawValue
+            let range    = text.asNSString.range(of: "+")
+            let color    = tintColor ?? UIColor(red: 0, green: 122/255, blue: 1, alpha: 1)
+            let attrText = NSMutableAttributedString(string: text)
+            attrText.addAttribute(.foregroundColor, value: color, range: range)
+            label.attributedText = attrText
+            label.addGestureRecognizer(recognizer)
+        default:
+            tapHandler = nil
+            label.text = state.rawValue
+            label.removeGestureRecognizer(recognizer)
+        }
+    }
+}
+
 extension NoteListBackgroundView: UIGestureRecognizerDelegate {
     
     /// Called when the UILabel detects a single tap anywhere on the UILabel
@@ -96,7 +96,7 @@ extension NoteListBackgroundView: UIGestureRecognizerDelegate {
         guard recognizer.state == .ended else { return }
         
         if shouldRespondTo(recognizer) {
-            callback?()
+            tapHandler?()
         }
     }
     
@@ -105,7 +105,7 @@ extension NoteListBackgroundView: UIGestureRecognizerDelegate {
     /// the .noNotesAvailable state and the tap location is on the call to
     /// action text (the + icon).
     private func shouldRespondTo(_ recognizer: UITapGestureRecognizer) -> Bool {
-        guard state == .noNotesAvailableState else { return false }
+        guard state == .noNotesAvailable else { return false }
         
         let point = recognizer.location(in: label)
         return withinRadius(point: point, raduis: 31, of: " + ")
@@ -114,25 +114,12 @@ extension NoteListBackgroundView: UIGestureRecognizerDelegate {
     /// Determine whether or not a point falls within a
     /// specified radius of a target substring in the label's text.
     private func withinRadius(point: CGPoint, raduis: CGFloat, of target: String) -> Bool {
+        let text   = label.text ?? ""
         let range  = text.asNSString.range(of: target)
         let prefix = text.asNSString.substring(to: range.location)
         let size   = prefix.size(withAttributes: [.font: label.font as Any])
         let target = CGPoint(x: size.width , y: size.height)
         
         return point.distance(from: target) < raduis
-    }
-}
-
-extension CGPoint {
-    func distance(from point: CGPoint) -> CGFloat {
-        return CGPoint.distance(from: self, to: point)
-    }
-    
-    /// Returns the euclidian distance between
-    /// two points in 2-dimensional cartesian plane.
-    static func distance(from: CGPoint, to: CGPoint) -> CGFloat {
-        let dx = from.x - to.x
-        let dy = from.y - to.y
-        return ( (dx * dx) + (dy * dy) ).squareRoot()
     }
 }

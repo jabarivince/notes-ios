@@ -33,7 +33,7 @@ class CoreDataNotePersistenceService: NotePersistenceService {
         do {
             try context.save()
         } catch _ {
-            //
+            // Report this somewhere?
         }
     }
     

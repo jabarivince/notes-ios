@@ -20,9 +20,7 @@ class NoteListBackgroundView: UIView {
     var tapHandler: (() -> Void)?
     
     var state: State = .hidden {
-        didSet {
-            configure(state)
-        }
+        didSet { respondToStateChange() }
     }
     
     override init(frame: CGRect) {
@@ -71,21 +69,29 @@ private extension NoteListBackgroundView {
 }
 
 private extension NoteListBackgroundView {
-    func configure(_ state: State) {
+    func respondToStateChange() {
         switch state {
         case .noNotesAvailable:
-            let text     = state.rawValue
-            let range    = text.asNSString.range(of: "+")
-            let color    = tintColor ?? UIColor(red: 0, green: 122/255, blue: 1, alpha: 1)
-            let attrText = NSMutableAttributedString(string: text)
-            attrText.addAttribute(.foregroundColor, value: color, range: range)
-            label.attributedText = attrText
-            label.addGestureRecognizer(recognizer)
+            configureNoNotesAvailableState()
         default:
-            tapHandler = nil
-            label.text = state.rawValue
-            label.removeGestureRecognizer(recognizer)
+            configureDefaultState()
         }
+    }
+    
+    func configureNoNotesAvailableState() {
+        let text     = state.rawValue
+        let range    = text.asNSString.range(of: "+")
+        let color    = tintColor ?? UIColor(red: 0, green: 122/255, blue: 1, alpha: 1)
+        let attrText = NSMutableAttributedString(string: text)
+        attrText.addAttribute(.foregroundColor, value: color, range: range)
+        label.attributedText = attrText
+        label.addGestureRecognizer(recognizer)
+    }
+    
+    func configureDefaultState() {
+        tapHandler = nil
+        label.text = state.rawValue
+        label.removeGestureRecognizer(recognizer)
     }
 }
 

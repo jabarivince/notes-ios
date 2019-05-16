@@ -6,7 +6,6 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-import CoreData
 import XCTest
 @testable import notesServices
 

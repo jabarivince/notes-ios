@@ -11,8 +11,8 @@ import UIKit
 public class NoteService {
     public static let shared = NoteService()
     
-    private let sharingService:      NoteSharingService
-    private let analyticsService:    NoteAnalyticsService
+    internal var sharingService:     NoteSharingService
+    internal var analyticsService:   NoteAnalyticsService
     internal var persistenceService: NotePersistenceService
     
     public func getAllNotes(containing searchText: String? = nil) -> [Note] {

@@ -6,7 +6,7 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-public struct NoteTableViewCellState {
+public struct NoteTableViewCellState: Equatable {
     public let text: String
     public let detailText: String
     public let accessibilityText: String
@@ -35,10 +35,10 @@ public struct NoteTableViewCellState {
         accessibilityText = accessibility
     }
 
-    private init() {
-        text = ""
-        detailText = ""
-        accessibilityText = ""
+    public init(text: String = "", detailText: String = "", accessibilityText: String = "") {
+        self.text =  text
+        self.detailText = detailText
+        self.accessibilityText = accessibilityText
     }
     
     public static let empty = NoteTableViewCellState()

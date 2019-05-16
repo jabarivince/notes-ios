@@ -9,3 +9,7 @@ before_install:
   - curl -o src/notes/GoogleService-Info.plist -X GET "https://firebasestorage.googleapis.com/v0/b/notes-574cb.appspot.com/o/app-config%2FGoogleService-Info.plist?alt=media&token=${FIREBASE_CONFIG_FILE_TOKEN}"
   - gem install cocoapods --pre
   - pod repo update
+
+notifications:
+  slack:
+    on_success: always

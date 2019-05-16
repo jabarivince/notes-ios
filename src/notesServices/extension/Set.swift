@@ -6,8 +6,6 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-//import notesServices
-
 extension Set: Stringifiable where Element == Note {
     public var stringified: String {
         return sorted(by: Note.comparator)

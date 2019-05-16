@@ -6,7 +6,6 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-import CoreData
 import XCTest
 @testable import notesServices
 
@@ -29,7 +28,7 @@ class NoteServiceTest: XCTestCase {
         
         let note = noteService.createNote(with: title)
 
-        let postcondition = allNotes.isOfSize(1)  && note.title == title
+        let postcondition = allNotes.isOfSize(1) && note.title == title
 
         XCTAssert(precondition)
         XCTAssert(postcondition)
@@ -81,7 +80,7 @@ class NoteServiceTest: XCTestCase {
         
         let precondition = allNotes.isOfSize(size)
         
-        noteService.deleteNotes(notes, completion: nil)
+        noteService.deleteNotes(notes)
     
         let postcondition = allNotes.isEmpty
         
@@ -111,7 +110,7 @@ class NoteServiceTest: XCTestCase {
         
         note.createdDate = now
         note.lastEditedDate = now
-        try! context.save()
+        save()
         
         let precondition = note.lastEditedDate == note.createdDate
         
@@ -199,7 +198,7 @@ class NoteServiceTest: XCTestCase {
             let _ = getNote()
         }
         
-        try! context.save()
+        save()
         
         let notes = noteService.getAllNotes()
         
@@ -216,7 +215,7 @@ class NoteServiceTest: XCTestCase {
             let _ = getNote()
         }
         
-        try! context.save()
+        save()
         
         let notes = noteService.getAllNotes(containing: nil)
         
@@ -233,7 +232,7 @@ class NoteServiceTest: XCTestCase {
             let _ = getNote()
         }
         
-        try! context.save()
+        save()
         
         let notes = noteService.getAllNotes(containing: "")
         
@@ -250,7 +249,7 @@ class NoteServiceTest: XCTestCase {
             note.body  = "ELSE"
         }
         
-        try! context.save()
+        save()
         
         let notes = noteService.getAllNotes(containing: "0123456789")
         
@@ -267,7 +266,7 @@ class NoteServiceTest: XCTestCase {
             note.title = title
         }
         
-        try! context.save()
+        save()
         
         let notes = noteService.getAllNotes(containing: title)
         
@@ -289,7 +288,7 @@ class NoteServiceTest: XCTestCase {
             allNotes[i].title = text
         }
         
-        try! context.save()
+        save()
         
         let notes = noteService.getAllNotes(containing: text)
         
@@ -304,15 +303,11 @@ class NoteServiceTest: XCTestCase {
 /// Auxiliary functions and wrappers
 extension NoteServiceTest {
     private var allNotes: [Note] {
-        return NoteServiceTest.allNotes
+        return NoteServiceTest.persistenceService.allNotes
     }
     
     private var noteService: NoteService {
         return NoteServiceTest.noteService
-    }
-    
-    private var context: NSManagedObjectContext {
-        return NoteServiceTest.context
     }
     
     private func noteHasNilTitle(element: Note) -> Bool {
@@ -323,11 +318,15 @@ extension NoteServiceTest {
         return entity.body == nil
     }
     
-    /// Create a note with values in title and body fields
+    private func save() {
+        let service = NoteServiceTest.persistenceService as! CoreDataNotePersistenceService
+        try! service.container.viewContext.save()
+    }
+    
     private func getNote() -> Note {
         let title  = "title"
         let body   = "body"
-        let note   = Note(context: context)
+        let note   = NoteServiceTest.persistenceService.createNote()
         note.title = title
         note.body  = body
         return note
@@ -336,51 +335,24 @@ extension NoteServiceTest {
 
 /// Static reusable properties and Core Data related logic
 extension NoteServiceTest {
-    private static var context: NSManagedObjectContext {
-        return noteService.context
-    }
-    
-    private static let noteService: NoteService = {
-        let service = NoteService.instance
-        
-        // In-memory database
-        service.container = {
-            let container   = NSPersistentContainer(name: NoteService.persistentContainerName)
-            let description = NSPersistentStoreDescription()
-            
-            description.type = NSInMemoryStoreType
-            container.persistentStoreDescriptions = [description]
-            
-            container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-                if let error = error as NSError? {
-                    fatalError("Unresolved error \(error), \(error.userInfo)")
-                }
-            })
-            
-            return container
-        }()
-    
+    private static let persistenceService: NotePersistenceService = {
+        let service       = CoreDataNotePersistenceService()
+        service.container = CoreDataNotePersistenceServiceTest.inMemoryContainer
         return service
     }()
     
-    /// SQL: SELECT * FROM Note
-    private static var allNotes: [Note] {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: NoteService.entityName)
-        return try! context.fetch(fetchRequest) as! [Note]
-    }
+    private static let noteService: NoteService = {
+        let service                  = NoteService.shared
+        service.persistenceService   = persistenceService
+        return service
+    }()
     
-    /// SQL: DELETE FROM Note
     static func clearDatabase() {
-        for note in allNotes {
-            context.delete(note)
-        }
-        
-        try! context.save()
+        persistenceService.allNotes.forEach(persistenceService.delete)
     }
     
-    /// SQL: INSERT INTO (title, body) Note VALUES (null, null)
     static func getEmptyNote() -> Note {
-        let note   = Note(context: context)
+        let note   = persistenceService.createNote()
         note.title = nil
         note.body  = nil
         return note

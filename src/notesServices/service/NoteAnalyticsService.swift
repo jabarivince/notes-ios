@@ -14,7 +14,7 @@ public extension AnalyticsService {
 }
 
 class NoteAnalyticsService: AnalyticsService {
-    static let instance = NoteAnalyticsService()
+    static let shared = NoteAnalyticsService()
     
     func publishCreateNoteEvent(for note: Note) {
         let event = Event(type: .createNote, loggable: note)

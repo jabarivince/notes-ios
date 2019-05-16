@@ -34,4 +34,12 @@ public struct NoteTableViewCellState {
         detailText = detail
         accessibilityText = accessibility
     }
+
+    private init() {
+        text = ""
+        detailText = ""
+        accessibilityText = ""
+    }
+    
+    public static let empty = NoteTableViewCellState()
 }

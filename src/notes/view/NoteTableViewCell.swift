@@ -10,7 +10,7 @@ import UIKit
 import notesServices
 
 class NoteTableViewCell: UITableViewCell {
-    var state: NoteTableViewCellState! {
+    var state: NoteTableViewCellState = .empty {
         didSet {
             textLabel?.text = state.text
             detailTextLabel?.text = state.detailText

@@ -48,7 +48,7 @@ class NoteListViewController: UITableViewController {
         trashButton      = UIBarButtonItem(barButtonSystemItem: .trash,         target: nil, action: nil)
         spacer           = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         searchController = UISearchController(searchResultsController: nil)
-        noteService      = NoteService.instance
+        noteService      = NoteService.shared
         notes            = [Note]()
         cellId           = "cell"
         super.init(style: .plain)
@@ -71,7 +71,6 @@ class NoteListViewController: UITableViewController {
         navigationController?.setToolbarHidden(true, animated: true)
         addObservers()
         getNotes()
-        tableView.reloadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -119,9 +118,9 @@ private extension NoteListViewController {
         let state: NoteListBackgroundView.State
         
         if !notes.isEmpty {
-            state = .hiddenState
+            state = .hidden
         } else {
-            state = isSearching ? .noNotesFoundState : .noNotesAvailableState
+            state = isSearching ? .noNotesFound : .noNotesAvailable
         }
         
         setupBackground(in: state)
@@ -129,9 +128,9 @@ private extension NoteListViewController {
     
     private func setupBackground(in state: NoteListBackgroundView.State) {
         switch state {
-        case .noNotesAvailableState, .noNotesFoundState:
+        case .noNotesAvailable, .noNotesFound:
             let backgroundView        = NoteListBackgroundView(frame: tableView.frame)
-            backgroundView.callback   = openNewNote
+            backgroundView.tapHandler   = openNewNote
             backgroundView.state      = state
             tableView.backgroundView  = backgroundView
             tableView.separatorStyle  = .none
@@ -289,7 +288,7 @@ extension NoteListViewController {
         if notes.isEmpty {
             determineAndSetBackground()
         } else {
-            setupBackground(in: .hiddenState)
+            setupBackground(in: .hidden)
         }
         
         return 1

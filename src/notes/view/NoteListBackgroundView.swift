@@ -9,9 +9,9 @@
 import UIKit
 
 class NoteListBackgroundView: UIView {
-    private let recognizer = UITapGestureRecognizer(target: nil, action: nil)
+    internal let recognizer = UITapGestureRecognizer(target: nil, action: nil)
     
-    private let label: UILabel = {
+    internal let label: UILabel = {
         let labelView = ExtendedTapTargetLabelView(top: -30, bottom: -30)
         labelView.adjustsFontForContentSizeCategory = true
         return labelView

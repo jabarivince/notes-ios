@@ -28,10 +28,9 @@ class NoteServiceTest: XCTestCase {
         
         let note = noteService.createNote(with: title)
 
-        let postcondition = allNotes.isOfSize(1) && note.title == title
-
         XCTAssert(precondition)
-        XCTAssert(postcondition)
+        XCTAssert(allNotes.isOfSize(1))
+        XCTAssert(note.title == title)
     }
     
     /// Notes should always have a created date
@@ -62,11 +61,9 @@ class NoteServiceTest: XCTestCase {
         let precondition = allNotes.isOfSize(1)
         
         noteService.deleteNote(note: note)
-        
-        let postcondition = allNotes.isEmpty
-        
+                
         XCTAssert(precondition)
-        XCTAssert(postcondition)
+        XCTAssert(allNotes.isEmpty)
     }
 
     /// Make N notes, delete all N, make sure DB has 0 notes
@@ -343,7 +340,7 @@ extension NoteServiceTest {
     
     private static let noteService: NoteService = {
         let service                  = NoteService.shared
-        service.persistenceService   = persistenceService
+        service.coreDataService   = persistenceService
         return service
     }()
     

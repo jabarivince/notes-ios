@@ -310,12 +310,12 @@
 			isa = PBXGroup;
 			children = (
 				0C6F3742225AC21B0060EC2B /* AnalyticsService.swift */,
-				0C8EBAD9228D2ECC006DC85A /* CoreDataNotePersistenceService.swift */,
 				0CCBA2FD2287A2B200C1C89B /* DateService.swift */,
 				0CE0BDA22246E4B6001C6401 /* NoteService.swift */,
 				0C6F3744225AF72B0060EC2B /* NoteAnalyticsService.swift */,
 				0C8EBAD7228D2C74006DC85A /* NotePersistenceService.swift */,
 				0C8EBADB228D364C006DC85A /* NoteSharingService.swift */,
+				0C8EBAD9228D2ECC006DC85A /* CoreDataNotePersistenceService.swift */,
 			);
 			path = service;
 			sourceTree = "<group>";

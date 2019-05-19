@@ -45,18 +45,18 @@ class ShareViewController: SLComposeServiceViewController {
     override func configurationItems() -> [Any]! {
         return [selectedNoteTitle]
     }
-        
+
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Notes"
-        self.navigationController?.navigationBar.topItem?.rightBarButtonItem?.title = "Save"
+        navigationController?.navigationBar.topItem?.rightBarButtonItem?.title = "Save"
+        originalContent = contentText
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         addObservers()
         findURL(then: appendURL)
-        originalContent = contentText
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -71,10 +71,8 @@ private extension ShareViewController {
     }
     
     @objc func refreshNote() {
-//        guard let oldNote = note else { return }
-        
-        // Fetch from updateNew NoteService
-        // set note = oldNote
+        guard let note = note else { return }
+        self.note = NoteService.shared.refresh(note)
     }
     
     func saveButtonTapped() {

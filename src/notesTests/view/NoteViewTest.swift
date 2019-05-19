@@ -25,7 +25,7 @@ class NoteViewTest: XCTestCase {
         XCTAssertEqual(invokations, 1)
     }
     
-    func testThatAutosaveExecutesInOneSecondAfterChange() {
+    func testThatAutosaveExecutesWithInOneSecondAfterChanging() {
         var invokations = 0
         
         let autoSave = {

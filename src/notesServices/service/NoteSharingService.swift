@@ -10,9 +10,9 @@ class NoteSharingService {
     static let shared = NoteSharingService()
     
     func send<T>(_ value: T,
-                        withSubject subject: String = "Notes",
-                        viewController: UIViewController,
-                        completion: @escaping (T) -> Void) where T: Stringifiable, T: Loggable {
+                 withSubject subject: String = "Notes",
+                 viewController: UIViewController,
+                 completion: @escaping (T) -> Void) where T: Stringifiable, T: Loggable {
         
         let text = value.stringified
         let activityViewController = UIActivityViewController(activityItems:[text], applicationActivities: nil)

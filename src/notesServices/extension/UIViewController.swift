@@ -27,10 +27,10 @@ public extension UIViewController {
         presentedVC.present(alert, animated: true, completion: nil)
     }
     
-    func promptForText(saying message: String,
-                       placeholder: String? = nil,
-                       initialValue: String? = nil,
-                       onConfirm: @escaping (String?) -> Void) {
+    @inlinable func promptForText(saying message: String,
+                                  placeholder: String? = nil,
+                                  initialValue: String? = nil,
+                                  onConfirm: @escaping (String?) -> Void) {
         
         promptForText(withMessage: message,
                       placeholder: placeholder,
@@ -74,7 +74,7 @@ public extension UIViewController {
         presentedVC.present(alert, animated: true, completion: nil)
     }
     
-    func promptToContinue(withMessage message: String, onYes: @escaping () -> Void) {
+    @inlinable func promptToContinue(withMessage message: String, onYes: @escaping () -> Void) {
         promptYesOrNo(withMessage: message,
                       onYes: onYes,
                       onNo: nil)
@@ -134,14 +134,14 @@ public extension UIViewController {
 
 // MARK:- Notification Center
 public extension UIViewController {
-    func respondTo(notification: NSNotification.Name?, with selector: Selector) {
+    @inlinable func respondTo(notification: NSNotification.Name?, with selector: Selector) {
         NotificationCenter.default.addObserver(self,
                                                selector: selector,
                                                name: notification,
                                                object: nil)
     }
     
-    func removeObservers() {
+    @inlinable func removeObservers() {
         NotificationCenter.default.removeObserver(self)
     }
 }

@@ -6,8 +6,6 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-import UIKit
-
 public extension String {
     var asNSString: NSString {
         return self as NSString

@@ -102,18 +102,23 @@ extension NoteView: UITextViewDelegate {
 
 // MARK:- UIGestureRecognizerDelegate
 extension NoteView: UIGestureRecognizerDelegate {
-    /// Enables editing on textView and displays keyboard, and places
-    /// cursor at closest position to area on screen  that was tapped
+    /// If the tap location is not a URL, this function Enables editing
+    /// on textView and displays keyboard, and places cursor at closest
+    /// position to area on screen that was tapped. If the tap location is
+    /// a URL, the URL is opened.
     @objc private func textViewTapped(_ recognizer: UITapGestureRecognizer) {
         if recognizer.state == .ended {
             
-            // TODO:- Detect links and handle first. Otherwise, just place cursor
-            
             if let position = closestPosition(to: recognizer.location(in: self)) {
-                selectedTextRange = textRange(from: position, to: position)
+                let attr = textStyling(at: position, in: .forward)
+                
+                if let url = attr?[.link] as? URL {
+                    UIApplication.shared.open(url)
+                } else {
+                    selectedTextRange = textRange(from: position, to: position)
+                    showKeyboard()
+                }
             }
-            
-            showKeyboard()
         }
     }
 }

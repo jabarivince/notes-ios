@@ -112,8 +112,9 @@ private extension NoteViewController {
     
     @objc func openMenu() {
         presentActionSheet(for: [
-            (title: (text: "Change title", style: .default), action: changeNoteName),
-            (title: (text: "Delete", style: .destructive), action: deleteNote),
+            (title: (text: "Change title", style: .default),     action: changeNoteName),
+            (title: (text: "Share",        style: .default),     action: sendNote),
+            (title: (text: "Delete",       style: .destructive), action: deleteNote),
         ])
     }
     
@@ -142,7 +143,7 @@ private extension NoteViewController {
         
         shareButton.accessibilityLabel    = "Share this note"
         trashButton.accessibilityLabel    = "Delete this note"
-        menuButton.accessibilityLabel     = "More options"
+        menuButton.accessibilityLabel     = "Options menu"
         navigationItem.rightBarButtonItem = shareButton
     }
     
@@ -198,6 +199,23 @@ private extension NoteViewController {
     }
     
     @objc func refreshNote() {
-        note = noteService.refresh(note)
+        let refreshedNote = noteService.refresh(note)
+        
+        if refreshedNote != nil {
+            note = refreshedNote!
+        } else {
+            // Log this error?? This should never happen
+            // because the note should not be able to be deleted
+            // from anywhere else but the main app target.
+            
+            let alert = UIAlertController(title: "Error", message: "This note is no longer available", preferredStyle: .alert)
+            let ok = UIAlertAction(title: "Dismiss", style: .default) { [weak self] _ in
+                guard let self = self else { return }
+                self.navigationController?.popViewController(animated: true)
+            }
+            
+            alert.addAction(ok)
+            presentedVC.present(alert, animated: true)
+        }
     }
 }

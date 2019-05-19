@@ -40,6 +40,25 @@ class CoreDataNotePersistenceServiceTest: XCTestCase {
         XCTAssert(CoreDataNotePersistenceService.shared.hasPendingChanges)
     }
     
+    func testRefreshingReflectsChanges() {
+        let note = NoteServiceTest.getEmptyNote()
+        note.title = "123"
+        note.body  = "456"
+        try! note.managedObjectContext?.save()
+        let refresh = CoreDataNotePersistenceService.shared.refresh(note)
+        XCTAssertNotNil(refresh)
+        XCTAssertEqual(refresh!.title, "123")
+        XCTAssertEqual(refresh!.body, "456")
+    }
+    
+    func testThatRefreshingaADeletedNoteReturnsNil() {
+        let note = NoteServiceTest.getEmptyNote()
+        note.managedObjectContext?.delete(note)
+        try! note.managedObjectContext?.save()
+        let refresh = CoreDataNotePersistenceService.shared.refresh(note)
+        XCTAssertNil(refresh)
+    }
+    
     static var inMemoryContainer: NSPersistentContainer = {
         let container   = NSPersistentContainer(name: "NotesDataModel")
         let description = NSPersistentStoreDescription()

@@ -60,7 +60,7 @@ public class NoteService {
         coreDataService.save(note)
     }
     
-    public func refresh(_ note: Note) -> Note {
+    public func refresh(_ note: Note) -> Note? {
         return coreDataService.refresh(note)
     }
     

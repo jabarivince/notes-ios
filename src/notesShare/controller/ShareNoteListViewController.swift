@@ -17,14 +17,23 @@ class ShareNoteListViewController: UITableViewController {
     weak var delegate: ShareNoteListViewControllerDelegate?
     let cellId = "cellReuseIdentifier"
     
-    var data: [Note] {
-        return NoteService.shared.getAllNotes()
-    }
+    var data: [Note] = [Note]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
         setupCreateNoteButton()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        addObservers()
+        refreshNotes()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        removeObservers()
     }
 }
 
@@ -50,6 +59,10 @@ extension ShareNoteListViewController {
 }
 
 private extension ShareNoteListViewController {
+    func addObservers() {
+        respondTo(notification: NSNotification.Name.NSExtensionHostDidBecomeActive, with: #selector(refreshNotes))
+    }
+    
     func setupCreateNoteButton() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New",
                                                             style: .done,
@@ -59,5 +72,10 @@ private extension ShareNoteListViewController {
     
     @objc func newNoteSelected() {
         delegate?.noteSelected(nil)
+    }
+    
+    @objc func refreshNotes() {
+        data = NoteService.shared.getAllNotes()
+        tableView.reloadData()
     }
 }

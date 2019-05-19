@@ -8,13 +8,13 @@
 
 public extension AnalyticsService {
     func publish(_ event: Event) {
-        let name = event.type.rawValue
-//        Analytics.logEvent(name, parameters: event.loggable?.parameters)
+        actuallyPublish?(event)
     }
 }
 
-class NoteAnalyticsService: AnalyticsService {
-    static let shared = NoteAnalyticsService()
+public class NoteAnalyticsService: AnalyticsService {
+    public var actuallyPublish: ((Event) -> Void)?
+    public static let shared = NoteAnalyticsService()
     
     func publishCreateNoteEvent(for note: Note) {
         let event = Event(type: .createNote, loggable: note)

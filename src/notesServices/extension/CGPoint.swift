@@ -9,7 +9,7 @@
 public extension CGPoint {
     /// Euclidian distance between this point
     /// and another specified point.
-    func distance(from point: CGPoint) -> CGFloat {
+    @inlinable func distance(from point: CGPoint) -> CGFloat {
         return CGPoint.distance(from: self, to: point)
     }
     

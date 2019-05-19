@@ -11,6 +11,34 @@ import XCTest
 @testable import notesServices
 
 class CoreDataNotePersistenceServiceTest: XCTestCase {
+    let bundleID     = Bundle.main.bundleIdentifier!
+    let userDefaults = UserDefaults(suiteName: "group.com.jabaridash.notes")!
+    
+    override func setUp() {
+        CoreDataNotePersistenceService.shared.userDefaults = userDefaults
+    }
+    
+    override func tearDown() {
+        userDefaults.removePersistentDomain(forName: bundleID)
+    }
+    
+    func testThatANoteWithUnpersistedChangesHasNoPendingChanges() {
+        let note   = NoteServiceTest.getEmptyNote()
+        note.title = "hey"
+        note.body  = "there"
+        XCTAssertFalse(CoreDataNotePersistenceService.shared.hasPendingChanges)
+    }
+    
+    func testThatSetPendingChangesInSameProcessHasNoEffect() {
+        CoreDataNotePersistenceService.shared.setHasPendingChanges()
+        XCTAssertFalse(CoreDataNotePersistenceService.shared.hasPendingChanges)
+    }
+    
+    func testThatSetPendingChangesInFromDifferentBundleIDHasAnEffect() {
+        CoreDataNotePersistenceService.shared.setHasPendingChanges()
+        userDefaults.set("xyz", forKey: "lastWriter")
+        XCTAssert(CoreDataNotePersistenceService.shared.hasPendingChanges)
+    }
     
     static var inMemoryContainer: NSPersistentContainer = {
         let container   = NSPersistentContainer(name: "NotesDataModel")

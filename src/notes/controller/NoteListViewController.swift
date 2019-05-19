@@ -104,11 +104,8 @@ class NoteListViewController: UITableViewController {
     }
     
     func addObservers() {
-        respondTo(notification: UIApplication.significantTimeChangeNotification, with: #selector(timeChanged))
-    }
-    
-    @objc func timeChanged() {
-        tableView.reloadData()
+        respondTo(notification: UIApplication.didBecomeActiveNotification,       with: #selector(getNotes))
+        respondTo(notification: UIApplication.significantTimeChangeNotification, with: #selector(refreshCells))
     }
 }
 
@@ -335,8 +332,12 @@ private extension NoteListViewController {
         }
     }
     
-    func getNotes() {
+    @objc func getNotes() {
         notes = noteService.getAllNotes(containing: searchBar.text)
+        tableView.reloadData()
+    }
+    
+    @objc func refreshCells() {
         tableView.reloadData()
     }
 }

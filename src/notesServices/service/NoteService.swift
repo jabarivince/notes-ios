@@ -11,20 +11,20 @@ import UIKit
 public class NoteService {
     public static let shared = NoteService()
     
-    internal var sharingService:     NoteSharingService
-    internal var analyticsService:   NoteAnalyticsService
-    internal var persistenceService: NotePersistenceService
+    internal var sharingService:   NoteSharingService
+    internal var analyticsService: NoteAnalyticsService
+    internal var coreDataService:  NotePersistenceService
     
     public func getAllNotes(containing searchText: String? = nil) -> [Note] {
-        guard let searchText = searchText, !searchText.isEmpty else { return persistenceService.allNotes }
+        guard let searchText = searchText, !searchText.isEmpty else { return coreDataService.allNotes }
         
-        return persistenceService.allNotes.filter { note in
+        return coreDataService.allNotes.filter { note in
             note.contains(text: searchText)
         }
     }
     
     public func createNote(with title: String?, body: String? = nil) -> Note {
-        let note = persistenceService.createNote()
+        let note = coreDataService.createNote()
         let now  = Date()
         
         note.createdDate    = now
@@ -37,16 +37,16 @@ public class NoteService {
         }
         
         note.body = body
-        persistenceService.save(note)
+        coreDataService.save(note)
         return note
     }
     
     public func deleteNote(note: Note) {
-        persistenceService.delete(note)
+        coreDataService.delete(note)
     }
     
     public func deleteNotes(_ notes: Set<Note>) {
-        persistenceService.delete(notes)
+        coreDataService.delete(notes)
     }
     
     public func saveNote(note : Note) {
@@ -57,7 +57,11 @@ public class NoteService {
         }
         
         note.lastEditedDate = now
-        persistenceService.save(note)
+        coreDataService.save(note)
+    }
+    
+    public func refresh(_ note: Note) -> Note {
+        return coreDataService.refresh(note)
     }
     
     public func sendNote(_ note: Note, viewController: UIViewController) {
@@ -69,8 +73,8 @@ public class NoteService {
     }
     
     private init() {
-        analyticsService   = NoteAnalyticsService.shared
-        sharingService     = NoteSharingService.shared
-        persistenceService = CoreDataNotePersistenceService.shared
+        analyticsService = NoteAnalyticsService.shared
+        sharingService   = NoteSharingService.shared
+        coreDataService  = CoreDataNotePersistenceService.shared
     }
 }

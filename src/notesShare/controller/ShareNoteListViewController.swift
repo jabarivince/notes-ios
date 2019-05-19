@@ -24,6 +24,7 @@ class ShareNoteListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
+        setupCreateNoteButton()
     }
 }
 
@@ -45,5 +46,18 @@ extension ShareNoteListViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath)
         cell.textLabel?.text = data[indexPath.row].title
         return cell
+    }
+}
+
+private extension ShareNoteListViewController {
+    func setupCreateNoteButton() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New",
+                                                            style: .done,
+                                                            target: self,
+                                                            action: #selector(newNoteSelected))
+    }
+    
+    @objc func newNoteSelected() {
+        delegate?.noteSelected(nil)
     }
 }

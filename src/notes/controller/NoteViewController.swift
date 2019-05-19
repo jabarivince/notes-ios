@@ -7,13 +7,19 @@
 //
 
 import UIKit
+import CoreData
 import notesServices
 
 class NoteViewController: UIViewController {
     private let titleButton: UIButton
     private let noteService: NoteService
     private let noteView:    NoteView
-    private let note:        Note
+    private var note:        Note {
+        didSet {
+            noteTitle = note.title
+            noteBody  = note.body
+        }
+    }
     
     private var noteTitle: String? {
         didSet {
@@ -22,7 +28,13 @@ class NoteViewController: UIViewController {
     }
     
     private var noteBody: String? {
-        return noteView.text
+        get {
+            return noteView.text
+        }
+        
+        set {
+            noteView.text = newValue
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -137,7 +149,7 @@ private extension NoteViewController {
     }
     
     func setupTextView() {
-        noteView.text            = note.body
+        noteBody                 = note.body
         noteView.autosave        = saveNote
         noteView.autosaveTimeout = 0.2
         view.addSubview(noteView)
@@ -147,8 +159,10 @@ private extension NoteViewController {
 // MARK:- Notification observers
 private extension NoteViewController {
     func addObservers() {
-        respondTo(notification: UIResponder.keyboardWillShowNotification, with: #selector(keyboardWillShow))
-        respondTo(notification: UIResponder.keyboardWillHideNotification, with: #selector(keyboardWillHide))
+        respondTo(notification: UIResponder.keyboardWillShowNotification,   with: #selector(keyboardWillShow))
+        respondTo(notification: UIResponder.keyboardWillHideNotification,   with: #selector(keyboardWillHide))
+        respondTo(notification: UIApplication.didBecomeActiveNotification,  with: #selector(refreshNote))
+        respondTo(notification: UIApplication.willResignActiveNotification, with: #selector(saveNote))
     }
     
     /// Returns size frame of the keyboard
@@ -173,5 +187,9 @@ private extension NoteViewController {
             let contentInset           = UIEdgeInsets.zero
             self.noteView.contentInset = contentInset
         }
+    }
+    
+    @objc func refreshNote() {
+        note = noteService.refresh(note)
     }
 }

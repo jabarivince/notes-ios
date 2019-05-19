@@ -6,84 +6,28 @@
 //  Copyright © 2019 jabari. All rights reserved.
 //
 
-public extension AnalyticsService {
-    func publish(_ event: Event) {
-        actuallyPublish?(event)
-    }
-}
-
 public class NoteAnalyticsService: AnalyticsService {
-    public var actuallyPublish: ((Event) -> Void)?
+    public var publish: ((Event) -> Void)?
     public static let shared = NoteAnalyticsService()
-    
-    func publishCreateNoteEvent(for note: Note) {
-        let event = Event(type: .createNote, loggable: note)
-        publish(event)
-    }
-    
-    func publishCreateNoteEventFailed(for note: Note) {
-        let event = Event(type: .createNoteFailed, loggable: note)
-        publish(event)
-    }
-    
-    func publishReadNoteEvent(for note: Note) {
-        let event = Event(type: .readNote, loggable: note)
-        publish(event)
-    }
-    
-    func publishReadNoteEventFailed(for note: Note) {
-        let event = Event(type: .readNoteFailed, loggable: note)
-        publish(event)
-    }
-    
-    func publishUpdateNoteEvent(for note: Note) {
-        let event = Event(type: .updateNote, loggable: note)
-        publish(event)
-    }
-    
-    func publishUpdateNoteEventFailed(for note: Note) {
-        let event = Event(type: .updateNoteFailed, loggable: note)
-        publish(event)
-    }
-    
-    func publishDeleteNoteEvent(for note: Note) {
-        let event = Event(type: .deleteNote, loggable: note)
-        publish(event)
-    }
-    
-    func publishDeleteNoteEventFailed(for note: Note) {
-        let event = Event(type: .deleteNoteFailed, loggable: note)
-        publish(event)
-    }
-    
-    func publishDeleteBatchNoteEvent(for notes: Set<Note>) {
-        let event = Event(type: .deleteBatchNote, loggable: notes)
-        publish(event)
-    }
-    
-    func publishDeleteBatchNoteEventFailed(for notes: Set<Note>) {
-        let event = Event(type: .deleteBatchNoteFailed, loggable: notes)
-        publish(event)
-    }
     
     func publishSendNoteEvent(for note: Note) {
         let event = Event(type: .sendNote, loggable: note)
-        publish(event)
-    }
-    
-    func publishSendNoteEventFailed(for note: Note) {
-        let event = Event(type: .sendNoteFailed, loggable: note)
-        publish(event)
+        publish?(event)
     }
     
     func publishSendBatchNoteEvent(for notes: Set<Note>) {
         let event = Event(type: .sendBatchNote, loggable: notes)
-        publish(event)
+        publish?(event)
     }
     
-    func publishSendBatchNoteEventFailed(for notes: Set<Note>) {
-        let event = Event(type: .sendBatchNoteFailed, loggable: notes)
-        publish(event)
+    func publishSendNoteFailedEvent(for loggable: Loggable) {
+        let event = Event(type: .sendNoteFailed, loggable: loggable)
+        publish?(event)
+    }
+    
+    public func publishRefreshNoteFailed(for note: Note) {
+        let event = Event(type: .refreshNoteFailed, loggable: note)
+        publish?(event)
     }
     
     private init() {}

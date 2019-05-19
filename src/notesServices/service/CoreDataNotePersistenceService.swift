@@ -35,9 +35,18 @@ class CoreDataNotePersistenceService: NotePersistenceService {
         return note
     }
     
-    func refresh(_ note: Note) -> Note {
-        context.refresh(note, mergeChanges: true)
-        return note
+    func refresh(_ note: Note) -> Note? {
+        if hasPendingChanges {
+            context.reset()
+        }
+        
+        do {
+            let fetchedNote = try context.existingObject(with: note.objectID) as! Note
+            context.refresh(fetchedNote, mergeChanges: true)
+            return fetchedNote
+        } catch _ {
+            return nil
+        }
     }
     
     /// Persist any changes that are in memory to disk

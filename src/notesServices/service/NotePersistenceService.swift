@@ -12,5 +12,5 @@ protocol NotePersistenceService {
     func delete(_ note: Note)
     func delete(_ notes: Set<Note>)
     func save(_ note : Note)
-    func refresh(_ note: Note) -> Note
+    func refresh(_ note: Note) -> Note?
 }

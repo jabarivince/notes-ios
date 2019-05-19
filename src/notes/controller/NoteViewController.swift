@@ -204,9 +204,7 @@ private extension NoteViewController {
         if refreshedNote != nil {
             note = refreshedNote!
         } else {
-            // Log this error?? This should never happen
-            // because the note should not be able to be deleted
-            // from anywhere else but the main app target.
+            NoteAnalyticsService.shared.publishRefreshNoteFailed(for: note)
             
             let alert = UIAlertController(title: "Error", message: "This note is no longer available", preferredStyle: .alert)
             let ok = UIAlertAction(title: "Dismiss", style: .default) { [weak self] _ in

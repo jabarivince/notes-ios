@@ -19,12 +19,9 @@ class NoteSharingService {
         
         activityViewController.completionWithItemsHandler = { (activity, success, items, error) in
             if let _ = error {
-                // Report an error????
+                NoteAnalyticsService.shared.publishSendNoteFailedEvent(for: value)
             }
-            
-            if success {
-                completion(value)
-            }
+            completion(value)
         }
         
         activityViewController.popoverPresentationController?.sourceView = viewController.view

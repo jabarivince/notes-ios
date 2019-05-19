@@ -7,8 +7,7 @@
 //
 
 public protocol AnalyticsService {
-    var actuallyPublish: ((Event) -> Void)? { get set }
-    func publish(_ event: Event)
+    var publish: ((Event) -> Void)? { get set }
 }
 
 public struct Event {
@@ -31,6 +30,7 @@ public struct Event {
         case deleteNoteFailed = "delete_note_failed"
         case readNote = "read_note_succeeded"
         case readNoteFailed = "read_note_failed"
+        case refreshNoteFailed = "refresh_note_failed"
         case sendBatchNote = "send_batch_note_succeeded"
         case sendBatchNoteFailed = "send_batch_note_failed"
         case sendNote = "send_note_succeeded"

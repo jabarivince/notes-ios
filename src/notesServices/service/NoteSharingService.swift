@@ -17,11 +17,19 @@ class NoteSharingService {
         let text = value.stringified
         let activityViewController = UIActivityViewController(activityItems:[text], applicationActivities: nil)
         
+        activityViewController.completionWithItemsHandler = { (activity, success, items, error) in
+            if let _ = error {
+                // Report an error????
+            }
+            
+            if success {
+                completion(value)
+            }
+        }
+        
         activityViewController.popoverPresentationController?.sourceView = viewController.view
         activityViewController.setValue(subject, forKey: "Subject")
-        viewController.presentedVC.present(activityViewController, animated: true) {
-            completion(value)
-        }
+        viewController.presentedVC.present(activityViewController, animated: true)
     }
     
     private init() {}

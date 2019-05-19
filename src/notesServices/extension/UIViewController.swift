@@ -16,17 +16,6 @@ public extension UIViewController {
         return presentedViewController ?? self
     }
     
-    func presentActionSheet(title: String? = nil,
-                            message: String? = nil,
-                            for actions: [(title: String, action: () -> Void)]) {
-        
-        let alert = getActionSheet(title: title,
-                                   message: message,
-                                   for: actions)
-        
-        presentedVC.present(alert, animated: true, completion: nil)
-    }
-    
     @inlinable func promptForText(saying message: String,
                                   placeholder: String? = nil,
                                   initialValue: String? = nil,
@@ -74,8 +63,13 @@ public extension UIViewController {
         presentedVC.present(alert, animated: true, completion: nil)
     }
     
-    @inlinable func promptToContinue(withMessage message: String, onYes: @escaping () -> Void) {
+    @inlinable func promptToContinue(withMessage message: String,
+                                     onYesText: String? = "Yes",
+                                     onNoText: String? = "No",
+                                     onYes: @escaping () -> Void) {
         promptYesOrNo(withMessage: message,
+                      onYesText: onYesText,
+                      onNoText: onNoText,
                       onYes: onYes,
                       onNo: nil)
     }
@@ -106,17 +100,28 @@ public extension UIViewController {
         presentedVC.present(alert, animated: true, completion: nil)
     }
     
+    func presentActionSheet(title: String? = nil,
+                            message: String? = nil,
+                            for actions: [(title: (text: String, style: UIAlertAction.Style), action: () -> Void)]) {
+        
+        let alert = getActionSheet(title: title,
+                                   message: message,
+                                   for: actions)
+        
+        presentedVC.present(alert, animated: true, completion: nil)
+    }
+    
     func getActionSheet(title: String? = nil,
                         message: String? = nil,
                         cancellable: Bool? = true,
-                        for actions: [(title: String, action: () -> Void)]) -> UIAlertController {
+                        for actions: [(title: (text: String, style: UIAlertAction.Style), action: () -> Void)]) -> UIAlertController {
         
         let alert = UIAlertController(title: title,
                                       message: nil,
                                       preferredStyle: .actionSheet)
         
         for (title, action) in actions {
-            let alertAction = UIAlertAction(title: title, style: .default) { _ in
+            let alertAction = UIAlertAction(title: title.text, style: title.style) { _ in
                 action()
             }
             

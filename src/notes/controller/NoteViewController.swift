@@ -24,6 +24,7 @@ class NoteViewController: UIViewController {
     private var noteTitle: String? {
         didSet {
             titleButton.setTitle(noteTitle, for: .normal)
+            titleButton.accessibilityLabel = "Tap to change title from current title: \(noteTitle ?? "")"
         }
     }
     
@@ -78,7 +79,7 @@ class NoteViewController: UIViewController {
 // MARK:- CRUD opertions
 private extension NoteViewController {
     @objc func deleteNote() {
-        promptToContinue(withMessage: "Deleting this note cannot be undone") { [weak self] in
+        promptToContinue(withMessage: "Deleting this note cannot be undone", onYesText: "Delete", onNoText: "Cancel") { [weak self] in
             guard let self = self else { return }
             self.noteService.deleteNote(note: self.note)
             self.closeNote(withoutSaving: true)
@@ -93,7 +94,10 @@ private extension NoteViewController {
     }
     
     @objc func changeNoteName() {
-        promptForText(saying: "Rename your note", placeholder: "Untitled", initialValue: noteTitle) { [weak self] title in
+        let msg     = "Change note title"
+        let initial = "Untitled"
+        
+        promptForText(saying: msg, placeholder: initial, initialValue: noteTitle) { [weak self] title in
             guard let self = self else { return }
             self.noteTitle = title
         }
@@ -108,13 +112,14 @@ private extension NoteViewController {
     
     @objc func openMenu() {
         presentActionSheet(for: [
-            (title: "Change note title", action: changeNoteName)
+            (title: (text: "Change title", style: .default), action: changeNoteName),
+            (title: (text: "Delete", style: .destructive), action: deleteNote),
         ])
     }
     
     @objc func sendNote() {
         saveNote()
-        noteService.sendNote(note, viewController: self)
+        noteService.sendNote(note, viewController: self, completion: refreshNote)
     }
     
     @objc func closeNote(withoutSaving: Bool = false) {
@@ -133,19 +138,22 @@ private extension NoteViewController {
         let shareButton       = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
         let trashButton       = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
         let menuButton        = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(openMenu))
-        trashButton.tintColor = .red
         toolbarItems          = [menuButton, spacer, trashButton]
+        
+        shareButton.accessibilityLabel    = "Share this note"
+        trashButton.accessibilityLabel    = "Delete this note"
+        menuButton.accessibilityLabel     = "More options"
         navigationItem.rightBarButtonItem = shareButton
     }
     
     func setupTitleButton() {
         titleButton.setTitleColor(.black, for: .normal)
         titleButton.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
-        titleButton.frame            = CGRect(x: 0, y: 0, width: 100, height: 40)
-        titleButton.backgroundColor  = .clear
-        titleButton.titleLabel?.font = titleButton.titleLabel?.font.bolded
-        noteTitle                    = note.title
-        navigationItem.titleView     = titleButton
+        titleButton.frame              = CGRect(x: 0, y: 0, width: 100, height: 40)
+        titleButton.backgroundColor    = .clear
+        titleButton.titleLabel?.font   = titleButton.titleLabel?.font.bolded
+        noteTitle                      = note.title
+        navigationItem.titleView       = titleButton
     }
     
     func setupTextView() {

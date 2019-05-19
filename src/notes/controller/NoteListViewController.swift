@@ -64,6 +64,7 @@ class NoteListViewController: UITableViewController {
         setupNavBar()
         setupTargets()
         setInitialState()
+        setupAccessibility()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -212,6 +213,12 @@ private extension NoteListViewController {
         title = "\(numberOfSelectedRows) Selected"
         selectAllButton.title = "Unselect \(numberOfSelectedRows) \(singularOrPlural)"
     }
+    
+    func setupAccessibility() {
+        addButtomItem.accessibilityLabel   = "Create a new note"
+        shareButtomItem.accessibilityLabel = "Share current selection"
+        trashButton.accessibilityLabel     = "Delete current selection"
+    }
 }
 
 // MARK: - UISearchBarDelegate
@@ -323,7 +330,7 @@ private extension NoteListViewController {
         let numberOfNotes = moreThanOneNoteSelected ? "\(numberOfSelectedRows) " : ""
         let message       = "Deleting \(thisOrThese) \(numberOfNotes)\(singularOrPlural) cannot be undone"
         
-        promptToContinue(withMessage: message) { [weak self] in
+        promptToContinue(withMessage: message, onYesText: "Delete", onNoText: "Cancel") { [weak self] in
             guard let self = self else { return }
             
             self.noteService.deleteNotes(self.selectedNotes)

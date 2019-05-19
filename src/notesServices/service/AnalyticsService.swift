@@ -7,6 +7,7 @@
 //
 
 public protocol AnalyticsService {
+    var actuallyPublish: ((Event) -> Void)? { get set }
     func publish(_ event: Event)
 }
 

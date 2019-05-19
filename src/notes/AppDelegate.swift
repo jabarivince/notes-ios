@@ -36,6 +36,11 @@ private extension AppDelegate {
     func setupAnalytics() {
         FirebaseApp.configure()
         Fabric.sharedSDK().debug = true
+        
+        NoteAnalyticsService.shared.actuallyPublish = { event in
+            let name = event.type.rawValue
+            Analytics.logEvent(name, parameters: event.loggable?.parameters)
+        }
     }
     
     func setupView() {

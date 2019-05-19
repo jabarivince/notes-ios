@@ -64,12 +64,18 @@ public class NoteService {
         return coreDataService.refresh(note)
     }
     
-    public func sendNote(_ note: Note, viewController: UIViewController) {
-        sharingService.send(note, viewController: viewController, completion: analyticsService.publishSendNoteEvent)
+    public func sendNote(_ note: Note, viewController: UIViewController, completion: (()->Void)? = nil) {
+        sharingService.send(note, viewController: viewController) { [weak self] arg in
+            completion?()
+            self?.analyticsService.publishSendNoteEvent(for: arg)
+        }
     }
     
-    public func sendNotes(_ notes: Set<Note>, viewController: UIViewController) {
-        sharingService.send(notes, viewController: viewController, completion: analyticsService.publishSendBatchNoteEvent)
+    public func sendNotes(_ notes: Set<Note>, viewController: UIViewController, completion: (()->Void)? = nil) {
+        sharingService.send(notes, viewController: viewController) { [weak self] arg in
+            completion?()
+            self?.analyticsService.publishSendBatchNoteEvent(for: arg)
+        }
     }
     
     private init() {

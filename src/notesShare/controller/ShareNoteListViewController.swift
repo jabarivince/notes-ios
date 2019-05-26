@@ -60,7 +60,7 @@ extension ShareNoteListViewController {
 
 private extension ShareNoteListViewController {
     func addObservers() {
-        respondTo(notification: NSNotification.Name.NSExtensionHostDidBecomeActive, with: #selector(refreshNotes))
+        respondTo(NSNotification.Name.NSExtensionHostDidBecomeActive, with: #selector(refreshNotes))
     }
     
     func setupCreateNoteButton() {

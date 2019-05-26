@@ -105,8 +105,8 @@ class NoteListViewController: UITableViewController {
     }
     
     func addObservers() {
-        respondTo(notification: UIApplication.didBecomeActiveNotification,       with: #selector(getNotes))
-        respondTo(notification: UIApplication.significantTimeChangeNotification, with: #selector(refreshCells))
+        respondTo(UIApplication.didBecomeActiveNotification,       with: #selector(getNotes))
+        respondTo(UIApplication.significantTimeChangeNotification, with: #selector(refreshCells))
     }
 }
 
@@ -193,7 +193,7 @@ private extension NoteListViewController {
     }
     
     func setInitialState() {
-        title = "Notes"
+        title = "The Note App"
         editButtonItem.title  = "Select"
         selectAllButton.title = "Select all"
         
@@ -250,7 +250,7 @@ extension NoteListViewController {
             trashButton.isEnabled     = false
             shareButtomItem.isEnabled = false
             selectAllButton.title     = "Select all"
-            title                     = "Notes"
+            title                     = "The Note App"
         } else {
             setTitleForSelection()
         }
@@ -264,7 +264,7 @@ extension NoteListViewController {
             shareButtomItem.isEnabled = true
             setTitleForSelection()
         } else {
-            openNote(notes[indexPath.row])
+            openNote(notes[indexPath.row], asNew: false)
         }
     }
     
@@ -306,11 +306,11 @@ private extension NoteListViewController {
     
     @objc func openNewNote() {
         let note = noteService.createNote(with: nil)
-        openNote(note)
+        openNote(note, asNew: true)
     }
     
-    func openNote(_ note: Note) {
-        let noteController = NoteViewController(note: note, noteService: noteService)
+    func openNote(_ note: Note, asNew: Bool) {
+        let noteController = NoteViewController(note: note, isNew: asNew)
         navigationController?.pushViewController(noteController, animated: true)
     }
     

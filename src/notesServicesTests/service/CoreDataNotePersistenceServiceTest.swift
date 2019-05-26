@@ -20,6 +20,7 @@ class CoreDataNotePersistenceServiceTest: XCTestCase {
     
     override func tearDown() {
         userDefaults.removePersistentDomain(forName: bundleID)
+        NoteServiceTest.clearDatabase()
     }
     
     func testThatANoteWithUnpersistedChangesHasNoPendingChanges() {

@@ -27,7 +27,7 @@ class ShareViewController: SLComposeServiceViewController {
     
     private lazy var selectedNoteTitle: SLComposeSheetConfigurationItem = {
         let select        = SLComposeSheetConfigurationItem()!
-        select.title      = "Selected Note:"
+        select.title      = "Select Note:"
         select.value      = "New Note"
         select.tapHandler = saveButtonTapped
         return select
@@ -67,7 +67,7 @@ class ShareViewController: SLComposeServiceViewController {
 
 private extension ShareViewController {
     func addObservers() {
-        respondTo(notification: NSNotification.Name.NSExtensionHostDidBecomeActive, with: #selector(refreshNote))
+        respondTo(NSNotification.Name.NSExtensionHostDidBecomeActive, with: #selector(refreshNote))
     }
     
     @objc func refreshNote() {

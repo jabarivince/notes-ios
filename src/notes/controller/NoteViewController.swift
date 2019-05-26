@@ -7,36 +7,13 @@
 //
 
 import UIKit
-import CoreData
 import notesServices
 
+// MARK:- UIViewController
 class NoteViewController: UIViewController {
-    private let titleButton: UIButton
-    private let noteService: NoteService
-    private let noteView:    NoteView
-    private var note:        Note {
-        didSet {
-            noteTitle = note.title
-            noteBody  = note.body
-        }
-    }
-    
-    private var noteTitle: String? {
-        didSet {
-            titleButton.setTitle(noteTitle, for: .normal)
-            titleButton.accessibilityLabel = "Tap to change title from current title: \(noteTitle ?? "")"
-        }
-    }
-    
-    private var noteBody: String? {
-        get {
-            return noteView.text
-        }
-        
-        set {
-            noteView.text = newValue
-        }
-    }
+    private let noteViewService: NoteViewService
+    internal let noteView: NoteView
+    internal let titleButton: UIButton
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -54,21 +31,22 @@ class NoteViewController: UIViewController {
         super.viewWillDisappear(animated)
         navigationController?.setToolbarHidden(true, animated: true)
         removeObservers()
-        closeNote()
+        handleViewWillDisappear()
     }
     
     override func viewDidLoad() {
         setupToolbars()
         setupTitleButton()
         setupTextView()
+        handleDidLoad()
     }
     
-    init(note: Note, noteService: NoteService) {
-        self.noteView    = NoteView()
-        self.titleButton = UIButton(type: .custom)
-        self.note        = note
-        self.noteService = noteService
+    init(note: Note, isNew: Bool) {
+        self.titleButton     = UIButton(type: .custom)
+        self.noteView        = NoteView()
+        self.noteViewService = NoteViewService(note, isNew: isNew)
         super.init(nibName: nil, bundle: nil)
+        self.noteViewService.controller = self
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -76,70 +54,14 @@ class NoteViewController: UIViewController {
     }
 }
 
-// MARK:- CRUD opertions
-private extension NoteViewController {
-    @objc func deleteNote() {
-        promptToContinue(withMessage: "Deleting this note cannot be undone", onYesText: "Delete", onNoText: "Cancel") { [weak self] in
-            guard let self = self else { return }
-            self.noteService.deleteNote(note: self.note)
-            self.closeNote(withoutSaving: true)
-        }
-    }
-    
-    @objc func saveNote() {
-        guard isDirty else { return }
-        note.title = noteTitle
-        note.body  = noteBody
-        noteService.saveNote(note: note)
-    }
-    
-    @objc func changeNoteName() {
-        let msg     = "Change note title"
-        let initial = "Untitled"
-        
-        promptForText(saying: msg, placeholder: initial, initialValue: noteTitle) { [weak self] title in
-            guard let self = self else { return }
-            self.noteTitle = title
-        }
-    }
-}
-
-// MARK:- Button callbacks
-private extension NoteViewController {
-    private var isDirty: Bool  {
-        return noteTitle != note.title || noteBody != note.body
-    }
-    
-    @objc func openMenu() {
-        presentActionSheet(for: [
-            (title: (text: "Change title", style: .default),     action: changeNoteName),
-            (title: (text: "Share",        style: .default),     action: sendNote),
-            (title: (text: "Delete",       style: .destructive), action: deleteNote),
-        ])
-    }
-    
-    @objc func sendNote() {
-        saveNote()
-        noteService.sendNote(note, viewController: self, completion: refreshNote)
-    }
-    
-    @objc func closeNote(withoutSaving: Bool = false) {
-        if !withoutSaving {
-            saveNote()
-        }
-        
-        navigationController?.popViewController(animated: true)
-    }
-}
-
-// MARK:- UI setup
-private extension NoteViewController {
+// MARK:- Setup UI
+extension NoteViewController {
     func setupToolbars() {
-        let spacer            = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        let shareButton       = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sendNote))
-        let trashButton       = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
-        let menuButton        = UIBarButtonItem(title: "•••", style: .plain, target: self, action: #selector(openMenu))
-        toolbarItems          = [menuButton, spacer, trashButton]
+        let spacer      = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        let shareButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(handleShareButtonTapped))
+        let trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action:  #selector(handleDeleteButtonTapped))
+        let menuButton  = UIBarButtonItem(title: "•••", style: .plain, target: self, action:  #selector(handleMenuButtonTapped))
+        toolbarItems    = [menuButton, spacer, trashButton]
         
         shareButton.accessibilityLabel    = "Share this note"
         trashButton.accessibilityLabel    = "Delete this note"
@@ -149,71 +71,69 @@ private extension NoteViewController {
     
     func setupTitleButton() {
         titleButton.setTitleColor(.black, for: .normal)
-        titleButton.addTarget(self, action: #selector(changeNoteName), for: .touchUpInside)
+        titleButton.addTarget(self, action: #selector(handleTitleTapped), for: .touchUpInside)
         titleButton.frame              = CGRect(x: 0, y: 0, width: 100, height: 40)
         titleButton.backgroundColor    = .clear
         titleButton.titleLabel?.font   = titleButton.titleLabel?.font.bolded
-        noteTitle                      = note.title
         navigationItem.titleView       = titleButton
     }
     
     func setupTextView() {
-        noteBody                 = note.body
-        noteView.autosave        = saveNote
-        noteView.autosaveTimeout = 0.2
         view.addSubview(noteView)
+    }
+    
+    func addObservers() {
+        respondTo(UIResponder.keyboardWillShowNotification,   with: #selector(respondToKeyboardWillShowNotification))
+        respondTo(UIResponder.keyboardWillHideNotification,   with: #selector(respondToKeyboardWillHideNotification))
+        respondTo(UIApplication.didBecomeActiveNotification,  with: #selector(respondToDidBecomeActiveNotification))
+        respondTo(UIApplication.willResignActiveNotification, with: #selector(respondToWillResignActiveNotification))
+        respondTo(UIApplication.willTerminateNotification,    with: #selector(respondToWillTerminateNotification))
     }
 }
 
-// MARK:- Notification observers
+// MARK:- Service function calls
 private extension NoteViewController {
-    func addObservers() {
-        respondTo(notification: UIResponder.keyboardWillShowNotification,   with: #selector(keyboardWillShow))
-        respondTo(notification: UIResponder.keyboardWillHideNotification,   with: #selector(keyboardWillHide))
-        respondTo(notification: UIApplication.didBecomeActiveNotification,  with: #selector(refreshNote))
-        respondTo(notification: UIApplication.willResignActiveNotification, with: #selector(saveNote))
+    @objc func respondToKeyboardWillShowNotification(notification: Notification) {
+        noteViewService.respondToKeyboardWillShowNotification(notification)
     }
     
-    /// Returns size frame of the keyboard
-    func getKeyboardSize(from notification: Notification) -> CGRect? {
-        return (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue
+    @objc func respondToKeyboardWillHideNotification() {
+        noteViewService.respondToKeyboardWillHideNotification()
     }
     
-    /// Shrinks scrollView height such that keyboard does not cover it
-    @objc func keyboardWillShow(notification: Notification) {
-        guard let keyboardSize = getKeyboardSize(from: notification) else { return }
-        var contentInset       = noteView.contentInset
-        contentInset.bottom    = keyboardSize.height
-        noteView.contentInset  = contentInset
-        var frame              = noteView.frame
-        frame.size.height     -= keyboardSize.height
+    @objc func respondToDidBecomeActiveNotification() {
+        noteViewService.respondToDidBecomeActiveNotification()
     }
     
-    /// Restores scrollView height to original height
-    @objc func keyboardWillHide(notification: Notification) {
-        UIView.animate(withDuration: 0.2) { [weak self] in
-            guard let self = self else { return }
-            let contentInset           = UIEdgeInsets.zero
-            self.noteView.contentInset = contentInset
-        }
+    @objc func respondToWillResignActiveNotification() {
+        noteViewService.respondToWillResignActiveNotification()
     }
     
-    @objc func refreshNote() {
-        let refreshedNote = noteService.refresh(note)
-        
-        if refreshedNote != nil {
-            note = refreshedNote!
-        } else {
-            NoteAnalyticsService.shared.publishRefreshNoteFailed(for: note)
-            
-            let alert = UIAlertController(title: "Error", message: "This note is no longer available", preferredStyle: .alert)
-            let ok = UIAlertAction(title: "Dismiss", style: .default) { [weak self] _ in
-                guard let self = self else { return }
-                self.navigationController?.popViewController(animated: true)
-            }
-            
-            alert.addAction(ok)
-            presentedVC.present(alert, animated: true)
-        }
+    @objc func respondToWillTerminateNotification() {
+        noteViewService.respondToWillTerminateNotification()
+    }
+    
+    @objc func handleMenuButtonTapped() {
+        noteViewService.handleMenuButtonTapped()
+    }
+    
+    @objc func handleDeleteButtonTapped() {
+        noteViewService.handleDeleteButtonTapped()
+    }
+    
+    @objc func handleShareButtonTapped() {
+        noteViewService.handleShareButtonTapped()
+    }
+    
+    @objc func handleTitleTapped() {
+        noteViewService.handleTitleButtonTapped()
+    }
+    
+    func handleViewWillDisappear() {
+        noteViewService.respondToViewWillDisapper()
+    }
+    
+    func handleDidLoad() {
+        noteViewService.handleViewDidLoad()
     }
 }

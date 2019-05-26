@@ -16,6 +16,18 @@ public extension UIViewController {
         return presentedViewController ?? self
     }
     
+    func alert(title: String,
+               message: String,
+               buttonText: String = "Dismiss",
+               style: UIAlertAction.Style = .default,
+               handler: ((UIAlertAction)->Void)?) {
+        
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let ok = UIAlertAction(title: buttonText, style: style, handler: handler)
+        alert.addAction(ok)
+        presentedVC.present(alert, animated: true)
+    }
+    
     @inlinable func promptForText(saying message: String,
                                   placeholder: String? = nil,
                                   initialValue: String? = nil,
@@ -44,6 +56,7 @@ public extension UIViewController {
             textField.text = initialValue
             textField.placeholder = placeholder
             textField.clearButtonMode = .whileEditing
+            textField.autocapitalizationType = .sentences
         }
         
         let ok = UIAlertAction(title: onConfirmText, style: .default) { [weak alert] _ in
@@ -139,7 +152,7 @@ public extension UIViewController {
 
 // MARK:- Notification Center
 public extension UIViewController {
-    @inlinable func respondTo(notification: NSNotification.Name?, with selector: Selector) {
+    @inlinable func respondTo(_ notification: NSNotification.Name?, with selector: Selector) {
         NotificationCenter.default.addObserver(self,
                                                selector: selector,
                                                name: notification,

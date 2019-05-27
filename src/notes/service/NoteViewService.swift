@@ -51,6 +51,9 @@ class NoteViewService {
 
 // MARK:- Private API
 private extension NoteViewService {
+    var isDirty: Bool {
+        return noteTitle != note.title || noteBody != note.body
+    }
     
     /// This function writes any changes
     /// that are in memoru out to disk.
@@ -67,14 +70,15 @@ private extension NoteViewService {
         let isClean = noteTitle == note.title && noteBody == ""
         
         if isNew {
-            if isClean && orDelete {
-                noteService.deleteNote(note: note)
-                
+            if isClean {
+                if orDelete {
+                    noteService.deleteNote(note: note)
+                }
             } else {
                 persistChanges()
             }
             
-        } else {
+        } else if isDirty {
             persistChanges()
         }
     }
@@ -84,7 +88,7 @@ private extension NoteViewService {
     func autosaveNote() {
         if isNew {
             manuallySaveNote()
-        } else if noteTitle != note.title || noteBody != note.body {
+        } else if isDirty {
             persistChanges()
         }
     }

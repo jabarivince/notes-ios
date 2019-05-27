@@ -23,6 +23,10 @@ class NoteListViewController: UITableViewController {
     /// Data source for table view
     private var notes = [Note]() {
         didSet {
+            if isSearching && selectedNotes.count == 0 {
+                shareButtomItem.isEnabled = false
+            }
+            
             editButtonItem.isEnabled = !notes.isEmpty
             determineAndSetBackground()
         }
@@ -227,6 +231,13 @@ extension NoteListViewController: UISearchBarDelegate {
         getNotes()
     }
     
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        if isEditing && atLeastOneNoteSelected {
+            tableView.deselectAllRows()
+        }
+        return true
+    }
+    
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         isSearching = true
     }
@@ -236,7 +247,7 @@ extension NoteListViewController: UISearchBarDelegate {
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        isSearching = false
+        isSearching                 = false
         searchBar.text              = nil
         searchBar.showsCancelButton = false
         getNotes()
@@ -368,6 +379,8 @@ private extension NoteListViewController {
     }
     
     var selectedNotes: Set<Note> {
+        guard atLeastOneNoteSelected else { return [] }
+        
         return Set(selectedIndices.map { notes[$0.row] })
     }
     

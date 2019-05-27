@@ -132,7 +132,7 @@ private extension NoteListViewController {
         switch state {
         case .noNotesAvailable, .noNotesFound:
             let backgroundView        = NoteListBackgroundView(frame: tableView.frame)
-            backgroundView.tapHandler   = openNewNote
+            backgroundView.tapHandler = openNewNote
             backgroundView.state      = state
             tableView.backgroundView  = backgroundView
             tableView.separatorStyle  = .none

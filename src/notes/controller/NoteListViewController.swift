@@ -81,6 +81,7 @@ class NoteListViewController: UITableViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setToolbarHidden(true, animated: false)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         searchController.dismiss(animated: false, completion: nil)
         removeObservers()
     }

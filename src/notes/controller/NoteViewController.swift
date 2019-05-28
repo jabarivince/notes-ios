@@ -11,9 +11,9 @@ import notesServices
 
 // MARK:- UIViewController
 class NoteViewController: UIViewController {
-    private let noteViewService: NoteViewService
-    internal let noteView: NoteView
-    internal let titleButton: UIButton
+    private  let noteViewService: NoteViewService
+    internal let noteView:        NoteView
+    internal let titleButton:     UIButton
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()

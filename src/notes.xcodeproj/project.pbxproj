@@ -10,6 +10,8 @@
 		0C0244B0228910BD00DE45EC /* NotesDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0C0244AE228910BD00DE45EC /* NotesDataModel.xcdatamodeld */; };
 		0C0244B2228D183300DE45EC /* CGPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0244B1228D183300DE45EC /* CGPoint.swift */; };
 		0C06CE39229B700B00915D42 /* NoteListViewService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C06CE38229B700B00915D42 /* NoteListViewService.swift */; };
+		0C06CE4F229CA89F00915D42 /* NoteListViewService+State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C06CE4E229CA89F00915D42 /* NoteListViewService+State.swift */; };
+		0C06CE51229CA94D00915D42 /* NoteListViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C06CE50229CA94D00915D42 /* NoteListViewState.swift */; };
 		0C6F3747225B1D740060EC2B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0C6F3746225B1D740060EC2B /* GoogleService-Info.plist */; };
 		0C8EBAD6228D1D16006DC85A /* ExtendedTapTargetLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8EBAD5228D1D16006DC85A /* ExtendedTapTargetLabelView.swift */; };
 		0C8EBAD8228D2C74006DC85A /* NotePersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8EBAD7228D2C74006DC85A /* NotePersistenceService.swift */; };
@@ -128,6 +130,8 @@
 		0C0244AF228910BD00DE45EC /* NotesDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = NotesDataModel.xcdatamodel; sourceTree = "<group>"; };
 		0C0244B1228D183300DE45EC /* CGPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPoint.swift; sourceTree = "<group>"; };
 		0C06CE38229B700B00915D42 /* NoteListViewService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListViewService.swift; sourceTree = "<group>"; };
+		0C06CE4E229CA89F00915D42 /* NoteListViewService+State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NoteListViewService+State.swift"; sourceTree = "<group>"; };
+		0C06CE50229CA94D00915D42 /* NoteListViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListViewState.swift; sourceTree = "<group>"; };
 		0C4A268C2285330900E1A9B2 /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		0C4A268F22924F2900E1A9B2 /* NoteTableViewCellState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTableViewCellState.swift; sourceTree = "<group>"; };
 		0C4A26922292555900E1A9B2 /* NoteTableViewCellStateTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTableViewCellStateTest.swift; sourceTree = "<group>"; };
@@ -234,6 +238,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C06CE4D229CA86C00915D42 /* state */ = {
+			isa = PBXGroup;
+			children = (
+				0C06CE4E229CA89F00915D42 /* NoteListViewService+State.swift */,
+				0C06CE50229CA94D00915D42 /* NoteListViewState.swift */,
+			);
+			path = state;
+			sourceTree = "<group>";
+		};
 		0C4A268B228532FA00E1A9B2 /* extension */ = {
 			isa = PBXGroup;
 			children = (
@@ -437,6 +450,7 @@
 		0CFAB6D92246CC75004AA4C7 /* notes */ = {
 			isa = PBXGroup;
 			children = (
+				0C06CE4D229CA86C00915D42 /* state */,
 				0CBA10E2227EBEA900F2509C /* view */,
 				0CDCD9F02299063400554CB4 /* service */,
 				0CE0BDA72246F707001C6401 /* controller */,
@@ -770,6 +784,7 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-notes/Pods-notes-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/ReSwift/ReSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -777,6 +792,7 @@
 			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -839,7 +855,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C06CE51229CA94D00915D42 /* NoteListViewState.swift in Sources */,
 				0CFAB6DD2246CC75004AA4C7 /* NoteListViewController.swift in Sources */,
+				0C06CE4F229CA89F00915D42 /* NoteListViewService+State.swift in Sources */,
 				0C06CE39229B700B00915D42 /* NoteListViewService.swift in Sources */,
 				0CAB8D87228287AB00D61DDD /* NoteTableViewCell.swift in Sources */,
 				0CDCD9F22299064800554CB4 /* NoteViewService.swift in Sources */,

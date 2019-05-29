@@ -67,10 +67,8 @@ private extension NoteViewService {
     /// of this function is to delete a newly created unmodified
     /// note when closing it. In all other cases, use autosaveNote().
     func manuallySaveNote(orDelete: Bool = false) {
-        let isClean = noteTitle == note.title && noteBody == ""
-        
         if isNew {
-            if isClean {
+            if noteTitle == note.title && noteBody == "" {
                 if orDelete {
                     noteService.deleteNote(note: note)
                 }

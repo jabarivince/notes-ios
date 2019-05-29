@@ -10,6 +10,8 @@ import UIKit
 import notesServices
 
 class NoteTableViewCell: UITableViewCell {
+    static let cellId = "cell"
+    
     var state: NoteTableViewCellState = .empty {
         didSet {
             textLabel?.text = state.text

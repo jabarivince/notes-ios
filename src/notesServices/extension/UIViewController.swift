@@ -152,6 +152,13 @@ public extension UIViewController {
 
 // MARK:- Notification Center
 public extension UIViewController {
+    @inlinable func respondTo(_ notification: NSNotification.Name?, with selector: Selector, observer: Any) {
+        NotificationCenter.default.addObserver(observer,
+                                               selector: selector,
+                                               name: notification,
+                                               object: nil)
+    }
+    
     @inlinable func respondTo(_ notification: NSNotification.Name?, with selector: Selector) {
         NotificationCenter.default.addObserver(self,
                                                selector: selector,

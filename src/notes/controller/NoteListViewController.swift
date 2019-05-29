@@ -11,12 +11,16 @@ import notesServices
 
 class NoteListViewController: UITableViewController {
     let searchController: UISearchController
-    let addButtomItem:    UIBarButtonItem
-    let shareButtomItem:  UIBarButtonItem
-    let trashButton:      UIBarButtonItem
-    let selectAllButton:  UIBarButtonItem
-    let spacer:           UIBarButtonItem
-    let viewService:      NoteListViewService
+    private let addButtomItem:    UIBarButtonItem
+    private let shareButtomItem:  UIBarButtonItem
+    private let trashButton:      UIBarButtonItem
+    private let selectAllButton:  UIBarButtonItem
+    private let spacer:           UIBarButtonItem
+    private let delegate:         NoteListViewService
+    
+    var searchText: String? {
+        return searchController.searchBar.text
+    }
     
     var state: NoteListViewState! {
         didSet {
@@ -25,11 +29,9 @@ class NoteListViewController: UITableViewController {
             tableView.isScrollEnabled = state.scrollingEnabled
             tableView.separatorStyle  = state.seperatorStyle
             editButtonItem.title      = state.editButtonTitle
-            selectAllButton.title     = state.selectButtonTitle
-            trashButton.isEnabled     = state.trashButtonIsEnabled
-            shareButtomItem.isEnabled = state.shareButtonIsEnabled
             navigationController?.setToolbarHidden(state.toolbarIsHidden, animated: true)
             
+            // Right bar buttom
             switch state.rightBarButtonState {
             case .add:
                 navigationItem.rightBarButtonItem = addButtomItem
@@ -37,16 +39,12 @@ class NoteListViewController: UITableViewController {
                 navigationItem.rightBarButtonItem = shareButtomItem
             }
             
+            // Enable or disable buttons
+            selectAllButton.title     = state.selectButtonTitle
+            trashButton.isEnabled     = state.trashButtonIsEnabled
+            shareButtomItem.isEnabled = state.shareButtonIsEnabled
             navigationItem.rightBarButtonItem?.isEnabled = state.rightBarButtonIsEnabled
-            
-            switch state.selectHandler {
-            case .selectAll:
-                tableView.selectAllRows()
-            case .deselectAll:
-                tableView.deselectAllRows()
-            case .doNothing:
-                break
-            }
+            navigationItem.leftBarButtonItem?.isEnabled  = state.leftBarButtonIsEnabled
         }
     }
     
@@ -57,7 +55,7 @@ class NoteListViewController: UITableViewController {
         trashButton      = UIBarButtonItem(barButtonSystemItem: .trash,         target: nil, action: nil)
         spacer           = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         searchController = UISearchController(searchResultsController: nil)
-        viewService      = NoteListViewService.shared
+        delegate      = NoteListViewService.shared
         super.init(style: .plain)
     }
     
@@ -67,7 +65,7 @@ class NoteListViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewService.controller = self
+        delegate.controller = self
         setupTableView()
         setupNavBar()
         setupTargets()
@@ -78,7 +76,7 @@ class NoteListViewController: UITableViewController {
         super.viewWillAppear(animated)
         navigationController?.setToolbarHidden(true, animated: true)
         addObservers()
-        viewService.getNotes()
+        delegate.viewWillAppear()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -100,12 +98,17 @@ class NoteListViewController: UITableViewController {
     
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
-        viewService.setEditing(editing, animated: animated)
+        delegate.setEditing(editing, animated: animated)
     }
     
     func addObservers() {
-        respondTo(UIApplication.didBecomeActiveNotification,       with: #selector(respondToDidBecomeActiveNotification))
-        respondTo(UIApplication.significantTimeChangeNotification, with: #selector(respondToSignificantTimeChangeNotification))
+        respondTo(UIApplication.didBecomeActiveNotification,
+                  with: #selector(delegate.respondToDidBecomeActiveNotification),
+                  observer: delegate)
+        
+        respondTo(UIApplication.significantTimeChangeNotification,
+                  with: #selector(delegate.respondToSignificantTimeChangeNotification),
+                  observer: delegate)
     }
 }
 
@@ -127,13 +130,14 @@ extension NoteListViewController {
             return view
         }()
         
-        /// Add a footer to satisfy UITableView height calculation
+        /// Add a footer to satisfy UITableView height calculation.
+        /// This way we avoid having empty white space at the bottom
         let footerView = UIView(frame: .zero)
         
         /// Search bar
         searchController.dimsBackgroundDuringPresentation     = false
         searchController.hidesNavigationBarDuringPresentation = false
-        searchController.searchBar.delegate                   = viewService
+        searchController.searchBar.delegate                   = delegate
         searchController.searchBar.returnKeyType              = .done
         searchController.searchBar.sizeToFit()
         
@@ -143,8 +147,8 @@ extension NoteListViewController {
         tableView.allowsMultipleSelectionDuringEditing = true
         tableView.tableHeaderView                      = headerView
         tableView.tableFooterView                      = footerView
-        tableView.delegate                             = viewService
-        tableView.dataSource                           = viewService
+        tableView.delegate                             = delegate
+        tableView.dataSource                           = delegate
         tableView.register(NoteTableViewCell.self, forCellReuseIdentifier: NoteTableViewCell.cellId)
     }
     
@@ -153,14 +157,14 @@ extension NoteListViewController {
         trashButton.tintColor     = .red
         shareButtomItem.isEnabled = false
         trashButton.isEnabled     = false
-        addButtomItem.target      = self
-        shareButtomItem.target    = self
-        trashButton.target        = self
-        selectAllButton.target    = self
-        addButtomItem.action      = #selector(handleAddButtonTapped)
-        shareButtomItem.action    = #selector(handleShareButtonTapped)
-        trashButton.action        = #selector(handleTrashButtonTapped)
-        selectAllButton.action    = #selector(handleSelectAllButtonTapped)
+        addButtomItem.target      = delegate
+        shareButtomItem.target    = delegate
+        trashButton.target        = delegate
+        selectAllButton.target    = delegate
+        addButtomItem.action      = #selector(delegate.handleAddButtonTapped)
+        shareButtomItem.action    = #selector(delegate.handleShareButtonTapped)
+        trashButton.action        = #selector(delegate.handleTrashButtonTapped)
+        selectAllButton.action    = #selector(delegate.handleSelectAllButtonTapped)
         toolbarItems              = [selectAllButton, spacer, trashButton]
     }
     
@@ -168,32 +172,5 @@ extension NoteListViewController {
         addButtomItem.accessibilityLabel   = "Create a new note"
         shareButtomItem.accessibilityLabel = "Share current selection"
         trashButton.accessibilityLabel     = "Delete current selection"
-    }
-}
-
-// MARK:- Button taps / notification handlers
-extension NoteListViewController {
-    @objc func handleAddButtonTapped() {
-        viewService.openNewNote()
-    }
-    
-    @objc func handleShareButtonTapped() {
-        viewService.sendMultipleNotes()
-    }
-    
-    @objc func handleTrashButtonTapped() {
-        viewService.deleteSelectedNotes()
-    }
-    
-    @objc func handleSelectAllButtonTapped() {
-        viewService.selectAllOrDeselectAllNotes()
-    }
-    
-    @objc func respondToDidBecomeActiveNotification() {
-        viewService.getNotes()
-    }
-    
-    @objc func respondToSignificantTimeChangeNotification() {
-        viewService.refreshCells()
     }
 }

@@ -9,27 +9,23 @@
 import UIKit
 
 struct NoteListViewState {
-    let trashButtonIsEnabled: Bool
-    let shareButtonIsEnabled: Bool
-    let toolbarIsHidden: Bool
-    let title: String
-    let editButtonTitle: String
-    let selectButtonTitle: String
-    let backgroundView: UIView?
-    let scrollingEnabled: Bool
-    let seperatorStyle: UITableViewCell.SeparatorStyle
-    let rightBarButtonState: RightBarButtonState
-    let rightBarButtonIsEnabled: Bool
-    let selectHandler: SelectHandler
-    
-    enum SelectHandler {
-        case doNothing
-        case selectAll
-        case deselectAll
-    }
+    var trashButtonIsEnabled    = false
+    var shareButtonIsEnabled    = false
+    var toolbarIsHidden         = true
+    var title                   = ""
+    var editButtonTitle         = ""
+    var selectButtonTitle       = ""
+    var scrollingEnabled        = true
+    var seperatorStyle          = UITableViewCell.SeparatorStyle.none
+    var rightBarButtonState     = RightBarButtonState.add
+    var rightBarButtonIsEnabled = false
+    var leftBarButtonIsEnabled  = true
+    var backgroundView: NoteListBackgroundView? = nil
     
     enum RightBarButtonState {
         case add
         case share
     }
+
+    static let `default` = NoteListViewState()
 }

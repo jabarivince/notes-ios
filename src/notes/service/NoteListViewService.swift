@@ -10,115 +10,69 @@ import UIKit
 import notesServices
 
 class NoteListViewService: NSObject {
+    static let shared       = NoteListViewService()
+    private let noteService = NoteService.shared
+    private var viewState   = NoteListViewState.default
+    
     weak var controller: NoteListViewController! {
         didSet {
             state = .default
         }
     }
     
-    static let shared       = NoteListViewService()
-    private let noteService = NoteService.shared
-    
     private var state: State! {
         didSet {
-            let trashButtonIsEnabled: Bool
-            let shareButtonIsEnabled: Bool
-            let toolbarIsHidden:      Bool
-            let title:                String
-            let editButtonTitle:      String
-            let selectButtonTitle:    String
-            let scrollingIsEnabled:   Bool
-            let seperatorStyle:       UITableViewCell.SeparatorStyle
-            let backgroundView:       NoteListBackgroundView?
-            let rightBarButtonState:  NoteListViewState.RightBarButtonState
-            let rightBarButtonIsEnabled: Bool
-            let selectHandler:        NoteListViewState.SelectHandler
-            
-            // Table state
-            switch state.tableState {
-            case .default:
-                editButtonTitle         = "Select"
-                rightBarButtonState     = .add
-                rightBarButtonIsEnabled = true
-                
-            case .editing:
-                editButtonTitle         = "Done"
-                rightBarButtonState     = .share
-                rightBarButtonIsEnabled = false
-                
-            case .searching:
-                editButtonTitle         = controller.state.editButtonTitle
-                rightBarButtonState     = controller.state.rightBarButtonState
-                rightBarButtonIsEnabled = true
-                
-            case .searchingAndEditing:
-                editButtonTitle         = "Done"
-                rightBarButtonIsEnabled = false
-                rightBarButtonState     = controller.state.rightBarButtonState
-            }
-            
             // Note selection
-            switch state.selectionState {
-            case .none:
-                trashButtonIsEnabled = false
-                shareButtonIsEnabled = false
-                toolbarIsHidden      = true
+            if !controller.isEditing || (controller.isEditing && zeroNotesSelected) {
+                viewState.trashButtonIsEnabled = false
+                viewState.shareButtonIsEnabled = false
+                viewState.toolbarIsHidden      = true
+                viewState.title                = "The Note App"
+                viewState.selectButtonTitle    = "Select all"
                 
-            case .one, .many:
-                trashButtonIsEnabled = true
-                shareButtonIsEnabled = true
-                toolbarIsHidden      = false
-            }
-            
-            // Select / deselect
-            switch state.tableViewSelectionHandler {
-            case .select:
-                selectHandler = .selectAll
+                if controller.isEditing {
+                    viewState.editButtonTitle         = "Done"
+                    viewState.rightBarButtonState     = .share
+                    viewState.rightBarButtonIsEnabled = false
+                } else {
+                    viewState.editButtonTitle         = "Select"
+                    viewState.rightBarButtonState     = .add
+                    viewState.rightBarButtonIsEnabled = true
+                }
                 
-            case .deselect:
-                selectHandler = .deselectAll
-                
-            case .none:
-                selectHandler = .doNothing
+            } else {
+                viewState.trashButtonIsEnabled    = true
+                viewState.shareButtonIsEnabled    = true
+                viewState.toolbarIsHidden         = false
+                viewState.title                   = "\(numberOfSelectedRows) Selected"
+                viewState.selectButtonTitle       = "Unselect \(numberOfSelectedRows) \(singularOrPlural)"
+                viewState.editButtonTitle         = "Done"
+                viewState.rightBarButtonState     = .share
+                viewState.rightBarButtonIsEnabled = true
             }
             
             // Background
-            switch state.backgroundState {
-            case .noNotesAvailable, .noNotesFound:
-                backgroundView             = NoteListBackgroundView(frame: controller.tableView.frame)
-                backgroundView!.tapHandler = openNewNote
-                backgroundView!.state      = state.backgroundState
-                scrollingIsEnabled         = false
-                seperatorStyle             = .none
+            if state.notes.isEmpty {
+                viewState.backgroundView             = NoteListBackgroundView(frame: controller.tableView.frame)
+                viewState.backgroundView!.tapHandler = handleAddButtonTapped
+                viewState.seperatorStyle             = .none
+                viewState.scrollingEnabled           = false
+                viewState.leftBarButtonIsEnabled     = false
                 
-            default:
-                backgroundView     = nil
-                scrollingIsEnabled = true
-                seperatorStyle     = .singleLine
+                if state.isSearching && !(controller.searchText ?? "").isEmpty {
+                    viewState.backgroundView!.state = .noNotesFound
+                } else {
+                    viewState.backgroundView!.state = .noNotesAvailable
+                }
+            } else {
+                viewState.seperatorStyle         = .singleLine
+                viewState.backgroundView         = nil
+                viewState.scrollingEnabled       = true
+                viewState.leftBarButtonIsEnabled = true
             }
-            
-            // Select all button
-            switch state.selectAllButtonState {
-            case .unselected:
-                title             = "The Note App"
-                selectButtonTitle = "Select all"
-            case .selected:
-                title = "\(numberOfSelectedRows) Selected"
-                selectButtonTitle = "Unselect \(numberOfSelectedRows) \(singularOrPlural)"
-            }
-            
-            controller.state = NoteListViewState(trashButtonIsEnabled: trashButtonIsEnabled,
-                                                 shareButtonIsEnabled: shareButtonIsEnabled,
-                                                 toolbarIsHidden: toolbarIsHidden,
-                                                 title: title,
-                                                 editButtonTitle: editButtonTitle,
-                                                 selectButtonTitle: selectButtonTitle,
-                                                 backgroundView: backgroundView,
-                                                 scrollingEnabled: scrollingIsEnabled,
-                                                 seperatorStyle: seperatorStyle,
-                                                 rightBarButtonState: rightBarButtonState,
-                                                 rightBarButtonIsEnabled: rightBarButtonIsEnabled,
-                                                 selectHandler: selectHandler)
+      
+            // Trigger view refresh in view controller
+            controller.state = viewState
         }
     }
     
@@ -126,20 +80,15 @@ class NoteListViewService: NSObject {
 }
 
 extension NoteListViewService {
+    func viewWillAppear() {
+        getNotes()
+    }
+    
     func setEditing(_ editing: Bool, animated: Bool) {
-        switch state.tableState {
-        case .editing, .default:
-            state.tableState = editing ? .editing : .default
-        case .searching, .searchingAndEditing:
-            state.tableState = editing ? .searchingAndEditing : .searching
-        }
+        refreshState()
     }
     
-    func refreshCells() {
-        controller.tableView.reloadData()
-    }
-    
-    func deleteSelectedNotes() {
+    @objc func handleTrashButtonTapped() {
         guard atLeastOneNoteSelected else { return }
         
         let thisOrThese   = moreThanOneNoteSelected ? "these" : "this"
@@ -155,29 +104,34 @@ extension NoteListViewService {
         }
     }
     
-    func sendMultipleNotes() {
+    @objc func handleShareButtonTapped() {
         guard atLeastOneNoteSelected else { return }
         noteService.sendNotes(selectedNotes, viewController: controller)
     }
     
-    func openNewNote() {
+    @objc func handleAddButtonTapped() {
         let note = noteService.createNote(with: nil)
         openNote(note, asNew: true)
     }
     
-    func getNotes() {
-        state.notes = noteService.getAllNotes(containing: controller.searchController.searchBar.text)
+    @objc func handleSelectAllButtonTapped() {
+        guard controller.isEditing else { return }
+        
+        if atLeastOneNoteSelected {
+            controller.tableView.deselectAllRows()
+        } else {
+            controller.tableView.selectAllRows()
+        }
+        
+        refreshState()
+    }
+    
+    @objc func respondToDidBecomeActiveNotification() {
+        getNotes()
+    }
+    
+    @objc func respondToSignificantTimeChangeNotification() {
         refreshCells()
-    }
-    
-    func openNote(_ note: Note, asNew: Bool) {
-        let noteController = NoteViewController(note: note, isNew: asNew)
-        controller.navigationController?.pushViewController(noteController, animated: true)
-    }
-    
-    func selectAllOrDeselectAllNotes() {
-        guard state.isEditing else { return }
-        state.tableViewSelectionHandler = atLeastOneNoteSelected ? .deselect : .select
     }
 }
 
@@ -203,30 +157,14 @@ extension NoteListViewService: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        if zeroNotesSelected {
-            state.selectionState       = .none
-            state.selectAllButtonState = .unselected
-        } else if moreThanOneNoteSelected {
-            state.selectionState       = .many
-            state.selectAllButtonState = .selected
-        } else {
-            state.selectionState       = .one
-            state.selectAllButtonState = .selected
-        }
+        refreshState()
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         controller.searchController.searchBar.resignFirstResponder()
         
-        if state.isEditing {
-            state.selectAllButtonState = .selected
-            
-            if numberOfSelectedRows > 1 {
-                state.selectionState = .many
-            } else {
-                state.selectionState = .one
-            }
-            
+        if controller.isEditing {
+            refreshState()
         } else {
             openNote(state.notes[indexPath.row], asNew: false)
         }
@@ -240,26 +178,44 @@ extension NoteListViewService : UISearchBarDelegate {
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        if state.isEditing && atLeastOneNoteSelected {
-            state.tableViewSelectionHandler = .deselect
+        if controller.isEditing && atLeastOneNoteSelected {
+            controller.tableView.deselectAllRows()
         }
+        
         return true
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        if state.tableState == .editing {
-            state.tableState = .searchingAndEditing
-        } else {
-            state.tableState = .searching
-        }
+        state.isSearching = true
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        if state.tableState == .editing {
-            state.tableState = .default
-        } else if state.tableState == .searchingAndEditing {
-            state.tableState = .searching
-        }
+        state.isSearching = false
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        state.isSearching = false
+        controller.setEditing(false, animated: true)
+    }
+}
+
+private extension NoteListViewService {
+    func refreshState() {
+        state = { state }()
+    }
+    
+    func refreshCells() {
+        controller.tableView.reloadData()
+    }
+    
+    func getNotes() {
+        state.notes = noteService.getAllNotes(containing: controller.searchText)
+        refreshCells()
+    }
+    
+    func openNote(_ note: Note, asNew: Bool) {
+        let noteController = NoteViewController(note: note, isNew: asNew)
+        controller.navigationController?.pushViewController(noteController, animated: true)
     }
 }
 
@@ -272,8 +228,6 @@ private extension NoteListViewService {
     var numberOfSelectedRows: Int {
         return selectedIndices.count
     }
-    
-    // TODO: PUT THESE IN AN ENUM none, one, many
     
     var zeroNotesSelected: Bool {
         return numberOfSelectedRows == 0

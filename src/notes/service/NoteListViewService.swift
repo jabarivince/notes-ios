@@ -204,6 +204,9 @@ extension NoteListViewService: UITableViewDelegate, UITableViewDataSource {
         if controller.isEditing {
             refreshState()
         } else {
+            // We set this to avoid already presenting issues
+            // https://stackoverflow.com/questions/31487824/error-application-tried-to-present-modal-view-controller-on-itself-while-activ
+            controller.searchController.isActive = false
             openNote(state.notes[indexPath.row], asNew: false)
         }
     }

@@ -102,6 +102,7 @@ private extension NoteViewController {
     }
     
     @objc func respondToDidBecomeActiveNotification() {
+        navigationController?.setToolbarHidden(false, animated: false)
         noteViewService.respondToDidBecomeActiveNotification()
     }
     

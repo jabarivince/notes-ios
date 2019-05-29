@@ -20,6 +20,7 @@ struct NoteListViewState {
     var rightBarButtonState     = RightBarButtonState.add
     var rightBarButtonIsEnabled = false
     var leftBarButtonIsEnabled  = true
+    var selectButtonIsEnabled   = true
     var backgroundView: NoteListBackgroundView? = nil
     
     enum RightBarButtonState {

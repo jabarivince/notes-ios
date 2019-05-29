@@ -43,6 +43,7 @@ class NoteListViewController: UITableViewController {
             selectAllButton.title     = state.selectButtonTitle
             trashButton.isEnabled     = state.trashButtonIsEnabled
             shareButtomItem.isEnabled = state.shareButtonIsEnabled
+            selectAllButton.isEnabled = state.selectButtonIsEnabled
             navigationItem.rightBarButtonItem?.isEnabled = state.rightBarButtonIsEnabled
             navigationItem.leftBarButtonItem?.isEnabled  = state.leftBarButtonIsEnabled
         }
@@ -98,7 +99,7 @@ class NoteListViewController: UITableViewController {
     
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
-        delegate.setEditing(editing, animated: animated)
+        delegate.setEditing()
     }
     
     func addObservers() {

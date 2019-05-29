@@ -20,9 +20,20 @@ class NoteListViewService: NSObject {
         }
     }
     
+    /// The state object contains all of the state of
+    /// the service. This massive didSet we can think about
+    /// as way of always keeping the view up to date. Whenever
+    /// events are dispatched from the view, their delegates
+    /// just modify / refresh the state. At the end of this
+    /// didSet, the controller viewState object is modified,
+    /// causing the didSet in the view controller to update the
+    /// view. This approach allows interactions to flow in one direction.
+    /// The view controller calls the service, the service updates
+    /// the state, and the state is sent back to the view controller.
+    /// We can think about it like a refresh cycle.
     private var state: State! {
         didSet {
-            // Note selection
+            // Either we are not editing or we just started editing
             if !controller.isEditing || (controller.isEditing && zeroNotesSelected) {
                 viewState.trashButtonIsEnabled = false
                 viewState.shareButtonIsEnabled = false
@@ -34,12 +45,15 @@ class NoteListViewService: NSObject {
                     viewState.editButtonTitle         = "Done"
                     viewState.rightBarButtonState     = .share
                     viewState.rightBarButtonIsEnabled = false
+                    viewState.toolbarIsHidden         = false
                 } else {
                     viewState.editButtonTitle         = "Select"
                     viewState.rightBarButtonState     = .add
                     viewState.rightBarButtonIsEnabled = true
+                    viewState.toolbarIsHidden         = true
                 }
                 
+            // We have already selected at least 1 note
             } else {
                 viewState.trashButtonIsEnabled    = true
                 viewState.shareButtonIsEnabled    = true
@@ -51,7 +65,7 @@ class NoteListViewService: NSObject {
                 viewState.rightBarButtonIsEnabled = true
             }
             
-            // Background
+            // No notes are on screen
             if state.notes.isEmpty {
                 viewState.backgroundView             = NoteListBackgroundView(frame: controller.tableView.frame)
                 viewState.backgroundView!.tapHandler = handleAddButtonTapped
@@ -64,11 +78,23 @@ class NoteListViewService: NSObject {
                 } else {
                     viewState.backgroundView!.state = .noNotesAvailable
                 }
+                
+            // Notes are on screen so remove background
             } else {
                 viewState.seperatorStyle         = .singleLine
                 viewState.backgroundView         = nil
                 viewState.scrollingEnabled       = true
                 viewState.leftBarButtonIsEnabled = true
+            }
+            
+            // Select all button is disabled when editing,
+            // searching, and no notes are found
+            if controller.isEditing && state.isSearching && state.notes.isEmpty {
+                viewState.selectButtonIsEnabled = false
+                
+            // Otherwise it is always enabled
+            } else {
+                viewState.selectButtonIsEnabled = true
             }
       
             // Trigger view refresh in view controller
@@ -79,12 +105,34 @@ class NoteListViewService: NSObject {
     override private init() {}
 }
 
+// MARK:- Public non-state-affecting functions
+// All functions that are publically exposed to
+// the controller that DO NOT modify the state.
+// That means, they should not in anyway trigger
+// the didSet on the state.
+extension NoteListViewService {
+    @objc func handleShareButtonTapped() {
+        guard atLeastOneNoteSelected else { return }
+        noteService.sendNotes(selectedNotes, viewController: controller)
+    }
+    
+    @objc func handleAddButtonTapped() {
+        let note = noteService.createNote(with: nil)
+        openNote(note, asNew: true)
+    }
+}
+
+// MARK:- Public state-affecting functions
+// All functions in here respond to some UI event and must
+// trigger the didSet on the state by either modifying the
+// state, or manually calling the refreshState() function.
+// This way we trigger a view refresh within the view controller.
 extension NoteListViewService {
     func viewWillAppear() {
         getNotes()
     }
     
-    func setEditing(_ editing: Bool, animated: Bool) {
+    func setEditing() {
         refreshState()
     }
     
@@ -102,16 +150,6 @@ extension NoteListViewService {
             self.controller.setEditing(false, animated: true)
             self.getNotes()
         }
-    }
-    
-    @objc func handleShareButtonTapped() {
-        guard atLeastOneNoteSelected else { return }
-        noteService.sendNotes(selectedNotes, viewController: controller)
-    }
-    
-    @objc func handleAddButtonTapped() {
-        let note = noteService.createNote(with: nil)
-        openNote(note, asNew: true)
     }
     
     @objc func handleSelectAllButtonTapped() {
@@ -200,6 +238,10 @@ extension NoteListViewService : UISearchBarDelegate {
 }
 
 private extension NoteListViewService {
+    /// Manually triggers the didSet on the state.
+    /// This is used merely to manually trigger a view
+    /// even when there is no new data to send to
+    /// the state object.
     func refreshState() {
         state = { state }()
     }

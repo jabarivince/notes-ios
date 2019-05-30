@@ -52,13 +52,11 @@ PODS:
     - nanopb/encode (= 0.3.901)
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
-  - ReSwift (4.1.1)
 
 DEPENDENCIES:
   - Crashlytics (~> 3.12.0)
   - Fabric (~> 1.9.0)
   - Firebase/Core
-  - ReSwift
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -71,7 +69,6 @@ SPEC REPOS:
     - GoogleAppMeasurement
     - GoogleUtilities
     - nanopb
-    - ReSwift
 
 SPEC CHECKSUMS:
   Crashlytics: 07fb167b1694128c1c9a5a5cc319b0e9c3ca0933
@@ -83,8 +80,7 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: 7f028ea162b72c8f326daec74afc95d94f7a47d6
   GoogleUtilities: f1faafc033ea203adf1783ce00af455bb99d0e5b
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
-  ReSwift: d925be0033558f55bd73d92869961230dfe19d52
 
-PODFILE CHECKSUM: a9b79681e32e0bbb6d8780c96d81d4937a44e213
+PODFILE CHECKSUM: f0e519b5fd05a295fb82c119546b02879434ba58
 
 COCOAPODS: 1.6.1
